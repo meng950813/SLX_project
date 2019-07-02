@@ -1,18 +1,5 @@
 var myChart = echarts.init(document.getElementById('container'));
 
-var categories = [];
-for (var i = 0; i < 6; i++) {
-    categories[i] = {
-        name: '社区' + (i + 1)
-    };
-}
-graph.nodes.forEach(function (node) {
-    node.itemStyle = null;
-    node.category = node.code;
-    // Use random x, y
-    node.x = node.y = null;
-    node.draggable = true;
-});
 
 graph_option = {
     tooltip: {
@@ -29,20 +16,16 @@ graph_option = {
     },
 
     // 图例
-    legend: [{
-        // selectedMode: 'single',
-        data: categories.map(function (a) {
-            return a.name;
-        })
-    }],
+    legend: [
+    ],
     animation: true,
     series : [
         {
             type: 'graph',
             layout: 'force',
-            data: graph.nodes,
-            links: graph.links,
-            categories: categories,
+            data: [],
+            links: [],
+            categories: [],
 
             // // 边的长度范围
             // edgeLength: [10, 50],
@@ -100,9 +83,55 @@ function reload_graph(data){
         data: categories.map(function (a) {
             return a.name;
         })
-    }],
+    }];
     myChart.setOption(graph_option);
 }
 
 myChart.setOption(graph_option);
 
+//添加点击跳转事件
+myChart.on('click', function (params) {
+    //仅限节点类型
+    if (params.dataType != 'node')
+        return;
+    //页面
+    window.open('/scholar/'+params.data.teacherId);
+});
+
+function format_data(data)
+{
+    let back_data = {
+        "nodes" : [],
+        "links" : [],
+        "community" : data['community_data']
+    };
+
+    let nodes = data['nodes'];
+    for(let index in nodes)
+    {
+        let node = nodes[index];
+        node['label'] = node['name'];
+        node['name'] = node['id'];
+        //node['symbolSize'] = parseInt(node['centrality'] * 20 + 5);
+        node['category'] = node['class'] - 1;
+        delete node["id"];
+        delete node["class"];
+        back_data["nodes"].push(node);
+    }
+    let links = data['edges'];
+    for(let index in links)
+    {
+        let link = links[index];
+        link["value"] = link["weight"];
+        delete link["weight"];
+        back_data['links'].push(link)
+    }
+
+    return back_data;
+}
+
+$.get('/static/relation_data/back.json').done(function (data) {
+    let graph = format_data(data);
+    console.log(graph);
+    reload_graph(graph);
+});
