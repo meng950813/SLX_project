@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>个人中心-专家检索</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="../static/css/bootsrap_v4.min.css">
+    <link rel="stylesheet" href="../static/css/glyphicon.css">
+    <link rel="stylesheet" href="../static/css/personal.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts.min.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="navbar-header">
+            <a class="navbar-brand thumbnail" href="#">Logo</a>
+        </div>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarColor01">
+            <!-- {% if username %} -->
+            <ul class="navbar-nav ml-auto">
+                <li><a class="nav-item nav-link " href="#">日程安排</a></li>
+                <li><a class="nav-item nav-link " href="#">拜访记录</a></li>
+                <li><a class="nav-item nav-link " href="#">消息提醒 <span class="badge" style="background-color: red; color: white">7</span></a></li>
+                <li><a class="nav-item nav-link " >{{ username }}</a></li>
+                <li><a class="nav-item nav-link active" >个人中心</a></li>
+                <li><a class="nav-item nav-link " href="#">注销</a></li>
+            <!-- </ul> -->
+            <!-- {% else %} -->
+            <!-- <ul class="navbar-nav ml-auto"> -->
+                <!-- <li class="clearfix"><a class="nav-item nav-link active float-right" href="#">注册</a></li>
+                <li class="clearfix"><a class="nav-item nav-link active float-right" href="#">登录</a></li> -->
+            </ul>
+        </div>
+    </nav>
+
+    <!-- <svg id="container">
+        <g id="network-graph"></g>
+    </svg> -->
+
+    <div id="container"></div>
+
+    <div class="container-fluid">
+        <div class="ml-3 mr-3 mt-3 mb-3">
+            <select id="select-college">
+                <option>某一学校</option>
+            </select>
+            <select id="select-institution" class="ml-3">
+                <option>某个学院</option>
+            </select>
+            <button class="btn btn-default float-right">行政关系</button>
+            <button class="btn btn-primary mr-3 float-right">学术关系</button>
+        </div>
+
+        <div id="visited-record" class="float-right mt-3 mr-3">
+
+            <ul class="list-group ">
+                <li class="list-group-item"><b class="lead">拜访记录</b></li>
+                <li class="list-group-item"><a href="#"><span class="lead"> 张老三 </span> 院长 2019-5-13</a></li>
+                <li class="list-group-item"><a href="#"> <span class="lead"> 李老四 </span> 教授 2019-5-12</a></li>
+                <li class="list-group-item"><a href="#"><span class="lead"> 王老五 </span> 副院长 2019-5-11</a></li>
+                <li class="list-group-item"><a href="#"><span class="lead"> 张老三 </span> 办公室主任 2019-5-10</a></li>
+                <li class="list-group-item"><a href="#"><span class="lead"> 李老四 </span> 院长 2019-5-9</a></li>
+                <li class="list-group-item"><a href="#"><span class="lead"> 王老五 </span> 院长 2019-5-8</a></li>
+                <li class="list-group-item clearfix"><a href="#" class="float-right">查看更多 > </a></li>
+            </ul>
+        </div>
+    </div>
+</body>
+<script src="../static/js/bootstrap_v4.min.js"></script>
+<script src="../static/js/echarts_data_test.js"></script>
+<script src="../static/js/echarts_graph.js"></script>
+
+
+<!-- <script src="../static/js/d3.min.js"></script>
+<script src="../static/js/index.js"></script>
+<script src="../static/js/networkGraph.js"></script> -->
+</html>

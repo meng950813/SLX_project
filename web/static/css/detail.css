@@ -1,0 +1,113 @@
+html,body{
+	box-sizing: border-box;
+}
+ul{
+	list-style: none;
+}
+
+.card-mine{
+	padding: 12px;
+	margin: 20px 10px;
+	border: 1px solid #ccc;
+	border-radius: 10px;
+	position: relative;
+}
+.card-mine:hover{
+	box-shadow: 5px 5px 5px #ccc;
+	/*cursor: pointer;*/
+}
+.editor{
+	position: absolute;
+	display: inline-block;
+	top: 27px;
+	right: 10px;
+	color: #777;
+    cursor: pointer;
+}
+.editor:hover{
+	color: black;
+}
+
+
+#basic-info .img-container{
+	text-align: center;
+}
+#img-name{
+	width: 100px;
+	height: 100px;
+	line-height: 100px;
+	border-radius: 50% 50%;
+	font-size: 40px;
+	color: white;
+	display: inline-block;
+}
+
+.scholar-depart{
+    line-height: 30px;
+}
+
+.half{
+	display: inline-block;
+	width: 49%;
+}
+
+.scholar-name{
+    font-size: 24px;
+    line-height: 40px;
+}
+
+.scholar-tags span{
+    display: inline-block;
+    padding: 0 10px;
+    margin: 5px 0;
+    border-left: 1px solid gray; 
+}
+.scholar-tags span:first-child{
+    border-left: none;
+    padding-left: 0;
+}
+
+
+#edu-exp p{
+	line-height: 27px;
+	text-indent: 2em;
+}
+
+#achieve-info a{
+	color: black;
+}
+#achieve-info a.active{
+	color: white;
+}
+
+.tab-pane{
+    padding:10px; 
+}
+
+.tab-pane li{
+    margin: 10px 0;
+	padding: 10px 0 10px 10px;
+    box-shadow: 1px 1px 1px #ccc;
+}
+
+.tab-pane li:hover{
+    box-shadow: 5px 5px 5px #ccc;
+}
+
+
+.tab-pane li  span{
+	margin-right: 10px;
+}
+
+
+
+#alert-box{
+	position: fixed;
+	width: 270px;
+	top: 20%;
+	left: 50%;
+	transform: translateX(-135px);
+}
+.hidden{
+	display: none;
+}

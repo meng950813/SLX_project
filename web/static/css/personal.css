@@ -1,0 +1,32 @@
+.container-full-screen{
+}
+
+#container{
+    position: absolute;
+    top: 56px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    /* z-index: -1; */
+}
+
+select, select option{
+    min-width: 180px;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    background: transparent;
+}
+#visited-record{
+    min-width: 200px;
+}
+#visited-record li{
+    background: transparent;
+}
+#visited-record a{
+    color: #333;
+}
