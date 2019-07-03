@@ -1,53 +1,15 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
-    <title>个人中心-专家检索</title>
+{% extends 'base.html' %}
+{% block title %}
+    个人中心-专家检索
+{% endblock %}
 
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="../static/css/bootsrap_v4.min.css">
+{% block styles %}
     <link rel="stylesheet" href="../static/css/glyphicon.css">
     <link rel="stylesheet" href="../static/css/personal.css">
-    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
-    <script src="https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts.min.js"></script>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="navbar-header">
-            <a class="navbar-brand thumbnail" href="#">Logo</a>
-        </div>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-        </button>
+{% endblock %}
 
-        <div class="collapse navbar-collapse" id="navbarColor01">
-             {% if username %}
-            <ul class="navbar-nav ml-auto">
-                <li><a class="nav-item nav-link " href="#">日程安排</a></li>
-                <li><a class="nav-item nav-link " href="#">拜访记录</a></li>
-                <li><a class="nav-item nav-link " href="#">消息提醒 <span class="badge" style="background-color: red; color: white">7</span></a></li>
-                <li><a class="nav-item nav-link " >{{ username }}</a></li>
-                <li><a class="nav-item nav-link active" >个人中心</a></li>
-                <li><a class="nav-item nav-link " href="#">注销</a></li>
-            </ul>
-            {% else %}
-            <ul class="navbar-nav ml-auto">
-                <li class="clearfix"><a class="nav-item nav-link active float-right" href="#">注册</a></li>
-                <li class="clearfix"><a class="nav-item nav-link active float-right" href="#">登录</a></li>
-            </ul>
-            {% endif %}
-        </div>
-    </nav>
-
-    <!-- <svg id="container">
-        <g id="network-graph"></g>
-    </svg> -->
-
+{% block main %}
     <div id="container"></div>
-
     <div class="container-fluid">
         <div class="ml-3 mr-3 mt-3 mb-3">
             <select id="select-college">
@@ -74,12 +36,11 @@
             </ul>
         </div>
     </div>
-</body>
-<script src="../static/js/bootstrap_v4.min.js"></script>
-<script src="../static/js/echarts_graph.js"></script>
+{% endblock %}
 
+{% block scripts %}
+    <script src="../static/js/bootstrap_v4.min.js"></script>
+    <script src="https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts.min.js"></script>
+    <script src="../static/js/echarts_graph.js"></script>
+{% endblock %}
 
-<!-- <script src="../static/js/d3.min.js"></script>
-<script src="../static/js/index.js"></script>
-<script src="../static/js/networkGraph.js"></script> -->
-</html>

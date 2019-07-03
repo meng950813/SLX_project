@@ -1,220 +1,184 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
-    <title>专家检索</title>
+{% extends 'base.html' %}
 
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="../static/css/bootsrap_v4.min.css">
-    <link rel="stylesheet" href="../static/css/glyphicon.css">
+{% block title %}
+    专家检索
+{% endblock %}
+
+{% block styles %}
     <link rel="stylesheet" type="text/css" href="../static/css/detail.css">
+{% endblock %}
 
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-  </head>
-
-  <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div class="navbar-header">
-        <a class="navbar-brand thumbnail" href="#">
-          Logo
-        </a>
-      </div>
-      <!-- <div class="container"> -->
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse">
-        <!-- {% if username %} -->
-          <ul class="navbar-nav ml-auto">
-            <li><a class="nav-item nav-link active" href="#">日程安排</a></li>
-            <li><a class="nav-item nav-link active" href="#">拜访记录</a></li>
-            <li><a class="nav-item nav-link active" href="#">消息提醒 <span class="badge" style="background-color: red; color: white">7</span></a></li>
-            <li><a class="nav-item nav-link active" >{{ username }}</a></li>
-            <li><a class="nav-item nav-link active" href="#">注销</a></li>
-          <!-- </ul> -->
-        <!-- {% else %} -->
-          <!-- <ul class="navbar-nav ml-auto"> -->
-            <li><a class="nav-item nav-link active" href="#">注册</a></li>
-            <li><a class="nav-item nav-link active" href="#">登录</a></li>
-          </ul>
-        <!-- {% endif %} -->
-
-      </div>
-      <!-- </div> -->
-    </nav>
+{% block main %}
     <div class="container">
-      <fieldset class="card-mine">
-        <legend>基本信息</legend>
-        <span title="编辑" class="editor glyphicon glyphicon-edit" aria-hidden="true"></span>
-        <div id="basic-info" class="row">
-          <div class="img-container col-sm-3 col-md-2 align-middle">
-            <div id="img-name" class="bg-primary align-middle">周</div>
-          </div>
-          <div class="col-sm-9 col-md-10">
-            <div class="scholar-name"> <strong> <a href="#" > 周志华</a>  </strong> </div>
-            <div class="scholar-depart">某某学校 - 某某学院</div>
-            <div class="scholar-depart half">邮箱： test@123.com</div>
-            <div class="scholar-depart half">手机： 139xxxx3265</div>
-            <div class="scholar-depart half">办公室电话： 0512-87654321</div>
-            <div class="scholar-tags">
-              <span>院长</span>
-              <span>46岁</span>
-              <span>某重点实验室主任</span>
-              <span>中国科学院院士</span>
-              <span>长江学长</span>
-              <span>教授</span>
+        <fieldset class="card-mine">
+            <legend>基本信息</legend>
+            <span title="编辑" class="editor glyphicon glyphicon-edit" aria-hidden="true"></span>
+            <div id="basic-info" class="row">
+                <div class="img-container col-sm-3 col-md-2 align-middle">
+                    <div id="img-name" class="bg-primary align-middle">周</div>
+                </div>
+                <div class="col-sm-9 col-md-10">
+                    <div class="scholar-name"> <strong> <a href="#" > 周志华</a>  </strong> </div>
+                    <div class="scholar-depart">某某学校 - 某某学院</div>
+                    <div class="scholar-depart half">邮箱： test@123.com</div>
+                    <div class="scholar-depart half">手机： 139xxxx3265</div>
+                    <div class="scholar-depart half">办公室电话： 0512-87654321</div>
+                    <div class="scholar-tags">
+                        <span>院长</span>
+                        <span>46岁</span>
+                        <span>某重点实验室主任</span>
+                        <span>中国科学院院士</span>
+                        <span>长江学长</span>
+                        <span>教授</span>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </fieldset>
-
-      <fieldset id="edu-exp" class="row card-mine">
-        <legend>教育经历</legend>
-        <span title="编辑" class="editor glyphicon glyphicon-edit" aria-hidden="true"></span>
-        <p>周志华，男，1973年11月生。分别于1996年6月、1998年6月和2000年12月于南京大学计算机科学与技术系获学士、硕士和博士学位。2001年1月起留校任教，2002年3月被破格聘任为副教授，2003年29岁获国家杰出青年科学基金，随后被聘为教授，2004年4月获博士生导师资格，2006年入选教育部长江学者特聘教授，2012年当选IEEE，Fellow，2013年当选ACM Distinguished Scientist[3]。2007年创建南京大学机器学习与数据挖掘研究所（LAMDA），2010年11月任软件新技术国家重点实验室常务副主任，2013年5月任计算机系副主任。</p>
-      </fieldset> 
-      
-      <fieldset id="team-info" class="row card-mine">
-        <legend>团队信息</legend>
-        <span title="编辑" class="editor glyphicon glyphicon-edit" aria-hidden="true"></span>
-        
-      </fieldset>
-
-      <fieldset id="team-info" class="row card-mine">
-          <legend>学会兼职</legend>
-          <span title="编辑" class="editor glyphicon glyphicon-edit" aria-hidden="true"></span>
-          <ol class="tab-pane">
-            <li>
-              <span>中国人工智能学会</span> 
-              <span>(第七届)</span>
-              <span>常务理事、理事</span> 
-            </li>
-          </ol>
         </fieldset>
-  
 
-      <fieldset id="achieve-info" class="row card-mine">
-        <legend>学术成果</legend>
-        <span title="编辑" class="editor glyphicon glyphicon-edit" aria-hidden="true"></span>
-        <ul class="nav nav-pills nav-fill">
-          <li class="nav-item">
-            <a href="#project-list" class="nav-link active" data-toggle="tab">
-              <i class="glyphicon glyphicon-tasks"></i> 科研项目(1)</a>
-          </li>
-          <li class="nav-item">
-            <a href="#patent-list" class="nav-link" data-toggle="tab">
-              <i class="glyphicon glyphicon-hdd"></i> 发明专利(1)</a>
-          </li>
-          <li class="nav-item" >
-            <a href="#paper-list" class="nav-link" data-toggle="tab"> 
-              <i class="glyphicon glyphicon-book"></i> 论文成果(1)</a>
-          </li>
-        </ul>
-        <div class="tab-content">
-          <ul class="tab-pane fade in active show" id="project-list">
-            <li>
-              <div class="d-inline">
-                <i class="glyphicon glyphicon-tasks"></i> 这是一个国家重大项目项目              </div>
-              <div class="d-inline">
-                <span>人工智能类</span>
-                <span>资金：1024万元</span>
-                <span>项目周期：4年</span>
-                <span>2018/12-2022/12</span>
-                <span>负责人：周志华</span>
-              </div>
-            </li>
-          </ul>
-          <ul class="tab-pane fade in" id="patent-list">
-            <li>
-              <div class="d-inline">
-                <i class="glyphicon glyphicon-hdd"></i> 这是一条专利，其他不重要
-              </div>
-              <div class="d-inline">
-                <span>实用类型</span>
-                <span>2018/9-2068-9</span>
-                <span>作者:凌锦江 周志华</span>
-              </div>
-            </li>            
-          </ul>
-          <ul class="tab-pane fade in" id="paper-list">
-            <li> 
-              <div class="d-inline">
-                <i class="glyphicon glyphicon-book"></i> 《基于因果发现的神经网络集成方法》
-              </div>
-              <div class="d-inline">
-                <span>2018/6月 </span>
-                <span>发表自《软件学报》</span>
-                <span>引用次数：30</span>
-                <span>作者:  凌锦江 周志华</span>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </fieldset>
+        <fieldset id="edu-exp" class="row card-mine">
+            <legend>教育经历</legend>
+            <span title="编辑" class="editor glyphicon glyphicon-edit" aria-hidden="true"></span>
+            <p>周志华，男，1973年11月生。分别于1996年6月、1998年6月和2000年12月于南京大学计算机科学与技术系获学士、硕士和博士学位。2001年1月起留校任教，2002年3月被破格聘任为副教授，2003年29岁获国家杰出青年科学基金，随后被聘为教授，2004年4月获博士生导师资格，2006年入选教育部长江学者特聘教授，2012年当选IEEE，Fellow，2013年当选ACM Distinguished Scientist[3]。2007年创建南京大学机器学习与数据挖掘研究所（LAMDA），2010年11月任软件新技术国家重点实验室常务副主任，2013年5月任计算机系副主任。</p>
+        </fieldset>
+
+        <fieldset id="team-info" class="row card-mine">
+            <legend>团队信息</legend>
+            <span title="编辑" class="editor glyphicon glyphicon-edit" aria-hidden="true"></span>
+
+        </fieldset>
+
+        <fieldset id="team-info" class="row card-mine">
+            <legend>学会兼职</legend>
+            <span title="编辑" class="editor glyphicon glyphicon-edit" aria-hidden="true"></span>
+            <ol class="tab-pane">
+                <li>
+                    <span>中国人工智能学会</span>
+                    <span>(第七届)</span>
+                    <span>常务理事、理事</span>
+                </li>
+            </ol>
+        </fieldset>
+
+
+        <fieldset id="achieve-info" class="row card-mine">
+            <legend>学术成果</legend>
+            <span title="编辑" class="editor glyphicon glyphicon-edit" aria-hidden="true"></span>
+            <ul class="nav nav-pills nav-fill">
+                <li class="nav-item">
+                    <a href="#project-list" class="nav-link active" data-toggle="tab">
+                        <i class="glyphicon glyphicon-tasks"></i> 科研项目(1)</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#patent-list" class="nav-link" data-toggle="tab">
+                        <i class="glyphicon glyphicon-hdd"></i> 发明专利(1)</a>
+                </li>
+                <li class="nav-item" >
+                    <a href="#paper-list" class="nav-link" data-toggle="tab">
+                        <i class="glyphicon glyphicon-book"></i> 论文成果(1)</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <ul class="tab-pane fade in active show" id="project-list">
+                    <li>
+                        <div class="d-inline">
+                            <i class="glyphicon glyphicon-tasks"></i> 这是一个国家重大项目项目              </div>
+                        <div class="d-inline">
+                            <span>人工智能类</span>
+                            <span>资金：1024万元</span>
+                            <span>项目周期：4年</span>
+                            <span>2018/12-2022/12</span>
+                            <span>负责人：周志华</span>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="tab-pane fade in" id="patent-list">
+                    <li>
+                        <div class="d-inline">
+                            <i class="glyphicon glyphicon-hdd"></i> 这是一条专利，其他不重要
+                        </div>
+                        <div class="d-inline">
+                            <span>实用类型</span>
+                            <span>2018/9-2068-9</span>
+                            <span>作者:凌锦江 周志华</span>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="tab-pane fade in" id="paper-list">
+                    <li>
+                        <div class="d-inline">
+                            <i class="glyphicon glyphicon-book"></i> 《基于因果发现的神经网络集成方法》
+                        </div>
+                        <div class="d-inline">
+                            <span>2018/6月 </span>
+                            <span>发表自《软件学报》</span>
+                            <span>引用次数：30</span>
+                            <span>作者:  凌锦江 周志华</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </fieldset>
 
     </div>
 
     <div class="modal fade" id="modifiyInfoModal" tabindex="-1" role="dialog" aria-labelledby="modifiyInfoModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="modifiyInfoModalLabel">操作基本信息</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <form>
-                <div class="form-group">
-                  <label class="col-form-label">选择操作类型</label>
-                  <div>
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" name="inlineRadioOptions" id="option-add" value="option1">
-                      <label class="form-check-label text-success" for="option-add">添加</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" checked name="inlineRadioOptions" id="option-modify" value="option2">
-                      <label class="form-check-label text-info" for="option-modify">修改</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" name="inlineRadioOptions" id="option-delete" value="option2">
-                      <label class="form-check-label text-danger" for="option-delete">删除</label>
-                    </div>
-                  </div>
-                  </div>
-              <div class="form-group">
-                <label for="recipient-name" class="col-form-label">修改项:</label>
-                <input type="text" class="form-control" id="recipient-name" placeholder="例如：手机号 / ">
-              </div>
-              <div class="form-group">
-                <label for="message-text" class="col-form-label">详细内容/操作理由:</label>
-                <textarea class="form-control" id="message-text"></textarea>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-            <button type="button" class="btn btn-primary">提交</button>
-          </div>
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modifiyInfoModalLabel">操作基本信息</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label class="col-form-label">选择操作类型</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="option-add" value="option1">
+                                    <label class="form-check-label text-success" for="option-add">添加</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" checked name="inlineRadioOptions" id="option-modify" value="option2">
+                                    <label class="form-check-label text-info" for="option-modify">修改</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="option-delete" value="option2">
+                                    <label class="form-check-label text-danger" for="option-delete">删除</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="recipient-name" class="col-form-label">修改项:</label>
+                            <input type="text" class="form-control" id="recipient-name" placeholder="例如：手机号 / ">
+                        </div>
+                        <div class="form-group">
+                            <label for="message-text" class="col-form-label">详细内容/操作理由:</label>
+                            <textarea class="form-control" id="message-text"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary">提交</button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
     <div id="alert-box" class="alert alert-success hidden">
         <strong><i class="glyphicon glyphicon-ok"></i>提交成功，等待管理员审核</strong>
-     
+
         <strong><i class="glyphicon glyphicon-remove"></i>提交失败，请稍后再试</strong>
-      
+
     </div>
-      
-  </body>
-  <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
-  <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
-  <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
-  <script src="../static/js/bootstrap_v4.min.js"></script>
-  <script src="../static/js/detail.js"></script>
-</html>
+{% endblock %}
+
+{% block scripts %}
+    <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
+    <script src="../static/js/bootstrap_v4.min.js"></script>
+    <script src="../static/js/detail.js"></script>
+{% endblock %}

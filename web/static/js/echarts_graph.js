@@ -114,6 +114,7 @@ function format_data(data)
         node['name'] = node['id'];
         //node['symbolSize'] = parseInt(node['centrality'] * 20 + 5);
         node['category'] = node['class'] - 1;
+        node.draggable= true;
         delete node["id"];
         delete node["class"];
         back_data["nodes"].push(node);
