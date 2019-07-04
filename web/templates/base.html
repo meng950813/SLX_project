@@ -7,10 +7,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
         <title>{% block title %}Base-Template{% endblock %}</title>
-
+        <link href="https://cdn.bootcss.com/mdui/0.4.2/css/mdui.min.css" rel="stylesheet">
         <!-- Bootstrap -->
         <link rel="stylesheet" href="../static/css/bootsrap_v4.min.css">
+
         <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+        <script src="https://cdn.bootcss.com/mdui/0.4.2/js/mdui.min.js"></script>
         {% block styles %}{% endblock %}
     {% endblock %}
 </head>
@@ -24,25 +26,31 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarColor01">
-        {% if username %}
+        {% if current_user %}
             <ul class="navbar-nav ml-auto">
                 <li><a class="nav-item nav-link " href="#">日程安排</a></li>
                 <li><a class="nav-item nav-link " href="#">拜访记录</a></li>
                 <li><a class="nav-item nav-link " href="#">消息提醒 <span class="badge" style="background-color: red; color: white">7</span></a></li>
-                <li><a class="nav-item nav-link " >{{ username }}</a></li>
+                <li><a class="nav-item nav-link " >{{ current_user['name'] }}</a></li>
                 <li><a class="nav-item nav-link active" >个人中心</a></li>
-                <li><a class="nav-item nav-link " href="#">注销</a></li>
+                <li><a class="nav-item nav-link " href="{{ url_for('auth.logout') }}">注销</a></li>
             </ul>
         {% else %}
             <ul class="navbar-nav ml-auto">
-                <li class="clearfix"><a class="nav-item nav-link active float-right" href="#">注册</a></li>
-                <li class="clearfix"><a class="nav-item nav-link active float-right" href="{{ url_for('auth.login') }}">登录</a></li>
+                <li class="clearfix"><a class="nav-item nav-link active float-right" href="{{ url_for('auth.login') }}"><i class="mdui-icon material-icons">&#xe7fd;</i></a></li>
             </ul>
         {% endif %}
     </div>
 </nav>
 
 <main>
+    {# 消息 #}
+    {% for message in get_flashed_messages(with_categories=True) %}
+    <div class="alert alert-{{ message[0] }}" role="alert">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message[1] }}
+    </div>
+    {% endfor %}
     {% block main %}
     {% endblock %}
 </main>

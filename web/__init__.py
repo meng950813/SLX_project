@@ -1,9 +1,12 @@
 import os
-from flask import Flask, render_template
-from web.settings import config
+from flask import Flask, render_template, session
+
+from web.settings import configuration
 from web.blueprints.school_agent import school_agent_bp
 from web.blueprints.auth import auth_bp
 from web.extensions import bootstrap
+from web.utils import mysql
+from web.config import MYSQL_CONFIG
 
 
 def create_app(config_name=None):
@@ -11,7 +14,9 @@ def create_app(config_name=None):
         config_name = os.getenv('FLASK_CONFIG', "development")
 
     app = Flask('web')
-    app.config.from_object(config[config_name])
+    app.config.from_object(configuration[config_name])
+    # 初始化mysql连接池
+    mysql.create_engine(**MYSQL_CONFIG)
 
     # 注册日志处理器
     register_logging(app)
@@ -21,6 +26,8 @@ def create_app(config_name=None):
     register_blueprints(app)
     # 注册错误处理函数
     register_errors(app)
+    # 注册模板上下文处理函数
+    register_template_context(app)
 
     return app
 
@@ -42,5 +49,15 @@ def register_errors(app):
     @app.errorhandler(400)
     def bad_request(e):
         return render_template('errors/400.html'), 400
+
+
+def register_template_context(app):
+    """注册模板上下文，使得变量可以在模板中使用"""
+    @app.context_processor
+    def make_template_context():
+        current_user = None
+        if "username" in session:
+            current_user = session['username']
+        return dict(current_user=current_user)
 
 

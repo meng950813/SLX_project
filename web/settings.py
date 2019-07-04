@@ -18,7 +18,7 @@ class ProductionConfig(BaseConfig):
     pass
 
 
-config = {
+configuration = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
     'production': ProductionConfig

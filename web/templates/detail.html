@@ -18,9 +18,9 @@
                     <div id="img-name" class="bg-primary align-middle">周</div>
                 </div>
                 <div class="col-sm-9 col-md-10">
-                    <div class="scholar-name"> <strong> <a href="#" > 周志华</a>  </strong> </div>
-                    <div class="scholar-depart">某某学校 - 某某学院</div>
-                    <div class="scholar-depart half">邮箱： test@123.com</div>
+                    <div class="scholar-name"> <strong> <a href="#" > {{ teacher_basic_info["name"] }} </a>  </strong> </div>
+                    <div class="scholar-depart">{{ teacher_basic_info["school"] }} - {{ teacher_basic_info["institution"] }}</div>
+                    <div class="scholar-depart half">邮箱： {{ teacher_basic_info["email"] }}</div>
                     <div class="scholar-depart half">手机： 139xxxx3265</div>
                     <div class="scholar-depart half">办公室电话： 0512-87654321</div>
                     <div class="scholar-tags">
@@ -28,8 +28,14 @@
                         <span>46岁</span>
                         <span>某重点实验室主任</span>
                         <span>中国科学院院士</span>
-                        <span>长江学长</span>
-                        <span>教授</span>
+
+                            {% for honor in teacher_basic_info["honor"] %}
+                                <span>
+                                    {{ honor["type"] }}
+                                </span>
+                            {% endfor %}
+
+                        <span>{{ teacher_basic_info["title"] }}</span>
                     </div>
                 </div>
             </div>
@@ -38,7 +44,8 @@
         <fieldset id="edu-exp" class="row card-mine">
             <legend>教育经历</legend>
             <span title="编辑" class="editor glyphicon glyphicon-edit" aria-hidden="true"></span>
-            <p>周志华，男，1973年11月生。分别于1996年6月、1998年6月和2000年12月于南京大学计算机科学与技术系获学士、硕士和博士学位。2001年1月起留校任教，2002年3月被破格聘任为副教授，2003年29岁获国家杰出青年科学基金，随后被聘为教授，2004年4月获博士生导师资格，2006年入选教育部长江学者特聘教授，2012年当选IEEE，Fellow，2013年当选ACM Distinguished Scientist[3]。2007年创建南京大学机器学习与数据挖掘研究所（LAMDA），2010年11月任软件新技术国家重点实验室常务副主任，2013年5月任计算机系副主任。</p>
+            <p>{{ teacher_basic_info["edu_exp"] }}</p>
+
         </fieldset>
 
         <fieldset id="team-info" class="row card-mine">
@@ -66,41 +73,53 @@
             <ul class="nav nav-pills nav-fill">
                 <li class="nav-item">
                     <a href="#project-list" class="nav-link active" data-toggle="tab">
-                        <i class="glyphicon glyphicon-tasks"></i> 科研项目(1)</a>
+                        <i class="glyphicon glyphicon-tasks"></i> 科研项目({{ length[0] }} )
+                    </a>
                 </li>
                 <li class="nav-item">
                     <a href="#patent-list" class="nav-link" data-toggle="tab">
-                        <i class="glyphicon glyphicon-hdd"></i> 发明专利(1)</a>
+                        <i class="glyphicon glyphicon-hdd"></i> 发明专利({{ length[1] }} )
+
+                    </a>
                 </li>
                 <li class="nav-item" >
                     <a href="#paper-list" class="nav-link" data-toggle="tab">
-                        <i class="glyphicon glyphicon-book"></i> 论文成果(1)</a>
+                        <i class="glyphicon glyphicon-book"></i> 论文成果(1)
+                    </a>
                 </li>
             </ul>
             <div class="tab-content">
                 <ul class="tab-pane fade in active show" id="project-list">
                     <li>
-                        <div class="d-inline">
-                            <i class="glyphicon glyphicon-tasks"></i> 这是一个国家重大项目项目              </div>
-                        <div class="d-inline">
-                            <span>人工智能类</span>
-                            <span>资金：1024万元</span>
-                            <span>项目周期：4年</span>
-                            <span>2018/12-2022/12</span>
-                            <span>负责人：周志华</span>
-                        </div>
+                        {% if "funds" in teacher_basic_info %}
+                            {% for fund in teacher_basic_info["funds"] %}
+                                <div class="d-inline">
+                                    <i class="glyphicon glyphicon-tasks"></i> {{ fund["title"] }}              </div>
+                                <div class="d-inline">
+                                    <span>{{ fund["belong"] }}</span>
+                                    <span>资金：{{ fund["money"] }}万元</span>
+                                    <span>项目周期：4年</span>
+                                    <span>{{ fund["year"] }}</span>
+                                    <span>负责人：{{ fund["name"] }}</span><br>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
                     </li>
                 </ul>
                 <ul class="tab-pane fade in" id="patent-list">
                     <li>
-                        <div class="d-inline">
-                            <i class="glyphicon glyphicon-hdd"></i> 这是一条专利，其他不重要
-                        </div>
-                        <div class="d-inline">
-                            <span>实用类型</span>
-                            <span>2018/9-2068-9</span>
-                            <span>作者:凌锦江 周志华</span>
-                        </div>
+                        {% if "patent" in teacher_basic_info %}
+                            {% for patent in teacher_basic_info["patent"] %}
+                                <div class="d-inline">
+                                    <i class="glyphicon glyphicon-hdd"></i> {{ patent["title"] }}
+                                </div>
+                                <div class="d-inline">
+                                    <span>申报单位： {{ patent["proposer"] }}</span>
+                                    <span>{{ patent["date"]}}</span>
+                                    <span>作者: {{ patent["author_list"] }}</span><br>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
                     </li>
                 </ul>
                 <ul class="tab-pane fade in" id="paper-list">
