@@ -6,7 +6,7 @@ school_agent_bp = Blueprint('school_agent', __name__)
 
 @school_agent_bp.route('/')
 @school_agent_bp.route('/homepage')
-def homepage():
+def index():
     """学校商务的个人主页"""
     return render_template('personal.html')
 

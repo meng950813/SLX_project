@@ -2,6 +2,7 @@ import os
 
 
 class BaseConfig(object):
+    # wtform库用于CSRF
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev key')
 
 
