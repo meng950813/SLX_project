@@ -1,7 +1,8 @@
-var myChart = echarts.init(document.getElementById('container'));
+//echarts 对象
+let myChart = echarts.init(document.getElementById('container'));
 
-
-graph_option = {
+//关系图属性
+let graphOption = {
     tooltip: {
         formatter: function (params) {
             if (params.dataType == "node") {
@@ -63,31 +64,85 @@ graph_option = {
             }
         }
     ]
-}
+};
 
-function reload_graph(data){
+//树属性
+let treeOption = {
+    tooltip: {
+        trigger: 'item',
+        triggerOn: 'mousemove',
+        formatter: function (params) {
+            //设置提示框的内容和格式 节点和边都显示name属性
+            return "行政关系。。。"
+        }
+    },
+    series:[
+        {
+            type: 'tree',
+
+            data: [],
+
+            left: '2%',
+            right: '2%',
+            top: '8%',
+            bottom: '20%',
+
+            symbol: 'emptyCircle',
+
+            orient: 'vertical',
+
+            expandAndCollapse: true,
+
+            label: {
+                normal: {
+                    position: 'top',
+                    rotate: -90,
+                    verticalAlign: 'middle',
+                    align: 'right',
+                    fontSize: 9
+                }
+            },
+
+            leaves: {
+                label: {
+                    normal: {
+                        position: 'bottom',
+                        rotate: -90,
+                        verticalAlign: 'middle',
+                        align: 'left'
+                    }
+                }
+            },
+            animationDurationUpdate: 750
+        }
+    ]
+};
+
+/**
+ * 重新加载关系图数据，把数据赋值给graphOption中的data
+ * @param data 关系图数据
+ */
+function reloadGraph(data){
     if(!"nodes" in data) return;
     let nodes = data.nodes, links = data.links, cates = data.community;
     console.log(nodes.length, links.length, cates.length);
-    graph_option.series[0].data = nodes;
-    graph_option.series[0].links = links;
+    graphOption.series[0].data = nodes;
+    graphOption.series[0].links = links;
 
-    categories = [];
-    for (var i = 0; i < cates.length; i++) {
+    let categories = [];
+    for (let i = 0; i < cates.length; i++) {
         categories[i] = {
             name: '社区' + (i + 1)
         };
     }
-    graph_option.series[0].categories = categories;
-    graph_option.legend = [{
+    graphOption.series[0].categories = categories;
+    graphOption.legend = [{
         data: categories.map(function (a) {
             return a.name;
         })
     }];
-    myChart.setOption(graph_option);
+    myChart.setOption(graphOption);
 }
-
-myChart.setOption(graph_option);
 
 //添加点击跳转事件
 myChart.on('click', function (params) {
@@ -98,7 +153,12 @@ myChart.on('click', function (params) {
     window.open('/scholar/'+params.data.teacherId);
 });
 
-function format_data(data)
+/**
+ * 规格化关系图数据，使之可以生成echarts可用的数据格式
+ * @param data
+ * @returns {{nodes: Array, links: Array, community: *}}
+ */
+function formatGraph(data)
 {
     let back_data = {
         "nodes" : [],
@@ -131,8 +191,28 @@ function format_data(data)
     return back_data;
 }
 
-$.get('/static/relation_data/back.json').done(function (data) {
-    let graph = format_data(data);
-    console.log(graph);
-    reload_graph(graph);
-});
+
+/**
+ * 显示关系图
+ */
+function showGraph() {
+    //默认请求的是关系图
+    $.get('/static/relation_data/back.json').done(function (data) {
+        let graph = formatGraph(data);
+        reloadGraph(graph);
+    });
+}
+//TODO:初次调用显示关系图
+showGraph();
+
+/**
+ * 显示行政关系
+ */
+function showTree() {
+    myChart.showLoading();
+    $.get('static/relation_data/back_tree.json', function (data) {
+        myChart.hideLoading();
+        treeOption.series[0].data = [data];
+        myChart.setOption(treeOption);
+    });
+}
