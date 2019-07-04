@@ -213,10 +213,10 @@ if __name__ == '__main__':
 
     sys.path.append("..")
 
-    from web.config import DB_CONFIG
+    from web.config import MYSQL_CONFIG
 
     # 需要预先调用，且只调用一次
-    create_engine(**DB_CONFIG)
+    create_engine(**MYSQL_CONFIG)
 
     teachers = select('select * from es_teacher limit 0,10')
     # print(teachers)
