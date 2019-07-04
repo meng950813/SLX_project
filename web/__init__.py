@@ -1,6 +1,6 @@
 import os
 from flask import Flask, render_template
-from web.settings import config
+from web.settings import configuration
 from web.blueprints.school_agent import school_agent_bp
 # from web.extensions import db, mail, bootstrap, moment, ckeditor, migrate
 
@@ -10,7 +10,7 @@ def create_app(config_name=None):
         config_name = os.getenv('FLASK_CONFIG', "development")
 
     app = Flask('web')
-    app.config.from_object(config[config_name])
+    app.config.from_object(configuration[config_name])
 
     # 注册日志处理器
     register_logging(app)
