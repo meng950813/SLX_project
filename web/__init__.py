@@ -2,7 +2,8 @@ import os
 from flask import Flask, render_template
 from web.settings import config
 from web.blueprints.school_agent import school_agent_bp
-# from web.extensions import db, mail, bootstrap, moment, ckeditor, migrate
+from web.blueprints.auth import auth_bp
+from web.extensions import bootstrap
 
 
 def create_app(config_name=None):
@@ -29,11 +30,12 @@ def register_logging(app):
 
 
 def register_extensions(app):
-    app.register_blueprint(school_agent_bp)
+    bootstrap.init_app(app)
 
 
 def register_blueprints(app):
-    pass
+    app.register_blueprint(school_agent_bp)
+    app.register_blueprint(auth_bp)
 
 
 def register_errors(app):

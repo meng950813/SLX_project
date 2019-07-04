@@ -1,7 +1,9 @@
 Bootstrap-Flask==1.0.10
 Click==7.0
 Flask==1.0.3
+Flask-WTF==0.14.2
 itsdangerous==1.1.0
 Jinja2==2.10.1
 MarkupSafe==1.1.1
 Werkzeug==0.15.4
+WTForms==2.2.1

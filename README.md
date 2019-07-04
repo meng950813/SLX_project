@@ -10,3 +10,12 @@
 >   2. flask run
 
 以上的方法大致类似，flask的自动搜索机制会自动从FLASK_APP的值定义的模块中寻找名称为create_app()或make_app()的工厂函数
+## 2. 第三方库
+>1. Bootstrap-Flask
+>
+> 该库是对bootstrap4的简单封装，提供了几个常用的宏。
+> 官网:https://bootstrap-flask.readthedocs.io/en/latest/
+>2. flask-wtf
+>
+>flask-wtf是对form表单的封装，带有csrf令牌的安全表单。
+>官网:http://www.pythondoc.com/flask-wtf/

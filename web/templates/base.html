@@ -36,7 +36,7 @@
         {% else %}
             <ul class="navbar-nav ml-auto">
                 <li class="clearfix"><a class="nav-item nav-link active float-right" href="#">注册</a></li>
-                <li class="clearfix"><a class="nav-item nav-link active float-right" href="#">登录</a></li>
+                <li class="clearfix"><a class="nav-item nav-link active float-right" href="{{ url_for('auth.login') }}">登录</a></li>
             </ul>
         {% endif %}
     </div>
