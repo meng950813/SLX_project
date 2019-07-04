@@ -17,7 +17,7 @@ def login_required(func):
         # 当前未登陆
         user = session.get('username')
         if user is None:
-            return redirect(url_for('user.login'))
+            return redirect(url_for('auth.login'))
         return func(*args, **kw)
     return wrapper
 
