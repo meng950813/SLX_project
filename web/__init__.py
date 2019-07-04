@@ -1,5 +1,6 @@
 import os
 from flask import Flask, render_template, session
+
 from web.settings import configuration
 from web.blueprints.school_agent import school_agent_bp
 from web.blueprints.auth import auth_bp

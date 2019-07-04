@@ -4,7 +4,7 @@
 >1. 在Pycharm中对Flask server设置（可断点调试）：
 >   1. 打开Edit Configuration
 >   2. 设置Target type => Script path。
->   2. 设置Target => web/\__init__.py的完整路径。
+>   3. 设置Target => web/\__init__.py的完整路径。
 >2. 在cmd中设置（无法断点调试）：
 >   1. set FLASK_APP=web
 >   2. flask run
