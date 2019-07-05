@@ -1,3 +1,7 @@
+// 全局变量，
+var SCHOOL_LIST = {};
+
+
 //echarts 对象
 let myChart = echarts.init(document.getElementById('container'));
 
@@ -7,7 +11,7 @@ let graphOption = {
         formatter: function (params) {
             if (params.dataType == "node") {
                 //设置提示框的内容和格式 节点和边都显示name属性
-                return `<strong>节点属性</strong><hr>姓名：${params.data.label}</b><br>所属学校：${params.data.school}<br>所属学院：${params.data.insititution}`;
+                return `<strong>节点属性</strong><hr>姓名：${params.data.label}</b><br>所属学校：${params.data.school}<br>所属学院：${params.data.institution}`;
             }
             else{
                 return `<strong>关系属性</strong><hr>
@@ -220,5 +224,80 @@ function showTree() {
         myChart.hideLoading();
         treeOption.series[0].data = [data];
         myChart.setOption(treeOption);
+    });
+}
+
+
+$("#select-college").change(function(){
+    let school = $(this).children("option:selected").text();
+    // 
+    if(school in SCHOOL_LIST){
+        setInstitution(SCHOOL_LIST[school],school);
+    }
+    else{
+        getInstitution(school);
+    }
+})
+
+
+/**
+ * 根据学校名获取其所有学院信息
+ * @param {String} school 学校名
+ */
+function getInstitution(school){
+    $.ajax({
+        type: "get",
+        // TODO
+        url: "TODO",
+        data: {"school" : school},
+        dataType: "json",
+        success: function (response) {
+            let institution = JSON.parse(response);
+            setInstitution(institution, school);
+            // 保存数据
+            SCHOOL_LIST[school] = institution;
+        },
+        error: function(error){
+            console.error(error);
+        }
+    });
+}
+
+
+/**
+ * 将学院信息填充到下拉框中
+ * @param {array} institution_list 学院数组
+ * @param {String} school 学校
+ */
+function setInstitution(institution_list, school){
+    if(institution_list.length <= 0){
+        alert("学院数据为空");
+        return;
+    }
+    let options = "";
+    for (let i = 0; i < institution_list.length; i++) {
+        options += `<option>${institution_list[i]}</option>`;
+    }
+    $("#select-institution").html(options);
+    getGraphData(school, institution_list[0]);
+}
+
+
+/**
+ * 根据学校名及学院名，获取学院内的关系数据
+ * @param {String} school 
+ * @param {String} institution 
+ */
+function getGraphData(school, institution){
+    let file_path = `/static/relation_data/${school}${institution}.txt`;
+    $.ajax({
+        type: "get",
+        url: file_path,
+        dataType: "json",
+        success: function (response) {
+            let data = JSON.stringify(response);
+            console.log(data);
+            reloadGraph(formatGraph(data));
+        }
     });
 }
