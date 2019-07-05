@@ -5,9 +5,6 @@ by zhang
 
 import pymongo
 import json
-
-# from Nameko.config import DB_CONFIG
-
 from web.config import MongoDB_CONFIG
 
 
@@ -17,7 +14,6 @@ def search_teacher_basic_info(teacher_id):
     :param teacher_id:
     :return:
     """
-    print("11",MongoDB_CONFIG)
     # 连接服务器
     myclient = pymongo.MongoClient("mongodb://" + MongoDB_CONFIG["ip"] + ":" + MongoDB_CONFIG["port"])
 
@@ -29,8 +25,6 @@ def search_teacher_basic_info(teacher_id):
     basic_col = mydb["basic_info"]
 
     basic_info_dict = basic_col.find_one({"id": teacher_id})
-
-
 
     # 利用基本信息表中的patent索引_id 搜索patent集合中对应的数据
     # 并将其加入到basic_info_dict中
@@ -67,16 +61,9 @@ def search_teacher_basic_info(teacher_id):
 
     # 由于MongoDB中的默认id是
     del basic_info_dict["_id"]
-
-
     """
     重点研发计划的部分未显示
-    
     """
-
-    # print(basic_info_dict)
-
-
     return json.dumps(basic_info_dict, ensure_ascii=False)
 
 

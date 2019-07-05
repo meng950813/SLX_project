@@ -20,15 +20,15 @@ def check_user(username, password):
     back = None
 
     # 利用正则判断用户名是否符合标准，以减少 sql 注入可能性
-    if tel.match(username) :
+    if tel.match(username):
         # 以电话登陆
-        back = user_dao.dologin(telphone = username , pwd = password)
+        back = user_dao.do_login(telephone=username, pwd=password)
     elif email.match(username):
         # 以邮件登陆
-        back = user_dao.dologin(email = username , pwd = password)
+        back = user_dao.do_login(email=username, pwd=password)
     elif u_id.match(username):
         # 以 id 登陆
-        back = user_dao.dologin(u_id = username , pwd = password)
-    
+        back = user_dao.do_login(u_id=username, pwd=password)
+
     # 返回查询结果
     return back

@@ -1,12 +1,11 @@
 from flask import Blueprint, render_template
-from web.dao.basic_info_service import search_teacher_basic_info
+from web.service.basic_info_service import search_teacher_basic_info
 import json
 school_agent_bp = Blueprint('school_agent', __name__)
 
 
 @school_agent_bp.route('/')
 @school_agent_bp.route('/homepage')
-
 def index():
     """学校商务的个人主页"""
 
@@ -20,7 +19,6 @@ def scholar_info(teacher_id):
     :param teacher_id:
     :return:
     """
-
     # 返回json 序列化后的文件
     json_file = search_teacher_basic_info(teacher_id)
 

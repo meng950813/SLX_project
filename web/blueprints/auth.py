@@ -37,9 +37,9 @@ def login():
         user = user_service.check_user(username, password)
         # 检验账号密码
         if user:
-            session['username'] = user["NAME"]
-            session['uid'] = user["ID"]
-            session["type"] = user["TYPE"]
+            session['username'] = user["name"]
+            session['uid'] = user["id"]
+            session["type"] = user["type"]
             # flash('登录成功，欢迎回来', 'success')
             return redirect(url_for('school_agent.index'))
         flash('登录失败，请检测账号或者密码后重新输入', 'danger')
