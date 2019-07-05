@@ -5,8 +5,6 @@ from web.settings import configuration
 from web.blueprints.school_agent import school_agent_bp
 from web.blueprints.auth import auth_bp
 from web.extensions import bootstrap
-from web.utils import mysql
-from web.config import MYSQL_CONFIG
 
 
 def create_app(config_name=None):
@@ -15,8 +13,6 @@ def create_app(config_name=None):
 
     app = Flask('web')
     app.config.from_object(configuration[config_name])
-    # 初始化mysql连接池
-    mysql.create_engine(**MYSQL_CONFIG)
 
     # 注册日志处理器
     register_logging(app)
