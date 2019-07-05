@@ -14,7 +14,8 @@ def do_login(telephone=None, email=None, u_id=None, pwd=""):
     # 连接服务器
     client = pymongo.MongoClient("mongodb://" + MongoDB_CONFIG["ip"] + ":" + MongoDB_CONFIG["port"])
     # 指定远程库
-    db = client["new_db"]
+    db = client[MongoDB_CONFIG['database']]
+    db.authenticate(name=MongoDB_CONFIG['username'], password=MongoDB_CONFIG['password'])
     # 指定集合
     collection = db['user']
     # 条件

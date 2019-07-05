@@ -17,7 +17,8 @@ def search_teacher_basic_info(teacher_id):
     myclient = pymongo.MongoClient("mongodb://" + MongoDB_CONFIG["ip"] + ":" + MongoDB_CONFIG["port"])
 
     # 指定远程库
-    mydb = myclient["new_db"]
+    mydb = myclient[MongoDB_CONFIG['database']]
+    mydb.authenticate(name=MongoDB_CONFIG['username'], password=MongoDB_CONFIG['password'])
 
     # 指定集合
 
