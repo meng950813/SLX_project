@@ -70,7 +70,6 @@ def search_teacher_basic_info(teacher_id):
 
 
     """
-    
     重点研发计划的部分未显示
     
     """

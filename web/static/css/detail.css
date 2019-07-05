@@ -1,6 +1,3 @@
-html,body{
-	box-sizing: border-box;
-}
 ul{
 	list-style: none;
 }
@@ -101,7 +98,8 @@ ul{
 
 
 
-#alert-box{
+#alert-box-success,
+#alert-box-error{
 	position: fixed;
 	width: 270px;
 	top: 20%;

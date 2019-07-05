@@ -12,7 +12,7 @@
     <div class="container">
         <fieldset class="card-mine">
             <legend>基本信息</legend>
-            <span title="编辑" class="editor glyphicon glyphicon-edit" aria-hidden="true"></span>
+            <i  title="编辑" class="editor mdui-icon material-icons">&#xe3c9;</i>
             <div id="basic-info" class="row">
                 <div class="img-container col-sm-3 col-md-2 align-middle">
                     <div id="img-name" class="bg-primary align-middle">周</div>
@@ -43,20 +43,20 @@
 
         <fieldset id="edu-exp" class="row card-mine">
             <legend>教育经历</legend>
-            <span title="编辑" class="editor glyphicon glyphicon-edit" aria-hidden="true"></span>
+            <i  title="编辑" class="editor mdui-icon material-icons">&#xe3c9;</i>
             <p>{{ teacher_basic_info["edu_exp"] }}</p>
 
         </fieldset>
 
         <fieldset id="team-info" class="row card-mine">
             <legend>团队信息</legend>
-            <span title="编辑" class="editor glyphicon glyphicon-edit" aria-hidden="true"></span>
+            <i  title="编辑" class="editor mdui-icon material-icons">&#xe3c9;</i>
 
         </fieldset>
 
         <fieldset id="team-info" class="row card-mine">
             <legend>学会兼职</legend>
-            <span title="编辑" class="editor glyphicon glyphicon-edit" aria-hidden="true"></span>
+            <i  title="编辑" class="editor mdui-icon material-icons">&#xe3c9;</i>
             <ol class="tab-pane">
                 <li>
                     <span>中国人工智能学会</span>
@@ -69,7 +69,7 @@
 
         <fieldset id="achieve-info" class="row card-mine">
             <legend>学术成果</legend>
-            <span title="编辑" class="editor glyphicon glyphicon-edit" aria-hidden="true"></span>
+            <i  title="编辑" class="editor mdui-icon material-icons">&#xe3c9;</i>
             <ul class="nav nav-pills nav-fill">
                 <li class="nav-item">
                     <a href="#project-list" class="nav-link active" data-toggle="tab">
@@ -144,53 +144,52 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modifiyInfoModalLabel">操作基本信息</h5>
+                    <h5 class="modal-title">操作 <span id="modifiyInfoModalLabel">基本信息</span> </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form>
-                        <div class="form-group">
-                            <label class="col-form-label">选择操作类型</label>
-                            <div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="option-add" value="option1">
-                                    <label class="form-check-label text-success" for="option-add">添加</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" checked name="inlineRadioOptions" id="option-modify" value="option2">
-                                    <label class="form-check-label text-info" for="option-modify">修改</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="option-delete" value="option2">
-                                    <label class="form-check-label text-danger" for="option-delete">删除</label>
-                                </div>
+                    <div class="form-group">
+                        <label class="col-form-label">选择操作类型</label>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="add-modify-delete" id="option-add" value="add">
+                                <label class="form-check-label text-success" for="option-add">添加</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" checked name="add-modify-delete" id="option-modify" value="modify">
+                                <label class="form-check-label text-info" for="option-modify">修改</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="add-modify-delete" id="option-delete" value="delete">
+                                <label class="form-check-label text-danger" for="option-delete">删除</label>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="recipient-name" class="col-form-label">修改项:</label>
-                            <input type="text" class="form-control" id="recipient-name" placeholder="例如：手机号 / ">
-                        </div>
-                        <div class="form-group">
-                            <label for="message-text" class="col-form-label">详细内容/操作理由:</label>
-                            <textarea class="form-control" id="message-text"></textarea>
-                        </div>
-                    </form>
+                    </div>
+                    <div class="form-group">
+                        <label for="recipient-name" class="col-form-label">修改项:</label>
+                        <input type="text" class="form-control" id="recipient-name" required placeholder="例如：手机号 / 学会兼职等">
+                    </div>
+                    <div class="form-group">
+                        <label for="message-text" class="col-form-label">详细内容/操作理由:</label>
+                        <textarea class="form-control" id="message-text" required></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary">提交</button>
+                    <button id="submit-btn" type="submit" class="btn btn-primary">提交</button>
                 </div>
+                
             </div>
         </div>
     </div>
 
-    <div id="alert-box" class="alert alert-success hidden">
+    <div id="alert-box-success" class="alert alert-success hidden">
         <strong><i class="glyphicon glyphicon-ok"></i>提交成功，等待管理员审核</strong>
-
+    </div>
+    <div id="alert-box-danger" class="alert alert-danger hidden">
         <strong><i class="glyphicon glyphicon-remove"></i>提交失败，请稍后再试</strong>
-
     </div>
 {% endblock %}
 
