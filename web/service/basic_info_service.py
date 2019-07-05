@@ -4,7 +4,6 @@ by zhang
 """
 
 import pymongo
-import json
 from web.config import MongoDB_CONFIG
 
 
@@ -64,7 +63,7 @@ def search_teacher_basic_info(teacher_id):
     """
     重点研发计划的部分未显示
     """
-    return json.dumps(basic_info_dict, ensure_ascii=False)
+    return basic_info_dict
 
 
 if __name__ == '__main__':
