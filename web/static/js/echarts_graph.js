@@ -91,7 +91,7 @@ let treeOption = {
 
             orient: 'vertical',
 
-            expandAndCollapse: true,
+            expandAndCollapse: false,
 
             label: {
                 normal: {
@@ -147,10 +147,16 @@ function reloadGraph(data){
 //添加点击跳转事件
 myChart.on('click', function (params) {
     //仅限节点类型
-    if (params.dataType != 'node')
+    if (params.dataType == 'node')
+    {
+        //页面
+        window.open('/scholar/'+params.data.teacherId);
         return;
-    //页面
-    window.open('/scholar/'+params.data.teacherId);
+    }
+    else if (params.dataType == 'main')
+    {
+        alert('点击了树的结点');
+    }
 });
 
 /**

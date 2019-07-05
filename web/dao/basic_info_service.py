@@ -4,7 +4,6 @@ by zhang
 """
 
 import pymongo
-from nameko.rpc import rpc
 import json
 
 # from Nameko.config import DB_CONFIG
