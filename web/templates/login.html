@@ -22,8 +22,8 @@
                     <div>
                         <form method="post">
                             {{ form.hidden_tag() }}
-                            {{ render_field(form.username) }}
-                            {{ render_field(form.password) }}
+                            {{ render_field(form.username, placeholder='请输入邮箱/手机号') }}
+                            {{ render_field(form.password, placeholder='请输入密码') }}
                             {{ render_field(form.remember) }}
                             {{ render_field(form.submit, class="btn btn-primary btn-block") }}
                         </form>
