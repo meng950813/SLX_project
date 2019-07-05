@@ -239,6 +239,13 @@ $("#select-college").change(function(){
     }
 })
 
+$("#select-institution").change(function () {
+    let school = $("#select-college").children("option:selected").text();
+    let institution = $(this).children("option:selected").text();
+    console.log(school,institution);
+    getGraphData(school,institution);
+});
+
 
 /**
  * 根据学校名获取其所有学院信息
