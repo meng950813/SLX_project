@@ -1,5 +1,6 @@
 import pymongo
 from web.config import MongoDB_CONFIG
+from web.utils.mongo_operator import MongoOperator
 
 
 def do_login(telephone=None, email=None, u_id=None, pwd=""):
@@ -12,12 +13,9 @@ def do_login(telephone=None, email=None, u_id=None, pwd=""):
     :return: 用户信息 ： （ID,NAME,TYPE）or None
     """
     # 连接服务器
-    client = pymongo.MongoClient("mongodb://" + MongoDB_CONFIG["ip"] + ":" + MongoDB_CONFIG["port"])
-    # 指定远程库
-    db = client[MongoDB_CONFIG['database']]
-    db.authenticate(name=MongoDB_CONFIG['username'], password=MongoDB_CONFIG['password'])
-    # 指定集合
-    collection = db['user']
+    # client = pymongo.MongoClient("mongodb://" + MongoDB_CONFIG["ip"] + ":" + MongoDB_CONFIG["port"])
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # TODO: 目前查询最多有一个查询该用户的日程安排
     # 条件
     condition = {'password': pwd}
 
@@ -28,7 +26,7 @@ def do_login(telephone=None, email=None, u_id=None, pwd=""):
     elif u_id:
         condition['id'] = u_id
 
-    result = collection.find_one(condition)
+    result = mongo_operator.find_one(condition, 'user')
     # 删除mongo的id
     if result:
         del result['_id']
