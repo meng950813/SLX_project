@@ -3,7 +3,7 @@ from web.service.basic_info_service import search_teacher_basic_info
 import json
 import os
 
-from blueprints.auth import login_required
+from web.blueprints.auth import login_required
 
 school_agent_bp = Blueprint('school_agent', __name__)
 
@@ -16,7 +16,7 @@ def index():
 
     # TODO 获取当前商务负责的学校 / 学院及其建立的关系
 
-    return render_template('personal.html', school = {}, institution = {})
+    return render_template('personal.html', school={}, institution={})
 
 
 @school_agent_bp.route('/scholar/<int:teacher_id>')
@@ -40,7 +40,13 @@ def scholar_info(teacher_id):
     if "patent" in teacher_basic_info:
         length[1] = len(teacher_basic_info["patent"])
 
-    return render_template('detail.html', teacher_basic_info=teacher_basic_info, length = length)
+    return render_template('detail.html', teacher_basic_info=teacher_basic_info, length=length)
+
+
+@school_agent_bp.route('/visit_record')
+@login_required
+def visit_record():
+    return render_template('visitRecode.html')
 
 
 def get_relations(school, institution):
@@ -50,18 +56,18 @@ def get_relations(school, institution):
     :param institution:学院名
     :return: 可供echarts直接渲染的json文件 or False
     """
-    file_path = "../static/relation_data/%s%s.txt" % (school,institution)
+    file_path = "../static/relation_data/%s%s.txt" % (school, institution)
 
     # 判断该学院社区网络文件是否存在
     if not os.path.exists(file_path):
-        print("%s %s 的社交网络尚未生成！" % (school,institution))
+        print("%s %s 的社交网络尚未生成！" % (school, institution))
         return False
     with open(file_path, "r") as f:
         data = json.loads(f.read())
         print(data)
         print(type(data))
         relation_data = format_relation_data(data)
-        
+
         # TODO 从数据库中获取当前用户与这些人的关系，合并到 relation_data 中
 
         return json.dumps(relation_data)
@@ -104,23 +110,20 @@ def format_relation_data(data):
                 link["value"] = link["weight"]
                 del link['weight']
                 data["links"].append(link)
-        
 
         data["community"] = []
         for cate in data["community_data"]:
-            data["community"].append(int( list( cate.keys() )[0] ) - 1)
-        
+            data["community"].append(int(list(cate.keys())[0]) - 1)
+
         del data["community_data"], data["algorithm_compare"], data["core_node"], data["edges"]
 
         return data
-        
+
     except Exception as e:
         print(e)
         return False
 
 
-
 if __name__ == '__main__':
     # scholar_info(73927)
     print(get_relations("北京大学", "化学生物学与生物技术学院"))
-
