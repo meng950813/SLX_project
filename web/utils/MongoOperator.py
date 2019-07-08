@@ -89,7 +89,7 @@ class MongoOperator:
 
 
 if __name__ == '__main__':
-
+    pass
     # funds_col = db.get_collection()
     # print(funds_col.find_one({"id": 73927}))
     
