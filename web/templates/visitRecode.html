@@ -1,23 +1,18 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>拜访记录</title>
-    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+{% extends 'base.html' %}
+
+{% block title %}
+    拜访记录
+{% endblock %}
+
+{% block styles %}
     <link rel="stylesheet" href="../static/css/bootstrap_v4.min.css">
-      <script src="https://cdn.bootcss.com/twitter-bootstrap/4.0.0-beta.3/js/bootstrap.min.js"></script>
-
-
-
-
+    <script src="https://cdn.bootcss.com/twitter-bootstrap/4.0.0-beta.3/js/bootstrap.min.js"></script>
     <style type="text/css">
 
         .form-group{
-           margin-top: 1%;
-           font-size: 23px;
-       }
+            margin-top: 1%;
+            font-size: 23px;
+        }
         .form-group input{
             width: 300px;
             height: 45px;
@@ -37,278 +32,114 @@
             width:100%;
             margin: 1% 0%;
         }
-        table a{
-            color: #333;
-        }
-        table tr>td:last-child a{
-            color: grey!important;
-            cursor: pointer;
-        }
-        table tr>td:last-child a:hover{
-            color: #007bff!important;
-            text-decoration: none;
-        }
-   </style>
-  </head>
-  <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div class="navbar-header">
-        <a class="navbar-brand thumbnail" href="#">
-          Logo
-        </a>
-      </div>
-        <div class="container">
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+    #add-new-record{
+        text-align: center;
+        cursor: pointer;
+    }
+    #add-new-record:hover{
+        color:#007bff;
+    }
+    </style>
+{% endblock %}
 
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav mr-auto">
-                  <li><a class="nav-item nav-link active" href="/">Home </a></li>
-                  <li><a class="nav-item nav-link " href=#>About </a></li>
-                </ul>
-            </div>
-
-                {% if username %}
-                    <ul class="navbar-nav mr-auto float-right">
-                      <li><a class="nav-item nav-link active" href="{{ url_for('schedule') }}">日程安排</a></li>
-                      <li><a class="nav-item nav-link active" href="{{ url_for('visitRecode') }}">拜访记录</a></li>
-                      <li><a class="nav-item nav-link active" href="/"></a></li>
-                      <li><a class="nav-item nav-link active" href="/">消息提醒 <span class="badge" style="background-color: red; color: white">7</span></a></li>
-                      <li><a class="nav-item nav-link active" >{{ username }}</a></li>
-                      <li><a class="nav-item nav-link active" href=#>注销</a></li>
-                    </ul>
-                {% else %}
-                    <ul class="navbar-nav mr-auto float-right">
-                      <li><a class="nav-item nav-link active" href="/">注册</a></li>
-                      <li><a class="nav-item nav-link active" href=#>登录</a></li>
-                    </ul>
-                {% endif %}
-        </div>
-    </nav>
-
-
-  <div class="recode">
-      <div class="input-group"   ><h2 style="margin: auto;text-align: center">拜访记录</h2></div>
-      <div class="search">
+{% block main %}
+<div class="container">
+    <div class="input-group">
+        <h2 style="margin: auto;text-align: center">拜访记录</h2></div>
+    <div class="search">
         <form class="form form-inline">
 
-        <div class="input-group float-right h3 ml-auto">
-            <input id="search-name-input" type="text" class="form-control" placeholder="搜索拜访记录">
-            <button class="btn btn-primary">搜索</button>
-        </div>
+            <div class="input-group float-right h3 ml-auto">
+                <input id="search-name-input" type="text" class="form-control" placeholder="搜索拜访记录">
+                <button class="btn btn-primary">搜索</button>
+            </div>
         </form>
-      </div>
-      <table class="table table-bordered  table-hover" id = "tab">
-          <tr>
-              <th>日期</th>
-              <th>学校</th>
-              <th>学院</th>
-              <th>教师</th>
-              <th>内容</th>
-              <th>编辑</th>
-          </tr>
-          <tr>
-              <td>2019-06-28</td>
-              <td>清华大学</td>
-              <td>计算机学院</td>
-              <td>罗军舟</td>
-              <td><a href=#>关于计算机科学产学研合</a></td>
-              <td class="operation"><a class="modify-btn" data-toggle="modal" data-target="#exampleModal">修改</a> <a  class="delete" href=#>删除</a></td>
-          </tr>
-          <tr>
-              <td>2019-06-28</td>
-              <td>北京大学</td>
-              <td>计算机学院</td>
-              <td>罗军舟</td>
-              <td><a href=#>关于计算机科学产学研合</a></td>
-              <td class="operation"><a class="modify-btn" data-toggle="modal" data-target="#exampleModal" >修改</a> <a class="delete" href=#>删除</a></td>
-          </tr>
-          <tr>
-              <td>2019-06-28</td>
-              <td>复旦大学</td>
-              <td>计算机学院</td>
-              <td>罗军舟</td>
-              <td><a href=#>关于计算机科学产学研合</a></td>
-               <td class="operation"><a class="modify-btn" data-toggle="modal" data-target="#exampleModal" >修改</a> <a class="delete" href=#>删除</a></td>
-          </tr>
-          <tr>
-              <td>2019-06-28</td>
-              <td>上海交融大学</td>
-              <td>计算机学院</td>
-              <td>罗军舟</td>
-              <td><a href=#>关于计算机科学产学研合</a></td>
-              <td class="operation"><a class="modify-btn" data-toggle="modal" data-target="#exampleModal" >修改</a> <a class="delete" href=#>删除</a></td>
-          </tr>
-          <tr>
-              <td>2019-06-28</td>
-              <td>浙江大学</td>
-              <td>计算机学院</td>
-              <td>罗军舟</td>
-              <td><a href=#>关于计算机科学产学研合</a></td>
-               <td class="operation"><a class="modify-btn" data-toggle="modal" data-target="#exampleModal" >修改</a> <a class="delete" href=#>删除</a></td>
-          </tr>
-          <tr>
-              <td colspan="7" ><a  id="add-new-record" data-toggle="modal" data-target="#exampleModal">+ 添加新纪录</a>  </td>
-          </tr>
+    </div>
+    <table class="table table-bordered  table-hover" id = "tab">
+        <tr>
+            <th>日期</th>
+            <th>学校</th>
+            <th>学院</th>
+            <th>教师</th>
+            <th>内容</th>
+            <th>编辑</th>
+        </tr>
+        <tr>
+            <td>2019-06-28</td>
+            <td>北京大学</td>
+            <td>计算机学院</td>
+            <td>罗军舟</td>
+            <td><a href=#>关于计算机科学产学研合</a></td>
+            <td class="operation">
+                <a class="btn btn-info" data-toggle="modal" data-target="#exampleModal" href="#">修改</a>
+                <a class="btn btn-danger" href=#>删除</a>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="7" id="add-new-record" data-toggle="modal" data-target="#exampleModal"> +添加新纪录 </td>
+        </tr>
     </table>
 
-<!-- 模态框（Modal） -->
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel"></h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-          <form>
-            <div class="input-group flex-nowrap">
-                 <div class="input-group-prepend">
-                      <span class="input-group-text " id="addon-wrapping">日期</span>
+    <!-- 模态框（Modal） -->
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                <input id="date" class="form-control mod"  type="date">
-            </div>
-          <br>
-            <div class="input-group flex-nowrap">
-                 <div class="input-group-prepend">
-                     <span class="input-group-text "  id="addon-wrapping">学校</span>
+                <div class="modal-body">
+                    <form>
+                        <div class="input-group flex-nowrap">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text " id="addon-wrapping">日期</span>
+                            </div>
+                            <input id="date" class="form-control mod"  type="date">
+                        </div>
+                        <br>
+                        <div class="input-group flex-nowrap">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text "  id="addon-wrapping">学校</span>
+                            </div>
+                            <input type="text" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
+                        </div>
+                        <br>
+                        <div class="input-group flex-nowrap">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="addon-wrapping">学院</span>
+                            </div>
+                            <input type="text" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
+                        </div>
+                        <br>
+                        <div class="input-group flex-nowrap">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="addon-wrapping">教师</span>
+                            </div>
+                            <input type="text" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
+                        </div>
+                        <br>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">内容</span>
+                            </div>
+                            <textarea class="form-control mod" aria-label="With textarea"></textarea>
+                        </div>
+                    </form>
                 </div>
-                <input type="text" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
-            </div>
-           <br>
-           <div class="input-group flex-nowrap">
-                 <div class="input-group-prepend">
-                     <span class="input-group-text" id="addon-wrapping">学院</span>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary preservation">保存</button>
                 </div>
-                <input type="text" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
             </div>
-          <br>
-                      <div class="input-group flex-nowrap">
-                 <div class="input-group-prepend">
-                     <span class="input-group-text" id="addon-wrapping">教师</span>
-                </div>
-                <input type="text" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
-            </div>
-          <br>
-        <div class="input-group">
-            <div class="input-group-prepend">
-            <span class="input-group-text">内容</span>
-            </div>
-            <textarea class="form-control mod" aria-label="With textarea"></textarea>
         </div>
-      </form>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
-        <button type="button" class="btn btn-primary preservation">保存</button>
-
-      </div>
     </div>
-  </div>
 </div>
+{% endblock %}
 
-<script>
-    function modify_medol(e){
-        //修改模态框标题
-        console.log(e)
-        c = e
-
-        $(".modal-title").text("修改拜访记录");
-
-        //将表格中的内容添加在表单中
-        //选择修改a标签所在的单元格
-        let target = $(e.target);
-        //选择其他的兄弟
-        let tds = e.parent().siblings();
-        console.log(target, tds)
-        //将表格中的内容逐个取出，然后填到表单中去
-        input_model = $("#exampleModal .mod");
-        for(var i=0;i<input_model.length;i++){
-            input_model[i].value = tds[i].textContent;
-        }
-        //给这个正在修改的行添加一个属性
-        target.parent().parent().addClass("modifying");
-
-    }
-    //点击“修改”，触发修改拜访记录功能
-    $(".modify-btn").on("click", modify_medol);
-
-    //修改，点击保存时改变所选那一行的数据 给要修改的那一行添加一个属性，利用这个属性去选择正在修改的那一行，然后捕捉到关闭模态框的状态，关闭模态框时将这一行的属性去掉；
-    $(".preservation").on("click",function (e){
-        mod_title = $(".modal-title");
-        if (mod_title.text() === "修改拜访记录"){
-            //选中正在被修改的那一行的子元素
-             let td = $(".modifying");
-             tds = td.children();
-             //模态框
-             input_model = $("#exampleModal .mod");
-             for(var i=0;i<=input_model.length;i++){
-                tds[i].textContent=input_model[i].value
-            }
-        }else{
-            //模态框
-            input_model = $("#exampleModal .mod");
-            var insert_html = `<tr><td>2019-06-28</td><td>上海交融大学</td> <td>计算机学院</td> <td>罗军舟</td> <td><a href=#>关于计算机科学产学研合</a></td>
-                        <td class="operation"><a class="modify-btn"  data-toggle="modal" data-target="#exampleModal"  onclick="modify_medol($(this))" >修改</a>
-                        <a class="delete" href=#>删除</a></td> </tr>`
-
-            var $tr=$("#tab tr").eq(-2);
-            $tr.after(insert_html);
-        }
-
-
-    });
-
-
-    //关闭模态框时，将被选中的那一行modifying属性去掉
-   $(function () { $('#exampleModal').on('hide.bs.modal', function () {
-
-     let td = $(".modifying");
-     td.removeClass("modifying");
-       })
-
-   });
-
-
-
-    //点击“添加新纪录”，触发添加新纪录功能
-    $("#add-new-record").on("click", function (e) {
-        mod_title = $(".modal-title");
-        mod_title.text("添加拜访记录");
-        //选择a标签所在的单元格
-        input_model = $("#exampleModal .mod");
-        for(var i=0;i<input_model.length;i++){
-            input_model[i].value = "";
-        }
-    });
-
-    //删除一条记录
-    $(".delete").on("click", function (e) {
-     let target = $(e.target);
-        //选择其他的兄弟
-     let td = target.parent().parent();
-     var res=confirm("确定要删除么？");
-     if(res){
-        //删除界面元素，当前行
-        td.remove();
-        alert("删除成功")
-    }
-    });
-
-
-    // 增加新纪录，点击保存时，与修改点击同一个按钮，所以要判断；
-    // 点击保存时，在倒数第二行下面添加一行
-
-
-
-
-
-
-</script>
-  </body>
-</html>
+{% block scripts %}
+    <script src="../static/js/visit_record.js"></script>
+{% endblock %}
