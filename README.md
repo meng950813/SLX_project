@@ -19,4 +19,4 @@
 >官网:http://www.pythondoc.com/flask-wtf/
 ## 3. 关于用户登录
 >1. 登录目前使用到了mysql，对应的配置文件为web/config.py。
->2. 当用户登录成功后，会把该用户的所有数据保存在session['username']中，并且把session['username']注册名称为current_user到jinja2环境中
+>2. 当用户登录成功后，会把该用户的用户名放入session['username']、uid放在session['uid']、type放在session['type']
