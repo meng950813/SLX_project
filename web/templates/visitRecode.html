@@ -65,15 +65,17 @@
             <th>编辑</th>
         </tr>
         <tr>
-            <td>2019-06-28</td>
-            <td>北京大学</td>
-            <td>计算机学院</td>
-            <td>罗军舟</td>
-            <td><a href=#>关于计算机科学产学研合</a></td>
-            <td class="operation">
-                <a class="btn btn-info" data-toggle="modal" data-target="#exampleModal" href="#">修改</a>
-                <a class="btn btn-danger" href=#>删除</a>
-            </td>
+            {% for record in visited_records %}
+                <td>{{ record.date }}</td>
+                <td>{{ record.school }}</td>
+                <td>{{ record.institution }}</td>
+                <td>{{ record.teacher }}</td>
+                <td><a data-toggle="modal" data-target="#exampleModal">{{ record.title }}</a></td>
+                <td class="operation">
+                    <a class="btn btn-info" data-toggle="modal" data-target="#exampleModal" onclick="modify_modal($(this));">修改</a>
+                    <a class="btn btn-danger" href=#>删除</a>
+                </td>
+            {% endfor %}
         </tr>
         <tr>
             <td colspan="7" id="add-new-record" data-toggle="modal" data-target="#exampleModal"> +添加新纪录 </td>
@@ -92,47 +94,49 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form method="post" action="{{ url_for('school_agent.edit_visit_record') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="input-group flex-nowrap">
                             <div class="input-group-prepend">
                                 <span class="input-group-text " id="addon-wrapping">日期</span>
                             </div>
-                            <input id="date" class="form-control mod"  type="date">
+                            <input id="date" class="form-control mod"  type="date" name="date">
                         </div>
                         <br>
                         <div class="input-group flex-nowrap">
                             <div class="input-group-prepend">
                                 <span class="input-group-text "  id="addon-wrapping">学校</span>
                             </div>
-                            <input type="text" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
+                            <input type="text" name="school" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
                         </div>
                         <br>
                         <div class="input-group flex-nowrap">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="addon-wrapping">学院</span>
                             </div>
-                            <input type="text" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
+                            <input type="text" name="institution" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
                         </div>
                         <br>
                         <div class="input-group flex-nowrap">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="addon-wrapping">教师</span>
                             </div>
-                            <input type="text" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
+                            <input type="text" name="teacher" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
                         </div>
                         <br>
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text">内容</span>
                             </div>
-                            <textarea class="form-control mod" aria-label="With textarea"></textarea>
+                            <textarea name="content" class="form-control mod" aria-label="With textarea"></textarea>
                         </div>
+                        <button type="submit">提交</button>
                     </form>
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
-                    <button type="button" class="btn btn-primary preservation">保存</button>
+                    <button type="button" class="btn btn-primary preservation" onclick="saveVisitedRecord($(this))">保存</button>
                 </div>
             </div>
         </div>

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session
+from flask import Blueprint, render_template, session, request, redirect, url_for
 from web.service.basic_info_service import search_teacher_basic_info
 import json
 import os
@@ -52,10 +52,29 @@ def visit_record():
     # 获取用户的uid
     uid = session['uid']
     # TODO: 目前查询最多有一个查询该用户的日程安排
-    results = mongo_operator.find({'user_id': uid}, 'visited_record')
-    for result in results:
-        print(result)
-    return render_template('visitRecode.html')
+    result = mongo_operator.find_one({'user_id': uid}, 'visited_record')
+    return render_template('visitRecode.html', visited_records=result['visited_record'])
+
+
+@school_agent_bp.route('/visit_record/new', methods=['POST'])
+@login_required
+def new_visit_record():
+    print(request.form)
+    return redirect(url_for('.visit_record'))
+
+
+@school_agent_bp.route('/visit_record/edit', methods=['POST'])
+@login_required
+def edit_visit_record():
+    print(request.form)
+    return redirect(url_for('.visit_record'))
+
+
+@school_agent_bp.route('/visit_record/delete', methods=['POST'])
+@login_required
+def delete_visit_record():
+    print(request.form)
+    return redirect(url_for('.visit_record'))
 
 
 def get_relations(school, institution):
