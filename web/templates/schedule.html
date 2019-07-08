@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>日程安排</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <style type="text/css">
+      .page-header {
+            padding-top: 20px;
+            padding-bottom: 20px;
+      }
+      .new-scheldule{
+          width: 10%;
+          margin: 1% 28%;
+      }
+        .schedule{
+            width:50%;
+            margin: 1% 27%;
+        }
+
+        .close{
+            position: absolute;
+            margin-left: 80%;
+            margin-top: -15%;
+        }
+        .card:hover{ -webkit-box-shadow: 4px 4px 8px 2px rgba(20, 20, 20, 0.15); -moz-box-shadow: 4px 4px 8px 2px rgba(20, 20, 20, 0.15);box-shadow: 4px 4px 8px 2px rgba(20, 20, 20, 0.15);}
+
+   </style>
+  </head>
+  <body>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <div class="navbar-header">
+        <a class="navbar-brand thumbnail" href="#">
+          Logo
+        </a>
+      </div>
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav mr-auto">
+                  <li><a class="nav-item nav-link active" href="/">Home </a></li>
+                  <li><a class="nav-item nav-link " href="/about">About </a></li>
+                </ul>
+            </div>
+
+                {% if username %}
+                    <ul class="navbar-nav mr-auto float-right">
+                      <li><a class="nav-item nav-link active" href="{{ url_for('schedule') }}">日程安排</a></li>
+                      <li><a class="nav-item nav-link active" href="{{ url_for('visitRecode') }}">拜访记录</a></li>
+                      <li><a class="nav-item nav-link active" href="/"></a></li>
+                      <li><a class="nav-item nav-link active" href="/">消息提醒 <span class="badge" style="background-color: red; color: white">7</span></a></li>
+                      <li><a class="nav-item nav-link active" >{{ username }}</a></li>
+                      <li><a class="nav-item nav-link active" href="/about">注销</a></li>
+                    </ul>
+                {% else %}
+                    <ul class="navbar-nav mr-auto float-right">
+                      <li><a class="nav-item nav-link active" href="/">注册</a></li>
+                      <li><a class="nav-item nav-link active" href="/about">登录</a></li>
+                    </ul>
+                {% endif %}
+        </div>
+    </nav>
+
+    <!-- 日程安排卡片 -->
+  <div class="new-scheldule"><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal" style="width: 100px; height: 45px;">新建日程</button></div>
+    <div class="form-inline schedule">
+
+        <div class="card" style="width: 20%; margin:2% 2%">
+          <div class="card-body">
+            <h5 class="card-title">2019-06-27</h5>
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <p class="card-text">下午3点到东南大学纪中楼203拜访王老师</p>
+            <a href="#" class="btn btn-primary" onclick="">编辑</a>
+          </div>
+        </div>
+
+        <div class="card" style="width: 20%; margin:2% 2%;vertical-align: top;">
+          <div class="card-body">
+            <h5 class="card-title">2019-06-27</h5>
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <p class="card-text">下午3点到东南大学纪中楼203拜访王老师</p>
+            <a href="#" class="btn btn-primary">编辑</a>
+          </div>
+        </div>
+
+        <div class="card" style="width: 20%; margin:2% 2%;vertical-align: top;">
+          <div class="card-body">
+            <h5 class="card-title">2019-06-27</h5>
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <p class="card-text">下午3点到东南大学纪中楼203拜访王老师下午3点到东南大学纪中楼203拜访王老师</p>
+            <a href="#" class="btn btn-primary">编辑</a>
+          </div>
+        </div>
+
+        <div class="card" style="width: 20%; margin:2% 2%;vertical-align: top;">
+          <div class="card-body">
+            <h5 class="card-title">2019-06-27</h5>
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <p class="card-text">下午3点到东南大学纪中楼203拜访王老师下午3点到东南大学纪中楼203拜访王老师</p>
+            <a href="#" class="btn btn-primary">编辑</a>
+          </div>
+        </div>
+    </div>
+
+  <div class="form-inline schedule">
+
+        <div class="card" style="width: 20%; margin:2% 2%">
+          <div class="card-body">
+            <h5 class="card-title">2019-06-27</h5>
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <p class="card-text">下午3点到东南大学纪中楼203拜访王老师</p>
+            <a href="#" class="btn btn-primary">编辑</a>
+          </div>
+        </div>
+
+        <div class="card" style="width: 20%; margin:2% 2%">
+          <div class="card-body">
+            <h5 class="card-title">2019-06-27</h5>
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <p class="card-text">下午3点到东南大学纪中楼203拜访王老师</p>
+            <a href="#" class="btn btn-primary">编辑</a>
+          </div>
+        </div>
+
+        <div class="card" style="width: 20%; margin:2% 2%">
+          <div class="card-body">
+            <h5 class="card-title">2019-06-27</h5>
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <p class="card-text">下午3点到东南大学纪中楼203拜访王老师</p>
+            <a href="#" class="btn btn-primary">编辑</a>
+          </div>
+        </div>
+
+        <div class="card" style="width: 20%; margin:2% 2%">
+          <div class="card-body">
+            <h5 class="card-title">2019-06-27</h5>
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <p class="card-text">下午3点到东南大学纪中楼203拜访王老师</p>
+            <a href="#" class="btn btn-primary">编辑</a>
+          </div>
+        </div>
+    </div>
+  <div class="form-inline schedule">
+
+        <div class="card" style="width: 20%; margin:2% 2%">
+          <div class="card-body">
+            <h5 class="card-title">2019-06-27</h5>
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <p class="card-text">下午3点到东南大学纪中楼203拜访王老师下午3点到东南大学纪中楼203拜访王老师</p>
+            <a href="#" class="btn btn-primary">编辑</a>
+          </div>
+        </div>
+
+        <div class="card" style="width: 20%; margin:2% 2%">
+          <div class="card-body">
+            <h5 class="card-title">2019-06-27</h5>
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <p class="card-text">下午3点到东南大学纪中楼203拜访王老师</p>
+            <a href="#" class="btn btn-primary">编辑</a>
+          </div>
+        </div>
+
+        <div class="card" style="width: 20%; margin:2% 2%">
+          <div class="card-body">
+            <h5 class="card-title">2019-06-27</h5>
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <p class="card-text">下午3点到东南大学纪中楼203拜访王老师</p>
+            <a href="#" class="btn btn-primary">编辑</a>
+          </div>
+        </div>
+
+        <div class="card" style="width: 20%; margin:2% 2%">
+          <div class="card-body">
+            <h5 class="card-title">2019-06-27</h5>
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <p class="card-text">下午3点到东南大学纪中楼203拜访王老师</p>
+              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">编辑</button>
+          </div>
+        </div>
+    </div>
+
+  <div class="container">
+
+  <!-- 模态框 -->
+  <div class="modal fade" id="myModal" >
+    <div class="modal-dialog" >
+      <div class="modal-content" style="margin: 70% -25%; width: 800px; height: 300px;">
+
+        <!-- 模态框头部 -->
+        <div class="modal-header">
+          <h4 class="modal-title">2019-06-27</h4>
+        </div>
+
+        <!-- 模态框主体 -->
+        <div class="modal-body" style="">
+            <textarea style="width: 750px;height: 100px;font-size: 23px" type="text">下午3点到东南大学纪中楼203拜访王老师</textarea>
+
+        </div>
+
+        <!-- 模态框底部 -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">保存</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+    <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+  </body>
+</html>
