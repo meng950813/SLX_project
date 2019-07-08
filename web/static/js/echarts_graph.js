@@ -11,7 +11,7 @@ let graphOption = {
         formatter: function (params) {
             if (params.dataType == "node") {
                 //设置提示框的内容和格式 节点和边都显示name属性
-                return `<strong>节点属性</strong><hr>姓名：${params.data.label}</b><br>所属学校：${params.data.school}<br>所属学院：${params.data.institution}`;
+                return `<strong>节点属性</strong><hr>姓名：${params.data.label}</b><br>所属学校：${params.data.school}<br>所属学院：${params.data.insititution}`;
             }
             else{
                 return `<strong>关系属性</strong><hr>
@@ -122,14 +122,16 @@ let treeOption = {
     ]
 };
 
+
 /**
  * 重新加载关系图数据，把数据赋值给graphOption中的data
  * @param data 关系图数据
  */
 function reloadGraph(data){
     if(!"nodes" in data) return;
+    // console.log(data)
     let nodes = data.nodes, links = data.links, cates = data.community;
-    console.log(nodes.length, links.length, cates.length);
+    // console.log(nodes.length, links.length, cates.length);
     graphOption.series[0].data = nodes;
     graphOption.series[0].links = links;
 
@@ -162,44 +164,6 @@ myChart.on('click', function (params) {
         alert('点击了树的结点');
     }
 });
-
-/**
- * 规格化关系图数据，使之可以生成echarts可用的数据格式
- * @param data
- * @returns {{nodes: Array, links: Array, community: *}}
- */
-function formatGraph(data)
-{
-    let back_data = {
-        "nodes" : [],
-        "links" : [],
-        "community" : data['community_data']
-    };
-
-    let nodes = data['nodes'];
-    for(let index in nodes)
-    {
-        let node = nodes[index];
-        node['label'] = node['name'];
-        node['name'] = node['id'];
-        //node['symbolSize'] = parseInt(node['centrality'] * 20 + 5);
-        node['category'] = node['class'] - 1;
-        node.draggable= true;
-        delete node["id"];
-        delete node["class"];
-        back_data["nodes"].push(node);
-    }
-    let links = data['edges'];
-    for(let index in links)
-    {
-        let link = links[index];
-        link["value"] = link["weight"];
-        delete link["weight"];
-        back_data['links'].push(link)
-    }
-
-    return back_data;
-}
 
 
 /**
@@ -239,11 +203,12 @@ $("#select-college").change(function(){
     }
 })
 
+// 切换学院的响应事件
 $("#select-institution").change(function () {
     let school = $("#select-college").children("option:selected").text();
     let institution = $(this).children("option:selected").text();
-    console.log(school,institution);
-    getGraphData(school,institution);
+    // console.log(school,institution);
+    getInstitutionGraphData(school,institution);
 });
 
 
@@ -286,7 +251,7 @@ function setInstitution(institution_list, school){
         options += `<option>${institution_list[i]}</option>`;
     }
     $("#select-institution").html(options);
-    getGraphData(school, institution_list[0]);
+    getInstitutionGraphData(school, institution_list[0]);
 }
 
 
@@ -295,16 +260,70 @@ function setInstitution(institution_list, school){
  * @param {String} school 
  * @param {String} institution 
  */
-function getGraphData(school, institution){
+function getInstitutionGraphData(school, institution){
     let file_path = `/static/relation_data/${school}${institution}.txt`;
     $.ajax({
         type: "get",
         url: file_path,
         dataType: "json",
         success: function (response) {
-            let data = JSON.stringify(response);
-            console.log(data);
-            reloadGraph(formatGraph(data));
+            reloadGraph(formatGraph(response));
         }
     });
 }
+
+
+/**
+ * 规格化关系图数据，使之可以生成echarts可用的数据格式
+ * @param data
+ * @returns {{nodes: Array, links: Array, community: *}}
+ */
+function formatGraph(data){
+    let back_data = {
+        "nodes" : [],
+        "links" : [],
+        "community" : data['community_data']
+    };
+
+    let nodes = data['nodes'];
+
+    for(let index in nodes){
+        let node = nodes[index];
+        node['label'] = node['name'];
+        node['name'] = String(node['teacherId']);
+        node['symbolSize'] = parseInt(node['centrality'] * 30 + 5);
+        node['category'] = node['class'] - 1;
+        node.draggable= true;
+
+        if(data.core_node.indexOf(node["teacherId"]) >= 0){
+            node["itemStyle"]= {
+                "normal": {
+                    "borderColor": 'yellow',
+                    "borderWidth": 5,
+                    "shadowBlur": 10,
+                    "shadowColor": 'rgba(0, 0, 0, 0.3)'
+                }
+            }
+        }
+
+        delete node["teacherId"];
+        delete node["class"];
+        delete node["centrality"];
+        back_data["nodes"].push(node);
+    }
+    
+    let links = data['edges'];
+    for(let index in links){   
+        let link = links[index];
+        if(!("source" in link && "target" in link))
+            continue;
+        link["source"] = String(link["source"]);
+        link["target"] = String(link["target"]);
+        link["value"] = link["weight"];
+        delete link["weight"];
+        back_data['links'].push(link)
+    }
+
+    return back_data;
+}
+
