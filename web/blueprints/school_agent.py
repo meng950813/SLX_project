@@ -3,7 +3,7 @@ from web.service.basic_info_service import search_teacher_basic_info
 import json
 import os
 
-from blueprints.auth import login_required
+from web.blueprints.auth import login_required
 
 school_agent_bp = Blueprint('school_agent', __name__)
 
