@@ -67,7 +67,7 @@ def new_visit_record():
 @login_required
 def edit_visit_record():
     print(request.form)
-    return redirect(url_for('.visit_record'))
+    return json.dumps({'success': True})
 
 
 @school_agent_bp.route('/visit_record/delete', methods=['POST'])

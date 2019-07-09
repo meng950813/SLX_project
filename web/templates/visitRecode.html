@@ -58,22 +58,23 @@
     <table class="table table-bordered  table-hover" id = "tab">
         <tr>
             <th>日期</th>
-            <th>学校</th>
+            <th>标题</th>
             <th>学院</th>
             <th>教师</th>
-            <th>内容</th>
+            <th>学校</th>
             <th>编辑</th>
         </tr>
         <tr>
             {% for record in visited_records %}
                 <td>{{ record.date }}</td>
-                <td>{{ record.school }}</td>
+                <td><a data-toggle="modal" data-target="#exampleModal">{{ record.title }}</a></td>
                 <td>{{ record.institution }}</td>
                 <td>{{ record.teacher }}</td>
-                <td><a data-toggle="modal" data-target="#exampleModal">{{ record.title }}</a></td>
+                <td>{{ record.school }}</td>
                 <td class="operation">
-                    <a class="btn btn-info" data-toggle="modal" data-target="#exampleModal" onclick="modify_modal($(this));">修改</a>
+                    <a class="btn btn-info" href="#" data-toggle="modal" data-target="#exampleModal" onclick="modify_modal($(this));">修改</a>
                     <a class="btn btn-danger" href=#>删除</a>
+                    <input type="hidden" id="detail" value="{{ record.content }}">
                 </td>
             {% endfor %}
         </tr>
@@ -94,8 +95,8 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form method="post" action="{{ url_for('school_agent.edit_visit_record') }}">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <form>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" id="csrf_token">
                         <div class="input-group flex-nowrap">
                             <div class="input-group-prepend">
                                 <span class="input-group-text " id="addon-wrapping">日期</span>
@@ -105,32 +106,38 @@
                         <br>
                         <div class="input-group flex-nowrap">
                             <div class="input-group-prepend">
+                                <span class="input-group-text "  id="addon-wrapping">标题</span>
+                            </div>
+                            <input type="text" id="title" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
+                        </div>
+                        <br>
+                        <div class="input-group flex-nowrap">
+                            <div class="input-group-prepend">
                                 <span class="input-group-text "  id="addon-wrapping">学校</span>
                             </div>
-                            <input type="text" name="school" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
+                            <input type="text" name="school" id="school" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
                         </div>
                         <br>
                         <div class="input-group flex-nowrap">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="addon-wrapping">学院</span>
                             </div>
-                            <input type="text" name="institution" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
+                            <input type="text" name="institution" id="institution" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
                         </div>
                         <br>
                         <div class="input-group flex-nowrap">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="addon-wrapping">教师</span>
                             </div>
-                            <input type="text" name="teacher" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
+                            <input type="text" name="teacher" id="teacher" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
                         </div>
                         <br>
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text">内容</span>
                             </div>
-                            <textarea name="content" class="form-control mod" aria-label="With textarea"></textarea>
+                            <textarea name="content" id="content" class="form-control mod" aria-label="With textarea"></textarea>
                         </div>
-                        <button type="submit">提交</button>
                     </form>
                 </div>
 
