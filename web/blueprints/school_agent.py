@@ -1,9 +1,11 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, session, request, redirect, url_for
 from web.service.basic_info_service import search_teacher_basic_info
 import json
 import os
 
 from web.blueprints.auth import login_required
+from web.utils.mongo_operator import MongoOperator
+from web.config import MongoDB_CONFIG
 
 school_agent_bp = Blueprint('school_agent', __name__)
 
@@ -46,7 +48,33 @@ def scholar_info(teacher_id):
 @school_agent_bp.route('/visit_record')
 @login_required
 def visit_record():
-    return render_template('visitRecode.html')
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # 获取用户的uid
+    uid = session['uid']
+    # TODO: 目前查询最多有一个查询该用户的日程安排
+    result = mongo_operator.find_one({'user_id': uid}, 'visited_record')
+    return render_template('visitRecode.html', visited_records=result['visited_record'])
+
+
+@school_agent_bp.route('/visit_record/new', methods=['POST'])
+@login_required
+def new_visit_record():
+    print(request.form)
+    return redirect(url_for('.visit_record'))
+
+
+@school_agent_bp.route('/visit_record/edit', methods=['POST'])
+@login_required
+def edit_visit_record():
+    print(request.form)
+    return redirect(url_for('.visit_record'))
+
+
+@school_agent_bp.route('/visit_record/delete', methods=['POST'])
+@login_required
+def delete_visit_record():
+    print(request.form)
+    return redirect(url_for('.visit_record'))
 
 
 def get_relations(school, institution):
