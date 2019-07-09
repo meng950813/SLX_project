@@ -1,5 +1,6 @@
 //选中项
 let tds = null;
+let detail = null;
 
 function modify_modal(e){
     //修改模态框标题
@@ -11,10 +12,11 @@ function modify_modal(e){
     tds = e.parent().siblings();
     //将表格中的内容逐个取出，然后填到表单中去
     let input_model = $("#exampleModal .mod");
-    for(let i = 0;i < input_model.length;i++){
+    for(let i = 0;i < tds.length;i++){
         input_model[i].value = tds[i].innerText;
-        console.log(input_model[i].value, typeof(input_model[i].value));
     }
+    detail = e.parent('.operation').find('#detail');
+    $('#content').val(e.parent('.operation').find('#detail').val());
 }
 
 /*
@@ -23,28 +25,53 @@ function modify_modal(e){
  */
 function saveVisitedRecord(e){
     let mod_title = $(".modal-title");
-    //判断当前是否是修改
+
+    let date = $('#date').val();
+    let title = $('#title').val();
+    let school = $('#school').val();
+    let institution = $('#institution').val();
+    let teacher = $('#teacher').val();
+    let content = $('#content').val();
+    let url = '';
+    //回写
     if (tds != null){
         //模态框
         let input_model = $("#exampleModal .mod");
-        for(let i=0;i < input_model.length;i++){
-            tds[i].textContent = input_model[i].value;
+        for(let i=0;i < tds.length;i++){
+            tds[i].innerHTML = input_model[i].value;
         }
-        /*
-        $.ajax({
-            url: '/visit_record/edit',
-            data: {csrf_token:}
-        });
-         */
+        detail.val(content);
+
+        url = '/visit_record/edit';
         tds = null;
+        detail = null;
     }else{
         //模态框
-        input_model = $("#exampleModal .mod");
-        var insert_html = `<tr><td>2019-06-28</td><td>上海交融大学</td> <td>计算机学院</td> <td>罗军舟</td> <td><a href=#>关于计算机科学产学研合</a></td>
-                        <td class="operation"><a class="modify-btn"  data-toggle="modal" data-target="#exampleModal"  onclick="modify_modal($(this))" >修改</a>
-                        <a class="delete" href=#>删除</a></td> </tr>`
+        let input_model = $("#exampleModal .mod");
+        var insert_html =
+            `<tr><td>${date}</td><td>${school}</td> <td>${institution}</td> <td>${teacher}</td> <td><a href=#>${title}</a></td>
+                <td class="operation">
+                    <a class="btn btn-info" href="#" data-toggle="modal" data-target="#exampleModal" onclick="modify_modal($(this));">修改</a>
+                    <a class="btn btn-danger" href=#>删除</a>
+                </td></tr>`;
 
         var $tr=$("#tab tr").eq(-2);
         $tr.after(insert_html);
+        url = '/visit_record/new';
     }
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data: {
+            date: date,
+            school: school,
+            institution: institution,
+            teacher: teacher,
+            content: content,
+            csrf_token: $('#csrf_token').val(),
+        },
+        dataType: 'json'
+    }).done(function (data) {
+        console.log(data);
+    });
 }

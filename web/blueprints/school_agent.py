@@ -29,9 +29,7 @@ def scholar_info(teacher_id):
     :return:
     """
     # 返回json 序列化后的文件
-    json_file = search_teacher_basic_info(teacher_id)
-
-    teacher_basic_info = json.loads(json_file)
+    teacher_basic_info = search_teacher_basic_info(teacher_id)
     length = [0, 0]
 
     # 计算该教师所拥有的基金的数目，并将其加到列表中，用以传送给前端
@@ -67,7 +65,7 @@ def new_visit_record():
 @login_required
 def edit_visit_record():
     print(request.form)
-    return redirect(url_for('.visit_record'))
+    return json.dumps({'success': True})
 
 
 @school_agent_bp.route('/visit_record/delete', methods=['POST'])
