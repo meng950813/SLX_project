@@ -8,11 +8,6 @@
     <link rel="stylesheet" href="../static/css/bootstrap_v4.min.css">
     <script src="https://cdn.bootcss.com/twitter-bootstrap/4.0.0-beta.3/js/bootstrap.min.js"></script>
     <style type="text/css">
-
-        .form-group{
-            margin-top: 1%;
-            font-size: 23px;
-        }
         .form-group input{
             width: 300px;
             height: 45px;
@@ -23,22 +18,13 @@
             width: 600px;
             font-size: 23px;
         }
-        .recode{
-            width: 60%;
-            margin: 1% auto;
+        #add-new-record{
             text-align: center;
+            cursor: pointer;
         }
-        .search{
-            width:100%;
-            margin: 1% 0%;
+        #add-new-record:hover{
+            color:#007bff;
         }
-    #add-new-record{
-        text-align: center;
-        cursor: pointer;
-    }
-    #add-new-record:hover{
-        color:#007bff;
-    }
     </style>
 {% endblock %}
 
@@ -50,7 +36,7 @@
             <small class="text-muted" id="total">{{ visited_records | length }}</small>
         </h2>
     </div>
-    <div class="search">
+    <div>
         <form class="form form-inline">
 
             <div class="input-group float-right h3 ml-auto">
@@ -94,7 +80,6 @@
     </table>
 
     <!-- 模态框（Modal） -->
-    <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -123,7 +108,7 @@
                         <br>
                         <div class="input-group flex-nowrap">
                             <div class="input-group-prepend">
-                                <span class="input-group-text "  id="addon-wrapping">学校</span>
+                                <span class="input-group-text"  id="addon-wrapping">学校</span>
                             </div>
                             <input type="text" name="school" id="school" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
                         </div>

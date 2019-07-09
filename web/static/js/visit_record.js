@@ -117,7 +117,8 @@ function saveVisitedRecord(e){
     }).done(function (data) {
         console.log(data);
         //是否成功
-        window.location.reload();
+        if (!isModifying)
+            window.location.reload();
     });
     $('#exampleModal').modal('hide');
 }
