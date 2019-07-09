@@ -57,22 +57,95 @@ def visit_record():
 @school_agent_bp.route('/visit_record/new', methods=['POST'])
 @login_required
 def new_visit_record():
-    print(request.form)
-    return redirect(url_for('.visit_record'))
+    """
+    插入新的拜访记录，当不存在拜访记录的时候会先新建
+    :return:
+    """
+    # 获取当前的id
+    record_id = request.form.get('id', type=int)
+    record = {
+        'id': record_id,
+        'institution': request.form.get('institution'),
+        'school': request.form.get('school'),
+        'content': request.form.get('content'),
+        'date': request.form.get('date'),
+        'teacher': request.form.get('teacher'),
+        'title': request.form.get('title'),
+    }
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # 获取用户的uid
+    uid = session['uid']
+    # TODO: 目前查询最多有一个查询该用户的日程安排
+    result = mongo_operator.find_one({'user_id': uid}, 'visited_record')
+    # 查询结果不存在，新建
+    if result is None:
+        mongo_operator.db['visited_record'].insert_one(
+            {
+                "user_id": uid,
+                "visited_record": [record]
+            })
+    else:
+        result['visited_record'].append(record)
+        mongo_operator.db['visited_record'].update({'user_id': uid}, result)
+
+    return json.dumps({'success': True})
 
 
 @school_agent_bp.route('/visit_record/edit', methods=['POST'])
 @login_required
 def edit_visit_record():
-    print(request.form)
+    """
+    修改拜访记录
+    :return:
+    """
+    # 获取当前的id
+    record_id = request.form.get('id', type=int)
+    datum = {
+        'institution': request.form.get('institution'),
+        'school': request.form.get('school'),
+        'content': request.form.get('content'),
+        'date': request.form.get('date'),
+        'teacher': request.form.get('teacher'),
+        'title': request.form.get('title'),
+        'id': record_id,
+    }
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # 获取用户的uid
+    uid = session['uid']
+    result = mongo_operator.find_one({'user_id': uid}, 'visited_record')
+    i = 0
+    for record in result['visited_record']:
+        if record_id == record['id']:
+            break
+        i += 1
+    result['visited_record'][i] = datum
+    mongo_operator.db['visited_record'].update({'user_id': uid}, result)
+
     return json.dumps({'success': True})
 
 
 @school_agent_bp.route('/visit_record/delete', methods=['POST'])
 @login_required
 def delete_visit_record():
-    print(request.form)
-    return redirect(url_for('.visit_record'))
+    """
+    删除拜访记录
+    :return:
+    """
+    # 获取当前的id
+    record_id = request.form.get('id', type=int)
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # 获取用户的uid
+    uid = session['uid']
+    result = mongo_operator.find_one({'user_id': uid}, 'visited_record')
+    i = 0
+    for record in result['visited_record']:
+        if record_id == record['id']:
+            break
+        i += 1
+    result['visited_record'].pop(i)
+    mongo_operator.db['visited_record'].update({'user_id': uid}, result)
+
+    return json.dumps({'success': True})
 
 
 def get_relations(school, institution):
