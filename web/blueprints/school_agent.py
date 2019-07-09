@@ -156,14 +156,28 @@ def schedule():
     return render_template("schedule.html")
 
 
-@school_agent_bp.route('/info_modify')
+@school_agent_bp.route('/info_modify',methods=['POST'])
 @login_required
 def info_modify():
     """
     进行信息修改
     :return:
     """
-    return
+    info = {
+        'title':request.form.get('title'),
+        'type':request.form.get('type'),
+        'target':request.form.get('target'),
+        'content':request.form.get('content')
+    }
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # 获取用户的uid
+    uid = session['uid']
+    mongo_operator.db['info_modify'].insert_one(
+        {
+            "user_id": uid,
+            "info_modify": info
+        })
+    return json.dumps({'success': True})
 
 
 def get_relations(school, institution):
