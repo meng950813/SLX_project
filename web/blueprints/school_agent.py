@@ -279,10 +279,34 @@ def edit_schedule():
     schedule_col.update({"user_id": uid}, {"$set": {"schedule": schedule_list}})
 
 
+def set_whether_completed(user_id, schedule_id, type):
+    """
+    设置该用户下的该计划是否完成
 
+    :param user_id:
+    :param schedule_id:
+    :param type: ==0 表示未完成， ==1 表示已完成 ==-1表示该计划已经取消
+    :return: 返回true表示修改成功，否则失败
+    """
 
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # 获取schedule集合
+    schedule_col = mongo_operator.get_collection("schedule")
+    # 获取集合中的schedule列表
+    schedule_list = schedule_col.find_one({"user_id": user_id})["schedule"]
+    # 查找对应的schedule_id
+    res = False
+    for schedule in schedule_list:
+        if schedule["schedule_id"] == schedule_id:
+            schedule["is_completed"] = str(type)
+            print("-----------已更新")
+            res = True
+            break
 
+    # 更新schedule_list
+    schedule_col.update({"user_id": user_id}, {"$set": {"schedule": schedule_list}})
 
+    return res
 
 
 def get_relations(school, institution):
@@ -365,4 +389,5 @@ if __name__ == '__main__':
     # print(get_relations("北京大学", "化学生物学与生物技术学院"))
     # new_schedule()
     # index()
-    edit_schedule()
+    # edit_schedule()
+    set_whether_completed(100006,1,1)
