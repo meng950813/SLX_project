@@ -178,6 +178,8 @@ def new_schedule():
 
     user_id = 100006
 
+    date = request.form.get('date')
+
     # 获取当前的年月日，并组合成字符串
     # current_year = datetime.datetime.now().year
     # current_month = datetime.datetime.now().month
