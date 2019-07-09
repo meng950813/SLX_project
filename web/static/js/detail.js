@@ -23,6 +23,7 @@ function check_model_submit(){
     if(content.trim().length == 0) return;
 
     let form_data = {
+        "csrf_token": $('#csrf_token').val(),
         "title": $("#modifiyInfoModalLabel").text(),
         "type" : $("input[name='add-modify-delete']:checked").val(),
         "target" : target,
@@ -30,7 +31,7 @@ function check_model_submit(){
     }
     $.ajax({
         type: "post",
-        url: "#TODO",
+        url: "/info_modify",
         data: form_data,
         dataType: "json",
         success: function (response) {
