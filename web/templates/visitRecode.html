@@ -8,11 +8,6 @@
     <link rel="stylesheet" href="../static/css/bootstrap_v4.min.css">
     <script src="https://cdn.bootcss.com/twitter-bootstrap/4.0.0-beta.3/js/bootstrap.min.js"></script>
     <style type="text/css">
-
-        .form-group{
-            margin-top: 1%;
-            font-size: 23px;
-        }
         .form-group input{
             width: 300px;
             height: 45px;
@@ -23,30 +18,25 @@
             width: 600px;
             font-size: 23px;
         }
-        .recode{
-            width: 60%;
-            margin: 1% auto;
+        #add-new-record{
             text-align: center;
+            cursor: pointer;
         }
-        .search{
-            width:100%;
-            margin: 1% 0%;
+        #add-new-record:hover{
+            color:#007bff;
         }
-    #add-new-record{
-        text-align: center;
-        cursor: pointer;
-    }
-    #add-new-record:hover{
-        color:#007bff;
-    }
     </style>
 {% endblock %}
 
 {% block main %}
 <div class="container">
     <div class="input-group">
-        <h2 style="margin: auto;text-align: center">拜访记录</h2></div>
-    <div class="search">
+        <h2 style="margin: auto;text-align: center">
+            拜访记录
+            <small class="text-muted" id="total">{{ visited_records | length }}</small>
+        </h2>
+    </div>
+    <div>
         <form class="form form-inline">
 
             <div class="input-group float-right h3 ml-auto">
@@ -57,34 +47,39 @@
     </div>
     <table class="table table-bordered  table-hover" id = "tab">
         <tr>
+            <th>No.</th>
             <th>日期</th>
             <th>标题</th>
+            <th>学校</th>
             <th>学院</th>
             <th>教师</th>
-            <th>学校</th>
             <th>编辑</th>
         </tr>
+        {% for record in visited_records %}
         <tr>
-            {% for record in visited_records %}
+                <td>{{ loop.index }}</td>
                 <td>{{ record.date }}</td>
                 <td><a data-toggle="modal" data-target="#exampleModal">{{ record.title }}</a></td>
+                <td>{{ record.school }}</td>
                 <td>{{ record.institution }}</td>
                 <td>{{ record.teacher }}</td>
-                <td>{{ record.school }}</td>
                 <td class="operation">
-                    <a class="btn btn-info" href="#" data-toggle="modal" data-target="#exampleModal" onclick="modify_modal($(this));">修改</a>
-                    <a class="btn btn-danger" href=#>删除</a>
+                    <button class="btn btn-info" data-toggle="modal" data-target="#exampleModal" onclick="modify_modal($(this));">修改</button>
+                    <form style="display: inline" method="post" action="/visit_record/delete">
+                        <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" id="identifier" name="id" value="{{ record.id }}">
+                        <button class="btn btn-danger" type="submit" onclick="return confirm('是否删除此条记录');">删除</button>
+                    </form>
                     <input type="hidden" id="detail" value="{{ record.content }}">
                 </td>
-            {% endfor %}
         </tr>
+        {% endfor %}
         <tr>
-            <td colspan="7" id="add-new-record" data-toggle="modal" data-target="#exampleModal"> +添加新纪录 </td>
+            <td colspan="7" id="add-new-record" data-toggle="modal" data-target="#exampleModal" onclick="wantToNewRecord($(this));"> +添加新纪录 </td>
         </tr>
     </table>
 
     <!-- 模态框（Modal） -->
-    <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -108,12 +103,12 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text "  id="addon-wrapping">标题</span>
                             </div>
-                            <input type="text" id="title" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
+                            <input type="text" id="title" class="form-control mod" placeholder="" aria-describedby="addon-wrapping">
                         </div>
                         <br>
                         <div class="input-group flex-nowrap">
                             <div class="input-group-prepend">
-                                <span class="input-group-text "  id="addon-wrapping">学校</span>
+                                <span class="input-group-text"  id="addon-wrapping">学校</span>
                             </div>
                             <input type="text" name="school" id="school" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
                         </div>
@@ -136,7 +131,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">内容</span>
                             </div>
-                            <textarea name="content" id="content" class="form-control mod" aria-label="With textarea"></textarea>
+                            <textarea name="content" rows="6" id="content" class="form-control mod" aria-label="With textarea"></textarea>
                         </div>
                     </form>
                 </div>
