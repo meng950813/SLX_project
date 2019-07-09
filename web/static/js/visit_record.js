@@ -1,5 +1,9 @@
 //选中项
 let tds = null;
+let detail = null;
+let identifier = null;
+//当前是否在修改数据
+let isModifying = true;
 
 function modify_modal(e){
     //修改模态框标题
@@ -9,12 +13,41 @@ function modify_modal(e){
     let target = $(e.target);
     //选择其他的兄弟
     tds = e.parent().siblings();
+    isModifying = true;
     //将表格中的内容逐个取出，然后填到表单中去
     let input_model = $("#exampleModal .mod");
-    for(let i = 0;i < input_model.length;i++){
-        input_model[i].value = tds[i].innerText;
-        console.log(input_model[i].value, typeof(input_model[i].value));
+    for(let i = 1;i < tds.length;i++){
+        input_model[i - 1].value = tds[i].innerText;
     }
+    detail = e.parent('.operation').find('#detail');
+    identifier = e.parent('.operation').find('#identifier');
+    $('#content').val(e.parent('.operation').find('#detail').val());
+}
+
+function wantToNewRecord() {
+    isModifying = false;
+}
+
+function deleteRecord(element) {
+    if (!confirm('确定删除此条记录?'))
+        return;
+    let record_id = element.parent().parent('.operation').find('#identifier').val();
+    let csrf_token = element.parent().find('#csrf_token').val();
+    //发送事件
+    $.ajax({
+        url: '/visit_record/delete',
+        type: 'POST',
+        data: {
+            id: record_id,
+            csrf_token: csrf_token,
+        },
+        dataType: 'json'
+    }).done(function (data) {
+        console.log(data);
+        //删除此条记录
+        element.parents('tr').remove();
+        $('#total').text(parseInt($('#total').text()) - 1);
+    });
 }
 
 /*
@@ -23,28 +56,64 @@ function modify_modal(e){
  */
 function saveVisitedRecord(e){
     let mod_title = $(".modal-title");
-    //判断当前是否是修改
-    if (tds != null){
+
+    let date = $('#date').val();
+    let title = $('#title').val();
+    let school = $('#school').val();
+    let institution = $('#institution').val();
+    let teacher = $('#teacher').val();
+    let content = $('#content').val();
+    let id = null;
+    let url = '';
+    //回写
+    if (isModifying){
         //模态框
         let input_model = $("#exampleModal .mod");
-        for(let i=0;i < input_model.length;i++){
-            tds[i].textContent = input_model[i].value;
+        for(let i = 1;i < tds.length;i++){
+            tds[i].innerHTML = input_model[i - 1].value;
         }
-        /*
-        $.ajax({
-            url: '/visit_record/edit',
-            data: {csrf_token:}
-        });
-         */
-        tds = null;
+        detail.val(content);
+        id = parseInt(identifier.val());
+        url = '/visit_record/edit';
     }else{
         //模态框
-        input_model = $("#exampleModal .mod");
-        var insert_html = `<tr><td>2019-06-28</td><td>上海交融大学</td> <td>计算机学院</td> <td>罗军舟</td> <td><a href=#>关于计算机科学产学研合</a></td>
-                        <td class="operation"><a class="modify-btn"  data-toggle="modal" data-target="#exampleModal"  onclick="modify_modal($(this))" >修改</a>
-                        <a class="delete" href=#>删除</a></td> </tr>`
+        id = parseInt($('#total').text()) + 1;
+        let insert_html =
+            `<tr><td>${id}</td><td>${date}</td><td><a>${title}</a></td><td>${school}</td> <td>${institution}</td> <td>${teacher}</td> 
+                <td class="operation">
+                    <a class="btn btn-info" href="#" data-toggle="modal" data-target="#exampleModal" onclick="modify_modal($(this));">修改</a>
+                    <form style="display: inline">
+                        <input type="hidden" id="csrf_token" value="{{ csrf_token() }}"/>
+                        <a class="btn btn-danger" href=# onclick="deleteRecord($(this));">删除</a>
+                    </form>
+                </td></tr>`;
 
-        var $tr=$("#tab tr").eq(-2);
+        let $tr=$("#tab tr").eq(-2);
         $tr.after(insert_html);
+        url = '/visit_record/new';
+        //修改总数目
+        $('#total').text(id);
     }
+    tds = null;
+    detail = null;
+    //发送事件
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data: {
+            id: id,
+            date: date,
+            school: school,
+            institution: institution,
+            teacher: teacher,
+            content: content,
+            title: title,
+            csrf_token: $('#csrf_token').val(),
+        },
+        dataType: 'json'
+    }).done(function (data) {
+        console.log(data);
+        //是否成功
+    });
+    $('#exampleModal').modal('hide');
 }

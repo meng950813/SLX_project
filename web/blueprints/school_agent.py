@@ -23,6 +23,7 @@ def index():
 
 
 @school_agent_bp.route('/scholar/<int:teacher_id>')
+@login_required
 def scholar_info(teacher_id):
     """
     专家个人信息
@@ -30,9 +31,7 @@ def scholar_info(teacher_id):
     :return:
     """
     # 返回json 序列化后的文件
-    json_file = search_teacher_basic_info(teacher_id)
-
-    teacher_basic_info = json.loads(json_file)
+    teacher_basic_info = search_teacher_basic_info(teacher_id)
     length = [0, 0]
 
     # 计算该教师所拥有的基金的数目，并将其加到列表中，用以传送给前端
@@ -60,22 +59,112 @@ def visit_record():
 @school_agent_bp.route('/visit_record/new', methods=['POST'])
 @login_required
 def new_visit_record():
-    print(request.form)
-    return redirect(url_for('.visit_record'))
+    """
+    插入新的拜访记录，当不存在拜访记录的时候会先新建
+    :return:
+    """
+    # 获取当前的id
+    record_id = request.form.get('id', type=int)
+    record = {
+        'id': record_id,
+        'institution': request.form.get('institution'),
+        'school': request.form.get('school'),
+        'content': request.form.get('content'),
+        'date': request.form.get('date'),
+        'teacher': request.form.get('teacher'),
+        'title': request.form.get('title'),
+    }
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # 获取用户的uid
+    uid = session['uid']
+    # TODO: 目前查询最多有一个查询该用户的日程安排
+    result = mongo_operator.find_one({'user_id': uid}, 'visited_record')
+    # 查询结果不存在，新建
+    if result is None:
+        mongo_operator.db['visited_record'].insert_one(
+            {
+                "user_id": uid,
+                "visited_record": [record]
+            })
+    else:
+        result['visited_record'].append(record)
+        mongo_operator.db['visited_record'].update({'user_id': uid}, result)
+
+    return json.dumps({'success': True})
 
 
 @school_agent_bp.route('/visit_record/edit', methods=['POST'])
 @login_required
 def edit_visit_record():
-    print(request.form)
-    return redirect(url_for('.visit_record'))
+    """
+    修改拜访记录
+    :return:
+    """
+    # 获取当前的id
+    record_id = request.form.get('id', type=int)
+    datum = {
+        'institution': request.form.get('institution'),
+        'school': request.form.get('school'),
+        'content': request.form.get('content'),
+        'date': request.form.get('date'),
+        'teacher': request.form.get('teacher'),
+        'title': request.form.get('title'),
+        'id': record_id,
+    }
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # 获取用户的uid
+    uid = session['uid']
+    result = mongo_operator.find_one({'user_id': uid}, 'visited_record')
+    i = 0
+    for record in result['visited_record']:
+        if record_id == record['id']:
+            break
+        i += 1
+    result['visited_record'][i] = datum
+    mongo_operator.db['visited_record'].update({'user_id': uid}, result)
+
+    return json.dumps({'success': True})
 
 
 @school_agent_bp.route('/visit_record/delete', methods=['POST'])
 @login_required
 def delete_visit_record():
-    print(request.form)
-    return redirect(url_for('.visit_record'))
+    """
+    删除拜访记录
+    :return:
+    """
+    # 获取当前的id
+    record_id = request.form.get('id', type=int)
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # 获取用户的uid
+    uid = session['uid']
+    result = mongo_operator.find_one({'user_id': uid}, 'visited_record')
+    i = 0
+    for record in result['visited_record']:
+        if record_id == record['id']:
+            break
+        i += 1
+    result['visited_record'].pop(i)
+    mongo_operator.db['visited_record'].update({'user_id': uid}, result)
+
+    return json.dumps({'success': True})
+
+
+@school_agent_bp.route('/schedule')
+@login_required
+def schedule():
+    print("显示日程安排页面")
+    return render_template("schedule.html")
+
+
+@school_agent_bp.route('/info_modify')
+@login_required
+def info_modify():
+    """
+    进行信息修改
+    :return:
+    """
+    return
 
 
 # @school_agent_bp.route('', methods=['POST'])
