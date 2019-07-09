@@ -6,6 +6,7 @@ import os
 from web.blueprints.auth import login_required
 from web.utils.mongo_operator import MongoOperator
 from web.config import MongoDB_CONFIG
+import datetime
 
 school_agent_bp = Blueprint('school_agent', __name__)
 
@@ -180,6 +181,62 @@ def info_modify():
     return json.dumps({'success': True})
 
 
+# @school_agent_bp.route('', methods=['POST'])
+# @login_required
+def new_schedule():
+    """
+    将用户新保存的拜访记录插入数据库
+    :return:
+    """
+    # 获取用户的id,
+
+    user_id = 100006
+
+    date = request.form.get('date')
+
+    # 获取当前的年月日，并组合成字符串
+    # current_year = datetime.datetime.now().year
+    # current_month = datetime.datetime.now().month
+    current_day = datetime.datetime.now().date()
+
+    # current_date = str(current_year) + "-" + str(current_month) + "-" + str(current_day)
+    current_date = str(current_day)
+
+    # 前端所保存的提醒时间、日程内容、以及是否完成
+    remind_date = "2019-7-30"
+
+    schedule_content = "拜访罗军舟"
+
+    is_completed = False
+
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+
+    schedule_col = mongo_operator.get_collection("schedule")
+    # 获取数据库中对应该user_id的文档
+    schedule_doc = schedule_col.find_one({"user_id": user_id})
+    # 获取数据库中的计划列表
+    schedule_list = schedule_doc["schedule"]
+    # 计算新的schedule_id
+    new_schedule_id = len(schedule_list) + 1
+
+    store_dict = {
+        "schedule_id": new_schedule_id,
+        "create_date": current_date,
+        "content": schedule_content,
+        "remind_date": remind_date,
+        "is_completed": str(is_completed)
+    }
+    # 更新计划列表
+    schedule_list.append(store_dict)
+    print(schedule_list)
+    # 更新集合
+    schedule_col.update({"user_id": user_id}, {"$set": {"schedule": schedule_list}})
+
+
+
+
+
+
 def get_relations(school, institution):
     """
     获取当前用户与某一学院之中的人员关系及其中的内部社区分布
@@ -257,4 +314,5 @@ def format_relation_data(data):
 
 if __name__ == '__main__':
     # scholar_info(73927)
-    print(get_relations("北京大学", "化学生物学与生物技术学院"))
+    # print(get_relations("北京大学", "化学生物学与生物技术学院"))
+    new_schedule()
