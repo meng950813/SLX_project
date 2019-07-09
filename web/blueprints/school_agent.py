@@ -15,11 +15,31 @@ school_agent_bp = Blueprint('school_agent', __name__)
 @school_agent_bp.route('/homepage')
 @login_required
 def index():
-    """学校商务的个人主页"""
+    """
+    学校商务的个人主页
+    :return:
+    """
 
     # TODO 获取当前商务负责的学校 / 学院及其建立的关系
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # 获取用户的uid
+    uid = session['uid']
 
-    return render_template('personal.html', school={}, institution={})
+    user_col = mongo_operator.get_collection("user")
+
+    # 获取该商务所管辖的学校列表
+    school_list = user_col.find_one({"id": uid})["charge_school"]
+
+    school_col = mongo_operator.get_collection("school")
+
+    school_institution = {}
+    # 获取学校对应的学院列表，并组装成字典
+    for school in school_list:
+        institution_list = school_col.find_one({"name": school})["institutions"]
+        school_institution[school] = institution_list
+
+    print(school_institution)
+    return render_template('personal.html', school=school_institution)
 
 
 @school_agent_bp.route('/scholar/<int:teacher_id>')
@@ -301,4 +321,5 @@ def format_relation_data(data):
 if __name__ == '__main__':
     # scholar_info(73927)
     # print(get_relations("北京大学", "化学生物学与生物技术学院"))
-    new_schedule()
+    # new_schedule()
+    index()
