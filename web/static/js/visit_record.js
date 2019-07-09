@@ -8,9 +8,6 @@ let isModifying = true;
 function modify_modal(e){
     //修改模态框标题
     $(".modal-title").text("修改拜访记录");
-    //将表格中的内容添加在表单中
-    //选择修改a标签所在的单元格
-    let target = $(e.target);
     //选择其他的兄弟
     tds = e.parent().siblings();
     isModifying = true;
@@ -77,14 +74,14 @@ function saveVisitedRecord(e){
         url = '/visit_record/edit';
     }else{
         //模态框
-        id = parseInt($('#total').text()) + 1;
+        let total = parseInt($('#total').text()) + 1;
         let insert_html =
-            `<tr><td>${id}</td><td>${date}</td><td><a>${title}</a></td><td>${school}</td> <td>${institution}</td> <td>${teacher}</td> 
+            `<tr><td>${total}</td><td>${date}</td><td><a>${title}</a></td><td>${school}</td> <td>${institution}</td> <td>${teacher}</td> 
                 <td class="operation">
-                    <a class="btn btn-info" href="#" data-toggle="modal" data-target="#exampleModal" onclick="modify_modal($(this));">修改</a>
+                    <button class="btn btn-info" href="#" data-toggle="modal" data-target="#exampleModal" onclick="modify_modal($(this));">修改</button>
                     <form style="display: inline">
                         <input type="hidden" id="csrf_token" value="{{ csrf_token() }}"/>
-                        <a class="btn btn-danger" href=# onclick="deleteRecord($(this));">删除</a>
+                        <button class="btn btn-danger" href=# onclick="deleteRecord($(this));">删除</button>
                     </form>
                 </td></tr>`;
 
@@ -92,7 +89,7 @@ function saveVisitedRecord(e){
         $tr.after(insert_html);
         url = '/visit_record/new';
         //修改总数目
-        $('#total').text(id);
+        $('#total').text(total);
     }
     tds = null;
     detail = null;

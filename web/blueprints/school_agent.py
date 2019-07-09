@@ -80,12 +80,16 @@ def new_visit_record():
     result = mongo_operator.find_one({'user_id': uid}, 'visited_record')
     # 查询结果不存在，新建
     if result is None:
+        record['id'] = 1
         mongo_operator.db['visited_record'].insert_one(
             {
                 "user_id": uid,
+                "max": 1,
                 "visited_record": [record]
             })
     else:
+        result['max'] += 1
+        record['id'] = result['max']
         result['visited_record'].append(record)
         mongo_operator.db['visited_record'].update({'user_id': uid}, result)
 
