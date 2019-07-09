@@ -88,7 +88,7 @@ class MongoOperator:
         if collection_name is None:
             return self.collection
         else:
-            return self.get_collection(collection_name)
+            return self.db.get_collection(collection_name)
 
     def get_user_relations(self, u_id):
         # TODO
