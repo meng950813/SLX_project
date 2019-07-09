@@ -82,6 +82,7 @@ def schedule():
     print("显示日程安排页面")
     return render_template("schedule.html")
 
+
 @school_agent_bp.route('/info_modify')
 @login_required
 def info_modify():
