@@ -279,9 +279,9 @@ def edit_schedule():
     schedule_col.update({"user_id": uid}, {"$set": {"schedule": schedule_list}})
 
 
-def set_whether_completed(user_id, schedule_id, type):
+def set_whether_completed_or_canceled(user_id, schedule_id, type):
     """
-    设置该用户下的该计划是否完成
+    设置该用户下的该计划是否完成或取消
 
     :param user_id:
     :param schedule_id:
@@ -390,4 +390,5 @@ if __name__ == '__main__':
     # new_schedule()
     # index()
     # edit_schedule()
-    set_whether_completed(100006,1,1)
+    # set_whether_completed(100006,1,1)
+    pass
