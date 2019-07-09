@@ -167,8 +167,8 @@ def info_modify():
     return
 
 
-# @school_agent_bp.route('', methods=['POST'])
-# @login_required
+@school_agent_bp.route('/new_schedule', methods=['POST'])
+@login_required
 def new_schedule():
     """
     将用户新保存的拜访记录插入数据库
@@ -176,7 +176,7 @@ def new_schedule():
     """
     # 获取用户的id,
 
-    user_id = 100006
+    user_id = session['uid']
 
     date = request.form.get('date')
 
