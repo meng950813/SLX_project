@@ -4,7 +4,7 @@ from flask import Flask, render_template, session
 from web.settings import configuration
 from web.blueprints.school_agent import school_agent_bp
 from web.blueprints.auth import auth_bp
-from web.extensions import bootstrap
+from web.extensions import bootstrap, csrf
 
 
 def create_app(config_name=None):
@@ -34,6 +34,7 @@ def register_logging(app):
 
 def register_extensions(app):
     bootstrap.init_app(app)
+    csrf.init_app(app)
 
 
 def register_blueprints(app):
