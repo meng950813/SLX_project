@@ -150,7 +150,7 @@ def delete_visit_record():
     result['visited_record'].pop(i)
     mongo_operator.db['visited_record'].update({'user_id': uid}, result)
 
-    return json.dumps({'success': True})
+    return redirect(url_for('.visit_record'))
 
 
 @school_agent_bp.route('/schedule')
