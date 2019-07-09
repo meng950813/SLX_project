@@ -22,6 +22,7 @@ def index():
 
 
 @school_agent_bp.route('/scholar/<int:teacher_id>')
+@login_required
 def scholar_info(teacher_id):
     """
     专家个人信息
@@ -146,6 +147,23 @@ def delete_visit_record():
     mongo_operator.db['visited_record'].update({'user_id': uid}, result)
 
     return json.dumps({'success': True})
+
+
+@school_agent_bp.route('/schedule')
+@login_required
+def schedule():
+    print("显示日程安排页面")
+    return render_template("schedule.html")
+
+
+@school_agent_bp.route('/info_modify')
+@login_required
+def info_modify():
+    """
+    进行信息修改
+    :return:
+    """
+    return
 
 
 def get_relations(school, institution):

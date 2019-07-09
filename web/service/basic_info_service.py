@@ -43,7 +43,7 @@ def search_teacher_basic_info(teacher_id):
         for funds_id in funds_id_list:
             funds_info = mongo_operator.find_one({"_id": funds_id}, "funds")
             del funds_info["_id"]
-            print(funds_info)
+            # print(funds_info)
 
             funds_info_list.append(funds_info)
         basic_info_dict["funds"] = funds_info_list
