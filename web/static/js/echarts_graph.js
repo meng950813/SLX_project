@@ -156,7 +156,7 @@ myChart.on('click', function (params) {
     if (params.dataType == 'node')
     {
         //页面
-        window.open('/scholar/'+params.data.teacherId);
+        window.open('/scholar/'+params.data.name);
         return;
     }
     else if (params.dataType == 'main')
