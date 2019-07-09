@@ -97,7 +97,7 @@ def new_visit_record():
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
     # 获取用户的uid
     uid = session['uid']
-    # TODO: 目前查询最多有一个查询该用户的日程安排
+    # 目前查询最多有一个查询该用户的日程安排
     result = mongo_operator.find_one({'user_id': uid}, 'visited_record')
     # 查询结果不存在，新建
     if result is None:
