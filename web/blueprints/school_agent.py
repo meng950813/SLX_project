@@ -22,6 +22,7 @@ def index():
 
 
 @school_agent_bp.route('/scholar/<int:teacher_id>')
+@login_required
 def scholar_info(teacher_id):
     """
     专家个人信息
