@@ -8,9 +8,6 @@ let isModifying = true;
 function modify_modal(e){
     //修改模态框标题
     $(".modal-title").text("修改拜访记录");
-    //将表格中的内容添加在表单中
-    //选择修改a标签所在的单元格
-    let target = $(e.target);
     //选择其他的兄弟
     tds = e.parent().siblings();
     isModifying = true;
@@ -20,7 +17,8 @@ function modify_modal(e){
         input_model[i - 1].value = tds[i].innerText;
     }
     detail = e.parent('.operation').find('#detail');
-    identifier = e.parent('.operation').find('#identifier');
+    identifier = e.siblings('form').find('#identifier');
+    // identifier = e.parent('.operation').find('#identifier');
     $('#content').val(e.parent('.operation').find('#detail').val());
 }
 
@@ -28,7 +26,9 @@ function wantToNewRecord() {
     isModifying = false;
 }
 
+/*
 function deleteRecord(element) {
+    console.log('want delete');
     if (!confirm('确定删除此条记录?'))
         return;
     let record_id = element.parent().parent('.operation').find('#identifier').val();
@@ -49,6 +49,7 @@ function deleteRecord(element) {
         $('#total').text(parseInt($('#total').text()) - 1);
     });
 }
+ */
 
 /*
 修改，点击保存时改变所选那一行的数据 给要修改的那一行添加一个属性，利用这个属性去选择正在
@@ -77,22 +78,24 @@ function saveVisitedRecord(e){
         url = '/visit_record/edit';
     }else{
         //模态框
-        id = parseInt($('#total').text()) + 1;
+        /*
+        let total = parseInt($('#total').text()) + 1;
         let insert_html =
-            `<tr><td>${id}</td><td>${date}</td><td><a>${title}</a></td><td>${school}</td> <td>${institution}</td> <td>${teacher}</td> 
+            `<tr><td>${total}</td><td>${date}</td><td><a>${title}</a></td><td>${school}</td> <td>${institution}</td> <td>${teacher}</td> 
                 <td class="operation">
-                    <a class="btn btn-info" href="#" data-toggle="modal" data-target="#exampleModal" onclick="modify_modal($(this));">修改</a>
+                    <button class="btn btn-info" href="#" data-toggle="modal" data-target="#exampleModal" onclick="modify_modal($(this));">修改</button>
                     <form style="display: inline">
                         <input type="hidden" id="csrf_token" value="{{ csrf_token() }}"/>
-                        <a class="btn btn-danger" href=# onclick="deleteRecord($(this));">删除</a>
+                        <button class="btn btn-danger" href=# onclick="deleteRecord($(this));">删除</button>
                     </form>
                 </td></tr>`;
 
         let $tr=$("#tab tr").eq(-2);
         $tr.after(insert_html);
-        url = '/visit_record/new';
         //修改总数目
-        $('#total').text(id);
+        $('#total').text(total);
+         */
+        url = '/visit_record/new';
     }
     tds = null;
     detail = null;
@@ -114,6 +117,8 @@ function saveVisitedRecord(e){
     }).done(function (data) {
         console.log(data);
         //是否成功
+        if (!isModifying)
+            window.location.reload();
     });
     $('#exampleModal').modal('hide');
 }
