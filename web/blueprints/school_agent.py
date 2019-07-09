@@ -15,11 +15,31 @@ school_agent_bp = Blueprint('school_agent', __name__)
 @school_agent_bp.route('/homepage')
 @login_required
 def index():
-    """学校商务的个人主页"""
+    """
+    学校商务的个人主页
+    :return:
+    """
 
     # TODO 获取当前商务负责的学校 / 学院及其建立的关系
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # 获取用户的uid
+    uid = session['uid']
 
-    return render_template('personal.html', school={}, institution={})
+    user_col = mongo_operator.get_collection("user")
+
+    # 获取该商务所管辖的学校列表
+    school_list = user_col.find_one({"id": uid})["charge_school"]
+
+    school_col = mongo_operator.get_collection("school")
+
+    school_institution = {}
+    # 获取学校对应的学院列表，并组装成字典
+    for school in school_list:
+        institution_list = school_col.find_one({"name": school})["institutions"]
+        school_institution[school] = institution_list
+
+    print(school_institution)
+    return render_template('personal.html', school=school_institution)
 
 
 @school_agent_bp.route('/scholar/<int:teacher_id>')
@@ -184,9 +204,8 @@ def new_schedule():
 
     date = request.form.get('date')
 
-    # 获取当前的年月日，并组合成字符串
-    # current_year = datetime.datetime.now().year
-    # current_month = datetime.datetime.now().month
+    # 获取当前的日期，并组合成字符串
+
     current_day = datetime.datetime.now().date()
 
     # current_date = str(current_year) + "-" + str(current_month) + "-" + str(current_day)
@@ -218,13 +237,80 @@ def new_schedule():
     }
     # 更新计划列表
     schedule_list.append(store_dict)
-    print(schedule_list)
     # 更新集合
     schedule_col.update({"user_id": user_id}, {"$set": {"schedule": schedule_list}})
 
 
 
 
+@school_agent_bp.route('', methods=['POST'])
+@login_required
+def edit_schedule():
+    """
+    用户编辑schedule
+    :return:
+    """
+
+    uid = session["id"]
+    # TODO 获取修改后的时间以及内容,没做完
+
+    edit_date = request.form.get('date')
+    edit_content = request.form.get('content')
+    edit_is_completed = str(request.form.get('is_completed'))
+
+    print("0-----------------")
+    print(edit_date)
+    print(edit_content)
+    print(edit_is_completed)
+    # TODO 如何获取schedule_id
+    schedule_id = 1
+
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # 获取schedule集合
+    schedule_col = mongo_operator.get_collection("schedule")
+    # 获取集合中的schedule列表
+    schedule_list = schedule_col.find_one({"user_id": uid})["schedule"]
+    # 查找对应的schedule_id
+    for schedule in schedule_list:
+        if schedule["schedule_id"] == schedule_id:
+            schedule["content"] = edit_content
+            schedule["remind_date"] = edit_date
+            schedule["is_completed"] = edit_is_completed
+            print("-----------已更新")
+            break
+
+    # 更新schedule_list
+    schedule_col.update({"user_id": uid}, {"$set": {"schedule": schedule_list}})
+
+
+def set_whether_completed_or_canceled(user_id, schedule_id, type):
+    """
+    设置该用户下的该计划是否完成或取消
+
+    :param user_id:
+    :param schedule_id:
+    :param type: ==0 表示未完成， ==1 表示已完成 ==-1表示该计划已经取消
+    :return: 返回true表示修改成功，否则失败
+    """
+
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # 获取schedule集合
+    schedule_col = mongo_operator.get_collection("schedule")
+    # 获取集合中的schedule列表
+    schedule_list = schedule_col.find_one({"user_id": user_id})["schedule"]
+    # 查找对应的schedule_id
+    res = False
+    for schedule in schedule_list:
+        if schedule["schedule_id"] == schedule_id:
+            schedule["is_completed"] = str(type)
+            print("-----------已更新")
+            res = True
+            break
+
+    # 更新schedule_list
+    schedule_col.update({"user_id": user_id}, {"$set": {"schedule": schedule_list}})
+
+    return res
 
 
 def get_relations(school, institution):
@@ -305,4 +391,8 @@ def format_relation_data(data):
 if __name__ == '__main__':
     # scholar_info(73927)
     # print(get_relations("北京大学", "化学生物学与生物技术学院"))
-    new_schedule()
+    # new_schedule()
+    # index()
+    # edit_schedule()
+    # set_whether_completed(100006,1,1)
+    pass
