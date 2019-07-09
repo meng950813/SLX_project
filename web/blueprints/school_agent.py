@@ -15,7 +15,6 @@ school_agent_bp = Blueprint('school_agent', __name__)
 @login_required
 def index():
     """学校商务的个人主页"""
-
     # TODO 获取当前商务负责的学校 / 学院及其建立的关系
 
     return render_template('personal.html', school={}, institution={})
@@ -91,6 +90,15 @@ def info_modify():
     """
     return
 
+@school_agent_bp.route('/info_reminder')
+@login_required
+def info_reminder():
+    """
+    进入消息提醒页面
+    :return:
+    """
+    session['info_num'] = ""
+    return render_template("info_reminder.html")
 
 def get_relations(school, institution):
     """

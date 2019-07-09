@@ -40,6 +40,7 @@ def login():
             session['username'] = user["name"]
             session['uid'] = user["id"]
             session["type"] = user["type"]
+            session["info_num"] = 7
             # flash('登录成功，欢迎回来', 'success')
             return redirect(url_for('school_agent.index'))
         flash('登录失败，请检测账号或者密码后重新输入', 'danger')
