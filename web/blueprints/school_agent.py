@@ -81,6 +81,16 @@ def schedule():
     print("显示日程安排页面")
     return render_template("schedule.html")
 
+@school_agent_bp.route('/info_modify')
+@login_required
+def info_modify():
+    """
+    进行信息修改
+    :return:
+    """
+    return
+
+
 def get_relations(school, institution):
     """
     获取当前用户与某一学院之中的人员关系及其中的内部社区分布
