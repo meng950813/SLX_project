@@ -77,6 +77,12 @@ def delete_visit_record():
     return redirect(url_for('.visit_record'))
 
 
+@school_agent_bp.route('/schedule')
+@login_required
+def schedule():
+    print("显示日程安排页面")
+    return render_template("schedule.html")
+
 def get_relations(school, institution):
     """
     获取当前用户与某一学院之中的人员关系及其中的内部社区分布

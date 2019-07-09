@@ -29,7 +29,7 @@
     <div class="collapse navbar-collapse" id="navbarColor01">
         {% if "username" in session %}
             <ul class="navbar-nav ml-auto">
-                <li><a class="nav-item nav-link " href="#">日程安排</a></li>
+                {{ render_nav_item('school_agent.schedule', '日程安排') }}
                 {{ render_nav_item('school_agent.visit_record', '拜访记录') }}
                 <li><a class="nav-item nav-link " href="#">消息提醒 <span class="badge" style="background-color: red; color: white">7</span></a></li>
                 <li><a class="nav-item nav-link " >{{ session["username"] }}</a></li>
