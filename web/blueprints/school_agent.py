@@ -67,7 +67,7 @@ def scholar_info(teacher_id):
 
 @school_agent_bp.route('/visit_record')
 @login_required
-def visit_record():
+def manage_visit_record():
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
     # 获取用户的uid
     uid = session['uid']
