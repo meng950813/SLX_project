@@ -184,7 +184,7 @@ def schedule():
     # 选定集合
     schedule_col = mongo_operator.get_collection("schedule")
     # 找到对应的user ,根据提醒日期对日程进行降序排序
-    schedule_list = schedule_col.find({"user_id": user_id, "status": 0}).sort([("remind_date", -1)])
+    schedule_list = schedule_col.find({"user_id": user_id, "status": 0}).sort([("remind_date", 1)])
 
     # print(schedule_list)
 
