@@ -82,7 +82,7 @@ function saveVisitedRecord(e){
             tds[i].innerHTML = input_model[i - 1].value;
         }
         detail.val(content);
-        id = parseInt(identifier.val());
+        id = identifier.val();
         url = '/visit_record/edit';
     }else{
         url = '/visit_record/new';
