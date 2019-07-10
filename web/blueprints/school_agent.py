@@ -182,19 +182,15 @@ def schedule():
     :return:
     """
     # 获取用户的id
-    user_id = session['uid']
+    # user_id = session['uid']
+    user_id = 100000
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
     # 选定集合
     schedule_col = mongo_operator.get_collection("schedule")
-    # 找到对应的user
-    schedule_doc = schedule_col.find_one({"user_id": user_id})
-    # 去除其下所有的日程（列表）
-    schedule_list = schedule_doc["schedule"]
-    # 根据提醒日期对日程进行降序排序
-    schedule_list.sort(key=lambda x: x["remind_date"], reverse=True)
+    # 找到对应的user ,根据提醒日期对日程进行降序排序
+    schedule_list = schedule_col.find({"user_id": user_id, "status": 0}).sort([("remind_date", -1)])
 
     return render_template("schedule.html", schedule_list=schedule_list)
-
 
 
 @school_agent_bp.route('/info_modify',methods=['POST'])
@@ -225,14 +221,14 @@ def info_modify():
 @login_required
 def edit_schedule():
     """
-    创建新的日程安排或编辑已有的日程
+    编辑已有的日程
     :return:
     """
     # 获取用户的id,
     user_id = session['uid']
 
     data = {
-        "schedule_id": request.form.get('id', type=int),
+        "_id": request.form.get('id', type=int),
         # 获取当前的日期，并组合成字符串
         "create_date": str(datetime.datetime.now().date()),
         # 详细内容
@@ -242,7 +238,7 @@ def edit_schedule():
         "status": 0
     }
     
-    back = insert_or_edit_schedule(data, user_id)
+    back = update_schedule(data, user_id)
     if back:
         return json.dumps({"success":True})
     
@@ -252,7 +248,10 @@ def edit_schedule():
 @school_agent_bp.route('/operator_schedule', methods=['POST'])
 @login_required
 def operator_schedule():
-    
+    """
+
+    :return:
+    """
     schedule_id = request.form.get('id', type=int)
     status = request.form.get('type', type=int)
     
@@ -349,48 +348,70 @@ def format_relation_data(data):
         return False
 
 
-def insert_or_edit_schedule(data, uid):
+def insert_schedule(data, uid):
     """
-    根据 schedule_id 决定 插入/更新 日程数据
+    根据 schedule_id 决定 插入 日程数据
     :param data: 具体数据
     :param uid: 用户id
-    :return: 
+    :return:
     """
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
     schedule_col = mongo_operator.get_collection("schedule")
 
     # 插入新数据
-    if data['schedule_id'] == -1:
-        # 返回当前日程数量
-        back = schedule_col.find_one({'user_id': uid}, {'schedule_num': 1})
+    data["user_id"] = uid
+    result = schedule_col.insert_one(data)
 
-        # 当前用户没有日程数据，需创建
-        if back == None:
-            data['schedule_id'] = 0
-            result = schedule_col.insert_one({
-                "user_id": uid,
-                "schedule_num": 1,
-                "schedule": [data]
-            })
-            print("创建记录，result.insert_id= %s" % result.inserted_id)
-            return result.inserted_id
+    return result.inserted_id
 
-        else:
-            num = back['schedule_num']
-            # 此前已有数据
-            data['schedule_id'], num = num, num+1
-            schedule_col.update_one({"user_id": uid}, {'$set': {'schedule_num': num}})
-            result = schedule_col.update_one({"user_id": uid}, {"$addToSet": {"schedule": data}})
-            print("插入到数组中: ", num, result.modified_count)
-            return result.modified_count
 
-    # 更新数据
-    else:
-        result = schedule_col.update_one(
-            {"user_id": uid, "schedule": {'$elemMatch': {"schedule_id": data['schedule_id']}}},
-            {'$set': {'schedule.$': data}})
-        print("更新数据： ", result.modified_count)
-        return result.modified_count
+    # if data['schedule_id'] == -1:
+    #     # 返回当前日程数量
+    #     back = schedule_col.find_one({'user_id': uid}, {'schedule_num': 1})
+    #
+    #     # 当前用户没有日程数据，需创建
+    #     if back == None:
+    #         data['schedule_id'] = 0
+    #         result = schedule_col.insert_one({
+    #             "user_id": uid,
+    #             "schedule_num": 1,
+    #             "schedule": [data]
+    #         })
+    #         print("创建记录，result.insert_id= %s" % result.inserted_id)
+    #         return result.inserted_id
+    #
+    #     else:
+    #         num = back['schedule_num']
+    #         # 此前已有数据
+    #         data['schedule_id'], num = num, num+1
+    #         schedule_col.update_one({"user_id": uid}, {'$set': {'schedule_num': num}})
+    #         result = schedule_col.update_one({"user_id": uid}, {"$addToSet": {"schedule": data}})
+    #         print("插入到数组中: ", num, result.modified_count)
+    #         return result.modified_count
+    #
+    # # 更新数据
+    # else:
+    #     result = schedule_col.update_one(
+    #         {"user_id": uid, "schedule": {'$elemMatch': {"schedule_id": data['schedule_id']}}},
+    #         {'$set': {'schedule.$': data}})
+    #     print("更新数据： ", result.modified_count)
+    #     return result.modified_count
+
+
+def update_schedule(schedule_id, data):
+    """
+    更新schedule中的数据
+    :param schedule_id: schedule集合中的_id
+    :param data:
+    :return:
+    """
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    schedule_col = mongo_operator.get_collection("schedule")
+
+    result = schedule_col.update({"_id", schedule_id}, data)
+
+    return result.modified_count
+
     
 
 def set_whether_completed_or_canceled(user_id, schedule_id, status):
@@ -407,9 +428,13 @@ def set_whether_completed_or_canceled(user_id, schedule_id, status):
     schedule_col = mongo_operator.get_collection("schedule")
     
     # 更新schedule_list
+
     result = schedule_col.update_one(
-        {"user_id": user_id, "schedule": {'$elemMatch': {"schedule_id": schedule_id}}},
-        {"$set": {"schedule.$.status": status}})
+        {"user_id": user_id, "_id": schedule_id},
+        {"$set": {"status": status}})
+    # result = schedule_col.update_one(
+    #     {"user_id": user_id, "_id": {'$elemMatch': {"schedule_id": schedule_id}}},
+    #     {"$set": {"schedule.$.status": status}})
 
     return result.modified_count
 
