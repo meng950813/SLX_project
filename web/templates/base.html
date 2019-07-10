@@ -35,8 +35,8 @@
                     <a class="nav-item nav-link {% if request.endpoint == 'school_agent.info_reminder' %}active{% endif %}"
                        href="{{ url_for('school_agent.info_reminder') }}">
                         消息提醒
-                        {% if session['info_num'] != "" %}
-                            <span class="badge" style="background-color: red; color: white">7</span>
+                        {% if session['message_num'] != 0 %}
+                            <span class="badge" style="background-color: red; color: white">{{ session['message_num'] }}</span>
                         {% endif %}
                     </a>
                 </li>

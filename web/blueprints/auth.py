@@ -2,6 +2,7 @@ from flask import Blueprint, session, redirect, url_for, render_template, flash
 from web.forms import LoginForm
 import functools
 from web.service import user_service
+from web.service import message_service
 
 
 auth_bp = Blueprint('auth', __name__)
@@ -35,12 +36,13 @@ def login():
         remember = form.remember.data
 
         user = user_service.check_user(username, password)
+        message_num = message_service.search_message_num(user['id'])
         # 检验账号密码
         if user:
             session['username'] = user["name"]
             session['uid'] = user["id"]
             session["type"] = user["type"]
-            session["info_num"] = 7
+            session["message_num"] = message_num
             # flash('登录成功，欢迎回来', 'success')
             return redirect(url_for('school_agent.index'))
         flash('登录失败，请检测账号或者密码后重新输入', 'danger')
