@@ -182,7 +182,7 @@ def schedule():
     print("------------------------显示日程安排的页面------------------------------")
     # 获取用户的id
     user_id = session['uid']
-    
+
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
     # 选定集合
     schedule_col = mongo_operator.get_collection("schedule")
@@ -214,10 +214,10 @@ def edit_schedule():
         # 标识当前日程的状态: 0 => 未处理; 1 => 已完成; -1 => 已舍弃
         "status": 0
     }
-    
+
     back = insert_or_edit_schedule(data, schedule_id)
     if back:
-        return json.dumps({"success": True, "message": "操作成功"})
+        return json.dumps({"success": True, "message": "操作成功", "id": back})
 
     return json.dumps({"success": False, "message": "操作失败, code: %s" % back})
 
@@ -350,7 +350,7 @@ def insert_or_edit_schedule(data, schedule_id):
     根据 schedule_id 决定 插入/更新 日程数据
     :param data: 具体数据
     :param schedule_id: string 类型的objectId
-    :return: 0 / 1 or objectId
+    :return: 0 / 1 or string 类型的 objectId ==> 24位字符串
     """
     schedule_col = MongoOperator(**MongoDB_CONFIG).get_collection("schedule")
 
@@ -365,7 +365,7 @@ def insert_or_edit_schedule(data, schedule_id):
         # 非法objectId ==> 创建
         print("type error", type(t), t)
         result = schedule_col.insert_one(data)
-        return result.inserted_id
+        return str(result.inserted_id)
 
     except Exception as e:
         print("添加/修改错误 ", e, schedule_id)
@@ -381,11 +381,14 @@ def set_whether_completed_or_canceled(schedule_id, status):
     """
 
     schedule_col = MongoOperator(**MongoDB_CONFIG).get_collection("schedule")
-    
 
+    status = 1 if status == 1 else -1
+    
     try:
         # 更新schedule_list
         result = schedule_col.update_one({"_id": ObjectId(schedule_id)},{"$set": {"status": status}})
+        print(result.modified_count, result.matched_count)
+        print(result)
         return result.modified_count
     except Exception as e:
         print("schedule_id 不符合标准", e)
@@ -409,6 +412,8 @@ if __name__ == '__main__':
         "remind_date": "2019-08-06",
         "status": 0
     }
-    # print(insert_or_edit_schedule(data, 100001))
-
+    a = insert_or_edit_schedule(data, 100001)
+    print(a, type(a))
+    b = str(a)
+    print(b, type(b))
 
