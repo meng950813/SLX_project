@@ -42,11 +42,11 @@
     <div class="collapse navbar-collapse" id="navbarColor01">
         {% if "username" in session %}
             <ul class="navbar-nav ml-auto">
-                {{ render_nav_item('school_agent.schedule', '日程安排') }}
-                {{ render_nav_item('school_agent.manage_visit_record', '拜访记录') }}
+                {{ render_nav_item('schedule.schedule', '日程安排') }}
+                {{ render_nav_item('visit_record.manage_visit_record', '拜访记录') }}
                 <li>
                     <a class="nav-item nav-link {% if request.endpoint == 'school_agent.info_reminder' %}active{% endif %}"
-                       href="{{ url_for('school_agent.info_reminder') }}">
+                       href="{{ url_for('reminder.info_reminder') }}">
                         消息提醒
                         {% if session['message_num'] != 0 %}
                             <span class="badge" style="background-color: red; color: white">{{ session['message_num'] }}</span>
