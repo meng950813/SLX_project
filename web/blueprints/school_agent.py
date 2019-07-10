@@ -244,7 +244,7 @@ def edit_schedule():
     
     back = insert_or_edit_schedule(data, user_id)
     if back:
-        return json.dumps({"success": True})
+        return json.dumps({"success": True, "message": "操作成功"})
     
     return json.dumps({"success": False, "message": "操作失败, code: %s" % back})
     
@@ -262,7 +262,7 @@ def operate_schedule():
     back = set_whether_completed_or_canceled(session["uid"], schedule_id, status)
 
     if back:
-        return json.dumps({"success": True})
+        return json.dumps({"success": True, "message": "操作成功"})
     
     return json.dumps({"success": False, "message": "操作失败, code: %s" % back })
 

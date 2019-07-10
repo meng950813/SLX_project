@@ -21,8 +21,8 @@ $(".editor").on("click", (e)=> {
 /**
  * 添加新日程
  */
-$("#new-schedule").click( (e) => { 
-    clear_modal();
+$("#new-schedule").click( (e) => {
+    // clear_modal();
     $("#scheduleModal").modal('show');
 });
 
@@ -38,8 +38,8 @@ $("#save-schedule").click((e) => {
         alert("错误代码");
         return;
     }
-    let date = $("#remind_date").val();
-    if(date.trim().length !== 10){
+    let remind_date = $("#remind_date").val();
+    if(remind_date.trim().length !== 10){
         alert("时间格式错误");
         return;
     }
@@ -49,7 +49,7 @@ $("#save-schedule").click((e) => {
         return;
     }
 
-    let data = {"csrf_token": $("#csrf_token").val(), "date": date, "content": content, "id": id}
+    let data = {"csrf_token": $("#csrf_token").val(), "date": remind_date, "content": content, "id": id}
 
     $.ajax({
         type: "post",
@@ -58,9 +58,13 @@ $("#save-schedule").click((e) => {
         dataType: "json",
         success: function (response) {
             console.log(response);
+            toggle_alert(response.success, "scheduleModal", response.message);
+
+
         },
         error: function(error){
             console.log(error);
+            toggle_alert(false, "scheduleModal", "服务器连接失败，请稍后再试");
         }
     });
 })
@@ -95,13 +99,12 @@ $(".operate-schedule").click((e)=>{
             success: function (response) {
                 if(response.success){
                     remove_card(id);
-                }else{
-                    alert(response.message);
                 }
+                toggle_alert(Response.success, "scheduleModal", response.message)
             },
             error: function(error){
                 console.log(error);
-                alert("服务器连接失败，请稍后再试");
+                toggle_alert(false, "scheduleModal", "服务器连接失败，请稍后再试");
             }
         });
     }
@@ -148,7 +151,10 @@ function create_card(id, data){
             </div>
         `)
     }else{
-        
+        let card_body = target.parent();
+        $target.text(data.date);
+        card_body.children(".schedule-detail").text(data.content);
+        card_body.children(".create-time").text(`创建于 ${new Date().Format("yyyy-MM-dd")}`);
     }
 }
 
