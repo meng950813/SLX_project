@@ -45,7 +45,7 @@ def register_blueprints(app):
 def register_errors(app):
     @app.errorhandler(400)
     def bad_request(e):
-        return render_template('errors/400.html'), 400
+        return render_template('errors/400.html', description="会话过期或失效，请返回上一页重试"), 400
 
 
 def register_template_context(app):

@@ -171,10 +171,9 @@ myChart.on('click', function (params) {
  */
 function showGraph() {
     //默认请求的是关系图
-    $.get('/static/relation_data/back.json').done(function (data) {
-        let graph = formatGraph(data);
-        reloadGraph(graph);
-    });
+    let school = $("#select-college").children("option:selected").text();
+    let institution = $('#select-institution').children("option:selected").text();
+    getInstitutionGraphData(school,institution);
 }
 //TODO:初次调用显示关系图
 showGraph();
@@ -268,6 +267,9 @@ function getInstitutionGraphData(school, institution){
         dataType: "json",
         success: function (response) {
             reloadGraph(formatGraph(response));
+        },
+        error: function () {
+            toggle_alert(false, "", "该学院暂时无关系图");
         }
     });
 }

@@ -21,7 +21,9 @@
         -moz-box-shadow: 4px 4px 8px 2px rgba(20, 20, 20, 0.15);
         box-shadow: 4px 4px 8px 2px rgba(20, 20, 20, 0.15);
       }
-      
+      .schedule-detail{
+          line-height: 1.6rem;
+      }
    </style>
     
 {% endblock %}
@@ -30,52 +32,25 @@
   <!-- 日程安排卡片 -->
   <div class="container">
     <div class="row">
-        <button id="new-schedule" type="button" class="btn btn-primary ml-auto" data-target="#myModal"><i class="mdui-icon material-icons">&#xe3c9;</i>新建日程</button>
+        <button id="new-schedule" type="button" class="btn btn-primary ml-auto" data-target="#myModal"><i class="mdui-icon material-icons">&#xe148;</i>新建日程</button>
     </div>
     <div class="row">
-        <div class="card">
-          <div class="card-body">
-            <button type="button" class="close" data-toggle="modal"><span aria-hidden="true"><i class="editor mdui-icon material-icons">&#xe3c9;</i></span></button>
-            <h5 class="card-title" data-id="1">2019-06-27</h5>
-            <p class="card-text schedule-detail">下午3点拜访王老师</p>
-            <p class="text-right card-text"><small class="create-time">创建于2019-06-08</small></p>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-body">
-            <button type="button" class="close" data-toggle="modal"><span aria-hidden="true"><i class="editor mdui-icon material-icons">&#xe3c9;</i></span></button>
-            <h5 class="card-title" data-id="5">2019-06-27</h5>
-            <p class="card-text schedule-detail">下午3点到东南大学纪中楼203拜访王老师下午3点到东南大学纪中楼203拜访王老师</p>
-            <p class="text-right card-text"><small class="create-time">创建于2019-06-08</small></p>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-body">
-            <button type="button" class="close" data-toggle="modal"><span aria-hidden="true"><i class="editor mdui-icon material-icons">&#xe3c9;</i></span></button>
-            <h5 class="card-title" data-id="4">2019-06-27</h5>
-            <p class="card-text schedule-detail">下午3点到东南大学纪中楼203拜访王老师下午3点到东南大学纪中楼203拜访王老师下午3点到东南大学纪中楼203拜访王老师</p>
-            <p class="text-right card-text"><small class="create-time">创建于2019-06-08</small></p>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-body">
-            <button type="button" class="close" data-toggle="modal"><span aria-hidden="true"><i class="editor mdui-icon material-icons">&#xe3c9;</i></span></button>
-            <h5 class="card-title" data-id="3">2019-06-27</h5>
-            <p class="card-text schedule-detail">下午3点到东南大学纪中楼203拜访王老师,
-            下午3点到东南大学纪中楼203拜访王老师
-            下午3点到东南大学纪中楼203拜访王老师下午3点到东南大学纪中楼203拜访王老师</p>
-            <p class="text-right card-text"><small class="create-time">创建于2019-06-08</small></p>
-          </div>
-        </div>
 
-        <div class="card">
-          <div class="card-body">
-            <button type="button" class="close" data-toggle="modal"><span aria-hidden="true"><i class="editor mdui-icon material-icons">&#xe3c9;</i></span></button>
-            <h5 class="card-title" data-id="2">2019-06-27</h5>
-            <p class="card-text schedule-detail">下午3点到东南大学纪中楼203拜访王老师</p>
-            <p class="text-right card-text"><small class="create-time">创建于2019-06-08</small></p>
-          </div>
-        </div>
+        {% for schedule in schedule_list  %}
+
+            {% if schedule["status"] == 0 %}
+                <div class="card">
+                  <div class="card-body">
+                    <button type="button" class="close" data-toggle="modal"><span aria-hidden="true"><i class="editor mdui-icon material-icons">&#xe3c9;</i></span></button>
+                    <h5 class="card-title" data-id="{{schedule['_id'] | string}}">{{ schedule["remind_date"] }}</h5>
+                    <p class="card-text schedule-detail">{{ schedule["content"] }}</p>
+                    <p class="text-right card-text"><small class="create-time">创建于{{ schedule["create_date"] }}</small></p>
+                  </div>
+                </div>
+            {% endif %}
+
+        {% endfor %}
+
     </div>
   </div>
   
@@ -87,9 +62,9 @@
 
         <!-- 模态框主体 -->
         <div class="modal-body">
-            <form>
+            <form id="form">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" id="csrf_token">
-                <input type="hidden" id="schedule-id" value="2">
+                <input type="hidden" id="schedule-id" name="id" value="2">
                 <div class="input-group flex-nowrap">
                     <div class="input-group-prepend">
                         <span class="input-group-text">提醒时间</span>
@@ -110,10 +85,10 @@
         <!-- 模态框底部 -->
         <div class="modal-footer">
           <span class="mr-auto">
-            <button class="btn btn-danger" id="cancel-schedule">取消安排</button>
-            <button class="btn btn-success mr-auto" id="finish-schedule">已完成</button>
+            <button class="btn btn-danger operate-schedule" data-type="0">取消安排</button>
+            <button class="btn btn-success mr-auto operate-schedule" data-type="1">已完成</button>
           </span>
-          <button type="button" class="btn btn-info" id="save-schedule" >保存修改</button>
+          <button type="button" class="btn btn-info" id="save-schedule" >提交内容</button>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
         </div>
 

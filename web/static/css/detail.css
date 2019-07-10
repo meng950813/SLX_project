@@ -95,17 +95,3 @@ ul{
 .tab-pane li  span{
 	margin-right: 10px;
 }
-
-
-
-#alert-box-success,
-#alert-box-error{
-	position: fixed;
-	width: 270px;
-	top: 20%;
-	left: 50%;
-	transform: translateX(-135px);
-}
-.hidden{
-	display: none;
-}

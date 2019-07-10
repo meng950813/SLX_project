@@ -5,7 +5,6 @@
 {% endblock %}
 
 {% block styles %}
-    <link rel="stylesheet" href="../static/css/bootstrap_v4.min.css">
     <script src="https://cdn.bootcss.com/twitter-bootstrap/4.0.0-beta.3/js/bootstrap.min.js"></script>
     <style type="text/css">
         .form-group input{
@@ -64,11 +63,11 @@
                 <td>{{ record.institution }}</td>
                 <td>{{ record.teacher }}</td>
                 <td class="operation">
-                    <button class="btn btn-info" data-toggle="modal" data-target="#exampleModal" onclick="modify_modal($(this));">修改</button>
-                    <form style="display: inline" method="post" action="/visit_record/delete">
+                    <button class="btn btn-info" data-toggle="modal" data-target="#exampleModal" onclick="fillModal($(this));">修改</button>
+                    <form style="display: inline">
                         <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <input type="hidden" id="identifier" name="id" value="{{ record.id }}">
-                        <button class="btn btn-danger" type="submit" onclick="return confirm('是否删除此条记录');">删除</button>
+                        <input type="hidden" id="identifier" name="id" value="{{ record._id }}">
+                        <button class="btn btn-danger" type="button" onclick="deleteRecord($(this));">删除</button>
                     </form>
                     <input type="hidden" id="detail" value="{{ record.content }}">
                 </td>
