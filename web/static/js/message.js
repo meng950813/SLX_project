@@ -1,42 +1,63 @@
 /**
 * 针对修改不同版块，修改模态框的标题
 */
-$(".editor").on("click", (e)=> {
-    let $target = $(e.target);
-    // let title = $target.siblings("legend").text();
-    // $("#scheduleModal").text(title);
-    let $card = $target.parent().parent().parent();
-    let remind_date = $card.children(".card-title").text();
-    let detail = $card.children(".schedule-detail").text();
-    let id = $card.children(".card-title").attr("data-id");
-
-    $("#schedule-id").val(id);
-    $("#remind_date").val(remind_date);
-    $("#content").val(detail);
-    $("#scheduleModal").modal('show');
+$("#send_message").on("click", (e)=> {
+    let $receivce= $("#receiver").val();
+    let $content =$("#content").val();
+    
 
 });
 
-
-$("#new-schedule").click( (e) => {
-    clear_modal();
-    $("#scheduleModal").modal('show');
-});
-
-
-function clear_modal(){
-    $("#schedule-id").val(-1);
-    $("#remind_date").val("");
-    $("#content").val("");
+/**
+ * 发送消息
+ * @param element
+ */
+function send_message(element){
+    let receiver= $("#receiver").val();
+    let content = $("#content").val();
+    $.ajax({
+        url: '/add_message',
+        type: 'POST',
+        data: {
+            receiver: receiver,
+            content: content,
+            csrf_token: csrf_token,
+        },
+        dataType: 'json'
+    }).done(function (data) {
+        if(data.success){
+            toggle_alert(true, "", "删除成功");
+            //删除此条记录
+            element.parents('tr').remove();
+            $('#total').text(parseInt($('#total').text()) - 1);
+        }
+    });
 }
 
 /**
- * 在dom中移除某一card
- * @param {int} id 该日程的id
+ * 删除拜访记录
+ * @param element
  */
-function remove_card(id){
-    let target = $(`.card-title[data-id=${id}]`).parent().parent();
-    if(target.length){
-        target.remove();
-    }
+function deleteRecord(element) {
+    if (!confirm('确定删除此条记录?'))
+        return;
+    let record_id = element.parent().parent('.operation').find('#identifier').val();
+    let csrf_token = element.parent().find('#csrf_token').val();
+    //发送事件
+    $.ajax({
+        url: '/visit_record/delete',
+        type: 'POST',
+        data: {
+            id: record_id,
+            csrf_token: csrf_token,
+        },
+        dataType: 'json'
+    }).done(function (data) {
+        if(data.success){
+            toggle_alert(true, "", "删除成功");
+            //删除此条记录
+            element.parents('tr').remove();
+            $('#total').text(parseInt($('#total').text()) - 1);
+        }
+    });
 }

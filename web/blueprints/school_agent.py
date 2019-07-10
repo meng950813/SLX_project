@@ -5,7 +5,6 @@ import os
 
 from web.service import message_service
 
-from bson.objectid import ObjectId
 
 from web.blueprints.auth import login_required
 from web.utils.mongo_operator import MongoOperator
@@ -240,6 +239,7 @@ def operate_schedule():
     return json.dumps({"success": False, "message": "操作失败, code: %s" % back})
 
 
+
 @school_agent_bp.route('/info_reminder')
 @login_required
 def info_reminder():
@@ -269,6 +269,30 @@ def info_reminder():
     message_service.update_massgae_state(session['uid'])
     return render_template("info_reminder.html",checked_message=checked_message[0:5],unchecked_message=unchecked_message)
 
+@school_agent_bp.route('/add_message')
+@login_required
+def insert_message():
+    import time
+    state = 0
+    date = str(time.strftime("%Y-%m-%d %H:%M:%S"))
+    from_id = session['uid']
+    from_name = session['username']
+    username = request.form.get("receiver")
+    detail = request.form.get("content")
+    user_id = message_service.get_user_id(username)
+    message = {
+        'state': state,
+        'date': date,
+        'from_id': from_id,
+        'from_name' : from_name,
+        'user_id' : user_id,
+        'detail': detail
+    }
+    try:
+        message_service.insert_message(message)
+        return json.dumps({"success": True, "message": "操作成功"})
+    except BaseException:
+        return json.dumps({"success": False, "message": "操作失败"})
 
 def get_relations(school, institution):
     """
