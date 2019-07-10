@@ -177,8 +177,25 @@ def delete_visit_record():
 @school_agent_bp.route('/schedule')
 @login_required
 def schedule():
-    print("显示日程安排页面")
-    return render_template("schedule.html")
+    """
+    显示日程安排页面
+    :return:
+    """
+    # 获取用户的id
+    user_id = session['uid']
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # 选定集合
+    schedule_col = mongo_operator.get_collection("schedule")
+    # 找到对应的user
+    schedule_doc = schedule_col.find_one({"user_id": user_id})
+    # 去除其下所有的日程（列表）
+    schedule_list = schedule_doc["schedule"]
+
+    # for per_schedule in schedule_list:
+    #     print(per_schedule)
+    return render_template("schedule.html", schedule_list=schedule_list)
+
+
 
 
 @school_agent_bp.route('/info_modify',methods=['POST'])
@@ -216,7 +233,7 @@ def new_schedule():
 
     user_id = session['uid']
 
-    date = request.form.get('date')
+    remind_date = request.form.get('date')
 
     # 获取当前的日期，并组合成字符串
 
@@ -226,7 +243,7 @@ def new_schedule():
     current_date = str(current_day)
 
     # 前端所保存的提醒时间、日程内容、以及是否完成
-    remind_date = "2019-7-30"
+    # remind_date = "2019-7-30"
 
     schedule_content = "拜访罗军舟"
 
@@ -411,11 +428,11 @@ def format_relation_data(data):
         return False
 
 
-if __name__ == '__main__':
-    # scholar_info(73927)
-    # print(get_relations("北京大学", "化学生物学与生物技术学院"))
-    # new_schedule()
-    # index()
-    # edit_schedule()
-    # set_whether_completed(100006,1,1)
-    pass
+# if __name__ == '__main__':
+#     # scholar_info(73927)
+#     # print(get_relations("北京大学", "化学生物学与生物技术学院"))
+#     # new_schedule()
+#     # index()
+#     # edit_schedule()
+#     # set_whether_completed(100006,1,1)
+#     pass
