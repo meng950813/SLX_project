@@ -33,6 +33,10 @@ function wantToNewRecord() {
     $(".modal-title").text("添加拜访记录");
 }
 
+/**
+ * 删除拜访记录
+ * @param element
+ */
 function deleteRecord(element) {
     if (!confirm('确定删除此条记录?'))
         return;
@@ -56,7 +60,6 @@ function deleteRecord(element) {
         }
     });
 }
-
 /*
 修改，点击保存时改变所选那一行的数据 给要修改的那一行添加一个属性，利用这个属性去选择正在
 修改的那一行，然后捕捉到关闭模态框的状态，关闭模态框时将这一行的属性去掉；
