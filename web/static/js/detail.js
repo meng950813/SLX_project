@@ -35,10 +35,11 @@ function check_model_submit(){
         data: form_data,
         dataType: "json",
         success: function (response) {
-            
+            $("#modifiyInfoModal").modal("hide");
             toggle_alert(true);
         },
         error : function(error){
+            $("#modifiyInfoModal").modal("hide");
             console.log(error);
             toggle_alert(false);
         }
