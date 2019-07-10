@@ -245,24 +245,28 @@ def edit_schedule():
     
     back = insert_or_edit_schedule(data, user_id)
     if back:
-        return json.dumps({"success":True})
+        return json.dumps({"success": True})
     
-    return json.dumps({"success":False, "message":"操作失败, " + back})
+    return json.dumps({"success": False, "message": "操作失败, code: %s" % back})
     
 
-@school_agent_bp.route('/operator_schedule', methods=['POST'])
+@school_agent_bp.route('/operate_schedule', methods=['POST'])
 @login_required
-def operator_schedule():
-    
+def operate_schedule():
+    """
+    标记当前日程 已取消 or 已完成
+    :return:
+    """
     schedule_id = request.form.get('id', type=int)
     status = request.form.get('type', type=int)
     
     back = set_whether_completed_or_canceled(session["uid"], schedule_id, status)
 
     if back:
-        return json.dumps({"success":True})
+        return json.dumps({"success": True})
     
-    return json.dumps({"success":False, "message":"操作失败, " + back})
+    return json.dumps({"success": False, "message": "操作失败, code: %s" % back })
+
 
 @school_agent_bp.route('/info_reminder')
 @login_required
@@ -407,6 +411,11 @@ def set_whether_completed_or_canceled(user_id, schedule_id, status):
     # 获取schedule集合
     schedule_col = mongo_operator.get_collection("schedule")
     
+    if status == 0:
+        status = -1
+    else:
+        status = 1
+
     # 更新schedule_list
     result = schedule_col.update_one(
         {"user_id": user_id, "schedule": {'$elemMatch': {"schedule_id": schedule_id}}},

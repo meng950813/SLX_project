@@ -76,21 +76,21 @@ $(".operate-schedule").click((e)=>{
         return;
     }
     else{
-        let type = $(e.target).attr("data-type");
-        if(type != 0 || type != 1){
+        let status = $(e.target).attr("data-type");
+        console.log(status)
+        /**
+         * status: 0 ==> 取消日程安排
+         * status: 1 ==> 完成日程安排
+         *  */
+        if(status != 0 && status != 1){
             alert("错误代码");
             return;
         }
 
         $.ajax({
             type: "post",
-            url: "/operator_schedule",
-            /**
-             * type: 0 ==> 取消日程安排
-             * type: 1 ==> 完成日程安排
-             *  */
-             
-            data: {"id":id, "type":type},
+            url: "/operate_schedule",
+            data: {"csrf_token": $("#csrf_token").val(), "id":id, "type":status},
             dataType: "json",
             success: function (response) {
                 if(response.success){
