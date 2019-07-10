@@ -176,8 +176,24 @@ def delete_visit_record():
 @school_agent_bp.route('/schedule')
 @login_required
 def schedule():
-    print("显示日程安排页面")
-    return render_template("schedule.html")
+    """
+    显示日程安排页面
+    :return:
+    """
+    # 获取用户的id
+    user_id = session['uid']
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # 选定集合
+    schedule_col = mongo_operator.get_collection("schedule")
+    # 找到对应的user
+    schedule_doc = schedule_col.find_one({"user_id": user_id})
+    # 去除其下所有的日程（列表）
+    schedule_list = schedule_doc["schedule"]
+    # 根据提醒日期对日程进行降序排序
+    schedule_list.sort(key=lambda x: x["remind_date"], reverse=True)
+
+    return render_template("schedule.html", schedule_list=schedule_list)
+
 
 
 @school_agent_bp.route('/info_modify',methods=['POST'])
@@ -213,7 +229,7 @@ def edit_schedule():
     """
     # 获取用户的id,
     user_id = session['uid']
-    
+
     data = {
         "schedule_id": request.form.get('id', type=int),
         # 获取当前的日期，并组合成字符串
@@ -222,16 +238,32 @@ def edit_schedule():
         "content": request.form.get("content"),
         "remind_date": request.form.get('date'),
         #标识当前日程的状态: 0 => 未处理; 1 => 已完成; -1 => 已舍弃
-        "status": 0    
+        "status": 0
     }
     
-    insert_or_edit_schedule(data, user_id)
+    back = insert_or_edit_schedule(data, user_id)
+    if back:
+        return json.dumps({"success": True})
+    
+    return json.dumps({"success": False, "message": "操作失败, code: %s" % back})
     
 
-@school_agent_bp.route('/operator_schedule', methods=['POST'])
+@school_agent_bp.route('/operate_schedule', methods=['POST'])
 @login_required
-def operator_schedule():
-    pass
+def operate_schedule():
+    """
+    标记当前日程 已取消 or 已完成
+    :return:
+    """
+    schedule_id = request.form.get('id', type=int)
+    status = request.form.get('type', type=int)
+    
+    back = set_whether_completed_or_canceled(session["uid"], schedule_id, status)
+
+    if back:
+        return json.dumps({"success": True})
+    
+    return json.dumps({"success": False, "message": "操作失败, code: %s" % back })
 
 
 @school_agent_bp.route('/info_reminder')
@@ -377,6 +409,11 @@ def set_whether_completed_or_canceled(user_id, schedule_id, status):
     # 获取schedule集合
     schedule_col = mongo_operator.get_collection("schedule")
     
+    if status == 0:
+        status = -1
+    else:
+        status = 1
+
     # 更新schedule_list
     result = schedule_col.update_one(
         {"user_id": user_id, "schedule": {'$elemMatch': {"schedule_id": schedule_id}}},
@@ -385,7 +422,6 @@ def set_whether_completed_or_canceled(user_id, schedule_id, status):
     return result.modified_count
 
 
-# TODO 更新OK, 插入尚有问题
 if __name__ == '__main__':
     # scholar_info(73927)
     # print(get_relations("北京大学", "化学生物学与生物技术学院"))
@@ -393,9 +429,9 @@ if __name__ == '__main__':
     # index()
     # edit_schedule()
     # set_whether_completed(100006,1,1)
-    # pass
+    pass
     # print(set_whether_completed_or_canceled(100006, 0, 1))
-    print(set_whether_completed_or_canceled(100001, 1, 1))
+    # print(set_whether_completed_or_canceled(100001, 1, 1))
     # print(set_whether_completed_or_canceled(100006, 1, -1))
     data = {
         "schedule_id": -1,
@@ -405,3 +441,4 @@ if __name__ == '__main__':
         "status": 0
     }
     # print(insert_or_edit_schedule(data, 100001))
+
