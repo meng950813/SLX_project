@@ -73,7 +73,7 @@ def visit_record():
     uid = session['uid']
     # TODO: 目前查询最多有一个查询该用户的日程安排
     result = mongo_operator.find_one({'user_id': uid}, 'visited_record')
-    return render_template('visitRecode.html', visited_records=result['visited_record'])
+    return render_template('visit_record.html', visited_records=result['visited_record'])
 
 
 @school_agent_bp.route('/visit_record/new', methods=['POST'])
@@ -83,10 +83,7 @@ def new_visit_record():
     插入新的拜访记录，当不存在拜访记录的时候会先新建
     :return:
     """
-    # 获取当前的id
-    record_id = request.form.get('id', type=int)
     record = {
-        'id': record_id,
         'institution': request.form.get('institution'),
         'school': request.form.get('school'),
         'content': request.form.get('content'),
@@ -102,6 +99,7 @@ def new_visit_record():
     # 查询结果不存在，新建
     if result is None:
         record['id'] = 1
+        record_id = 1
         mongo_operator.db['visited_record'].insert_one(
             {
                 "user_id": uid,
@@ -111,10 +109,11 @@ def new_visit_record():
     else:
         result['max'] += 1
         record['id'] = result['max']
+        record_id = result['max']
         result['visited_record'].append(record)
         mongo_operator.db['visited_record'].update({'user_id': uid}, result)
 
-    return json.dumps({'success': True})
+    return json.dumps({'success': True, 'record_id': record_id})
 
 
 @school_agent_bp.route('/visit_record/edit', methods=['POST'])
@@ -171,7 +170,7 @@ def delete_visit_record():
     result['visited_record'].pop(i)
     mongo_operator.db['visited_record'].update({'user_id': uid}, result)
 
-    return redirect(url_for('.visit_record'))
+    return json.dumps({"success": True})
 
 
 @school_agent_bp.route('/schedule')

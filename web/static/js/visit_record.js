@@ -33,9 +33,7 @@ function wantToNewRecord() {
     $(".modal-title").text("添加拜访记录");
 }
 
-/*
 function deleteRecord(element) {
-    console.log('want delete');
     if (!confirm('确定删除此条记录?'))
         return;
     let record_id = element.parent().parent('.operation').find('#identifier').val();
@@ -50,13 +48,14 @@ function deleteRecord(element) {
         },
         dataType: 'json'
     }).done(function (data) {
-        console.log(data);
-        //删除此条记录
-        element.parents('tr').remove();
-        $('#total').text(parseInt($('#total').text()) - 1);
+        if(data.success){
+            toggle_alert(true, "删除成功");
+            //删除此条记录
+            element.parents('tr').remove();
+            $('#total').text(parseInt($('#total').text()) - 1);
+        }
     });
 }
- */
 
 /*
 修改，点击保存时改变所选那一行的数据 给要修改的那一行添加一个属性，利用这个属性去选择正在
@@ -69,6 +68,7 @@ function saveVisitedRecord(e){
     let institution = $('#institution').val();
     let teacher = $('#teacher').val();
     let content = $('#content').val();
+    let csrf_token = $('#csrf_token').val();
     let id = null;
     let url = '';
     //回写
@@ -98,15 +98,67 @@ function saveVisitedRecord(e){
             teacher: teacher,
             content: content,
             title: title,
-            csrf_token: $('#csrf_token').val(),
+            csrf_token: csrf_token,
         },
         dataType: 'json'
     }).done(function (data) {
         console.log(data);
-        //添加新的拜访记录，则必须刷新页面
-        if (!isModifying)
-            window.location.reload();
+        //新的拜访记录添加成功
+        if (!isModifying){
+            if (!data.success){
+                toggle_alert(false, "拜访记录添加失败");
+                return ;
+            }
+            let record_id = data.record_id;
+            let total = parseInt($('#total').text()) + 1;
+            let insert_html =
+                `<tr><td>${total}</td><td>${date}</td><td><a>${title}</a></td><td>${school}</td> <td>${institution}</td> <td>${teacher}</td> 
+                <td class="operation">
+                    <button class="btn btn-info" href="#" data-toggle="modal" data-target="#exampleModal" onclick="fillModal($(this));">修改</button>
+                    <form style="display: inline">
+                        <input type="hidden" id="csrf_token" name="csrf_token" value="${csrf_token}"/>
+                        <input type="hidden" id="identifier" name="id" value="${record_id}">
+                        <button class="btn btn-danger" type="button" onclick="deleteRecord($(this));">删除</button>
+                    </form>
+                    <input type="hidden" id="detail" value="${content}">
+                </td></tr>`;
+            let $tr=$("#tab tr").eq(-2);
+            $tr.after(insert_html);
+            //修改总数目
+            $('#total').text(total);
+
+            toggle_alert(true, "拜访记录添加成功");
+        }
+        else if(data.success){
+            toggle_alert(true, "修改成功");
+        }
     });
     //隐藏模态框
     $('#exampleModal').modal('hide');
+}
+
+/**
+ * 显示/隐藏提示框
+ * @param {boolean} isSuccess
+ * @param {string} text 要显示的文本
+ */
+function toggle_alert(isSuccess, text){
+    let success = $("#alert-box-success");
+    let error = $("#alert-box-danger");
+    // 显示操作成功的提示框
+    if(isSuccess){
+        error.hide();
+        success.show(200);
+        success.text(text);
+        setTimeout(()=>{
+            success.hide(200);
+        }, 2000)
+    }else{
+        success.hide();
+        error.show(200);
+        error.text(text);
+        setTimeout(()=>{
+            error.hide(200);
+        },2000);
+    }
 }
