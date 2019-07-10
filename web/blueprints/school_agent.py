@@ -243,14 +243,26 @@ def edit_schedule():
         "status": 0
     }
     
-    insert_or_edit_schedule(data, user_id)
+    back = insert_or_edit_schedule(data, user_id)
+    if back:
+        return json.dumps({"success":True})
+    
+    return json.dumps({"success":False, "message":"操作失败, " + back})
     
 
 @school_agent_bp.route('/operator_schedule', methods=['POST'])
 @login_required
 def operator_schedule():
-    pass
+    
+    schedule_id = request.form.get('id', type=int)
+    status = request.form.get('type', type=int)
+    
+    back = set_whether_completed_or_canceled(session["uid"], schedule_id, status)
 
+    if back:
+        return json.dumps({"success":True})
+    
+    return json.dumps({"success":False, "message":"操作失败, " + back})
 
 @school_agent_bp.route('/info_reminder')
 @login_required
@@ -403,7 +415,6 @@ def set_whether_completed_or_canceled(user_id, schedule_id, status):
     return result.modified_count
 
 
-# TODO 更新OK, 插入尚有问题
 if __name__ == '__main__':
     # scholar_info(73927)
     # print(get_relations("北京大学", "化学生物学与生物技术学院"))
@@ -411,9 +422,9 @@ if __name__ == '__main__':
     # index()
     # edit_schedule()
     # set_whether_completed(100006,1,1)
-    # pass
+    pass
     # print(set_whether_completed_or_canceled(100006, 0, 1))
-    print(set_whether_completed_or_canceled(100001, 1, 1))
+    # print(set_whether_completed_or_canceled(100001, 1, 1))
     # print(set_whether_completed_or_canceled(100006, 1, -1))
     data = {
         "schedule_id": -1,
