@@ -53,7 +53,7 @@ function deleteRecord(element) {
         dataType: 'json'
     }).done(function (data) {
         if(data.success){
-            toggle_alert(true, "删除成功");
+            toggle_alert(true, "", "删除成功");
             //删除此条记录
             element.parents('tr').remove();
             $('#total').text(parseInt($('#total').text()) - 1);
@@ -109,7 +109,7 @@ function saveVisitedRecord(e){
         //新的拜访记录添加成功
         if (!isModifying){
             if (!data.success){
-                toggle_alert(false, "拜访记录添加失败");
+                toggle_alert(false, "exampleModal", "拜访记录添加失败");
                 return ;
             }
             let record_id = data.record_id;
@@ -130,38 +130,13 @@ function saveVisitedRecord(e){
             //修改总数目
             $('#total').text(total);
 
-            toggle_alert(true, "拜访记录添加成功");
+            toggle_alert(true, "exampleModal", "拜访记录添加成功");
         }
         else if(data.success){
-            toggle_alert(true, "修改成功");
+            toggle_alert(true, "exampleModal", "修改成功");
         }
     });
     //隐藏模态框
-    $('#exampleModal').modal('hide');
+    //$('#exampleModal').modal('hide');
 }
 
-/**
- * 显示/隐藏提示框
- * @param {boolean} isSuccess
- * @param {string} text 要显示的文本
- */
-function toggle_alert(isSuccess, text){
-    let success = $("#alert-box-success");
-    let error = $("#alert-box-danger");
-    // 显示操作成功的提示框
-    if(isSuccess){
-        error.hide();
-        success.show(200);
-        success.text(text);
-        setTimeout(()=>{
-            success.hide(200);
-        }, 2000)
-    }else{
-        success.hide();
-        error.show(200);
-        error.text(text);
-        setTimeout(()=>{
-            error.hide(200);
-        },2000);
-    }
-}
