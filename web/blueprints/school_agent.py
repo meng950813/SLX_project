@@ -25,21 +25,16 @@ def index():
     # 获取用户的uid
     uid = session['uid']
 
-    user_col = mongo_operator.get_collection("user")
+    # 获取该商务的信息
+    user_result = mongo_operator.find_one({"id": uid}, "user")
+    # 获取负责的学校名称列表
+    schools = user_result['charge_school']
+    # 仅仅获取第一个学校的学院数组
+    collection = mongo_operator.get_collection("school")
+    school_result = collection.find_one({"name": schools[0]})
+    institutions = school_result['institutions']
 
-    # 获取该商务所管辖的学校列表
-    school_list = user_col.find_one({"id": uid})["charge_school"]
-
-    school_col = mongo_operator.get_collection("school")
-
-    school_institution = {}
-    # 获取学校对应的学院列表，并组装成字典
-    for school in school_list:
-        institution_list = school_col.find_one({"name": school})["institutions"]
-        school_institution[school] = institution_list
-
-    print(school_institution)
-    return render_template('personal.html', school=school_institution)
+    return render_template('personal.html', schools=schools, institutions=institutions)
 
 
 @school_agent_bp.route('/scholar/<int:teacher_id>')
