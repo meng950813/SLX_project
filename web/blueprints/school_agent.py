@@ -7,7 +7,6 @@ from web.blueprints.auth import login_required
 from web.utils.mongo_operator import MongoOperator
 from web.config import MongoDB_CONFIG
 import datetime
-
 from bson.objectid import ObjectId
 
 school_agent_bp = Blueprint('school_agent', __name__)
@@ -175,34 +174,12 @@ def delete_visit_record():
     return json.dumps({"success": True})
 
 
-@school_agent_bp.route('/schedule')
-@login_required
-def schedule():
-    """
-    显示日程安排页面
-    :return:
-    """
-    # 获取用户的id
-    user_id = session['uid']
-    mongo_operator = MongoOperator(**MongoDB_CONFIG)
-    # 选定集合
-    schedule_col = mongo_operator.get_collection("schedule")
-    # 找到对应的user
-    schedule_doc = schedule_col.find_one({"user_id": user_id})
-    # 去除其下所有的日程（列表）
-    schedule_list = schedule_doc["schedule"]
-    # 根据提醒日期对日程进行降序排序
-    schedule_list.sort(key=lambda x: x["remind_date"], reverse=True)
-
-    return render_template("schedule.html", schedule_list=schedule_list)
-
-
-
-@school_agent_bp.route('/info_modify',methods=['POST'])
+@school_agent_bp.route('/info_modify', methods=['POST'])
 @login_required
 def info_modify():
     """
     进行信息修改
+
     :return:
     """
     info = {
@@ -222,6 +199,29 @@ def info_modify():
     return json.dumps({'success': True})
 
 
+@school_agent_bp.route('/schedule')
+@login_required
+def schedule():
+    """
+    显示日程安排页面
+    :return:
+    """
+
+    print("------------------------显示日程安排的页面------------------------------")
+    # 获取用户的id
+    user_id = session['uid']
+    
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # 选定集合
+    schedule_col = mongo_operator.get_collection("schedule")
+    # 找到对应的user ,根据提醒日期对日程进行降序排序
+    schedule_list = schedule_col.find({"user_id": user_id, "status": 0}).sort([("remind_date", -1)])
+
+    # print(schedule_list)
+
+    return render_template("schedule.html", schedule_list=schedule_list)
+
+
 @school_agent_bp.route('/edit_schedule', methods=['POST'])
 @login_required
 def edit_schedule():
@@ -239,16 +239,16 @@ def edit_schedule():
         # 详细内容
         "content": request.form.get("content"),
         "remind_date": request.form.get('date'),
-        #标识当前日程的状态: 0 => 未处理; 1 => 已完成; -1 => 已舍弃
+        # 标识当前日程的状态: 0 => 未处理; 1 => 已完成; -1 => 已舍弃
         "status": 0
     }
     
     back = insert_or_edit_schedule(data, schedule_id)
     if back:
         return json.dumps({"success": True, "message": "操作成功"})
-    
+
     return json.dumps({"success": False, "message": "操作失败, code: %s" % back})
-    
+
 
 @school_agent_bp.route('/operate_schedule', methods=['POST'])
 @login_required
@@ -259,13 +259,13 @@ def operate_schedule():
     """
     schedule_id = request.form.get('id')
     status = request.form.get('type', type=int)
-    
+
     back = set_whether_completed_or_canceled(schedule_id, status)
 
     if back:
         return json.dumps({"success": True, "message": "操作成功"})
-    
-    return json.dumps({"success": False, "message": "操作失败, code: %s" % back })
+
+    return json.dumps({"success": False, "message": "操作失败, code: %s" % back})
 
 
 @school_agent_bp.route('/info_reminder')
@@ -369,13 +369,15 @@ def insert_or_edit_schedule(data, schedule_id):
         result = schedule_col.update_one({'_id': obj_id}, {"$set": data})
         return result.modified_count
 
-    except TypeError as e:
+    # TODO to checkout error type
+    except Exception as t:
         # 非法objectId ==> 创建
+        print("type error", type(t), t)
         result = schedule_col.insert_one(data)
         return result.inserted_id
 
     except Exception as e:
-        print("添加/修改错误 ", e)
+        print("添加/修改错误 ", e, schedule_id)
         return 0
 
 
@@ -389,16 +391,12 @@ def set_whether_completed_or_canceled(schedule_id, status):
 
     schedule_col = MongoOperator(**MongoDB_CONFIG).get_collection("schedule")
     
-    if status == 0:
-        status = -1
-    else:
-        status = 1
 
     try:
         # 更新schedule_list
         result = schedule_col.update_one({"_id": ObjectId(schedule_id)},{"$set": {"status": status}})
         return result.modified_count
-    except TypeError as e:
+    except Exception as e:
         print("schedule_id 不符合标准", e)
         return 0
 
