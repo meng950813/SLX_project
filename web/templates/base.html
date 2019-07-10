@@ -14,6 +14,19 @@
 
         <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
         {% block styles %}{% endblock %}
+        <style>
+            #alert-box-success,
+            #alert-box-danger{
+                position: fixed;
+                width: 270px;
+                top: 20%;
+                left: 50%;
+                transform: translateX(-135px);
+            }
+            .hidden{
+                display: none;
+            }
+        </style>
         <link rel="icon" type="image/x-icon" href="../static/images/favicon.ico">
     {% endblock %}
 </head>
@@ -63,11 +76,56 @@
     {% block main %}
     {% endblock %}
 </main>
-
+<div id="alert-box-success" class="alert alert-success hidden">
+    <strong><i class="mdui-icon material-icons">&#xe86c;</i><span class="alert-message">提交成功，等待管理员审核</span></strong>
+</div>
+<div id="alert-box-danger" class="alert alert-danger hidden">
+    <strong><i class="mdui-icon material-icons">&#xe000;</i><span class="alert-message">提交失败，请稍后再试</span></strong>
+</div>
 <footer>
     {% block footer %}
     {% endblock %}
 </footer>
+<script>
+    /**
+ * 显示/隐藏提示框
+ * @param {boolean} isSuccess 
+ * @param {string} modal 模态框id, 用于隐藏模态框 
+ * @param {string} message 用于显示的消息
+ */
+function toggle_alert(isSuccess, modal, message = ""){
+    if(modal){
+        $(`#${modal}`).modal("hide");
+    }
+
+    let alert_success = $("#alert-box-success");
+    let alert_error = $("#alert-box-danger");
+    // 显示操作成功的提示框
+    if(isSuccess){
+        alert_error.hide();
+        
+        if(message){
+            alert_success.find('.alert-message').text(message);
+        }
+
+        alert_success.show(200);
+        setTimeout(()=>{
+            alert_success.hide(200);
+        }, 2000)
+    }else{
+        alert_success.hide();
+        
+        if(message){
+            alert_error.find('.alert-message').text(message);
+        }
+
+        alert_error.show(200);
+        setTimeout(()=>{
+            alert_error.hide(200);
+        },2000);
+    }
+}
+</script>
 {% block scripts %}
 {% endblock %}
 </body>

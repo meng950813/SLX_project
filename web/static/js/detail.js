@@ -35,38 +35,12 @@ function check_model_submit(){
         data: form_data,
         dataType: "json",
         success: function (response) {
-            $("#modifiyInfoModal").modal("hide");
-            toggle_alert(true);
+            toggle_alert(response.success, "modifiyInfoModal");
         },
         error : function(error){
-            $("#modifiyInfoModal").modal("hide");
+            $("#").modal("hide");
             console.log(error);
-            toggle_alert(false);
+            toggle_alert(false, "modifiyInfoModal");
         }
     });
 }
-
-/**
- * 显示/隐藏提示框
- * @param {boolean} isSuccess 
- */
-function toggle_alert(isSuccess){
-    let success = $("#alert-box-success");
-    let error = $("#alert-box-danger");
-    // 显示操作成功的提示框
-    if(isSuccess){
-        error.hide();
-        success.show(200);
-        setTimeout(()=>{
-            success.hide(200);
-        }, 2000)
-    }else{
-        success.hide();
-        error.show(200);
-        setTimeout(()=>{
-            error.hide(200);
-        },2000);
-    }
-}
-
-

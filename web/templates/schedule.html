@@ -37,11 +37,12 @@
     <div class="row">
 
         {% for schedule in schedule_list  %}
+
             {% if schedule["status"] == 0 %}
                 <div class="card">
                   <div class="card-body">
                     <button type="button" class="close" data-toggle="modal"><span aria-hidden="true"><i class="editor mdui-icon material-icons">&#xe3c9;</i></span></button>
-                    <h5 class="card-title" data-id="1">{{ schedule["remind_date"] }}</h5>
+                    <h5 class="card-title" data-id="{{schedule['_id'] | string}}">{{ schedule["remind_date"] }}</h5>
                     <p class="card-text schedule-detail">{{ schedule["content"] }}</p>
                     <p class="text-right card-text"><small class="create-time">创建于{{ schedule["create_date"] }}</small></p>
                   </div>
@@ -85,7 +86,7 @@
         <div class="modal-footer">
           <span class="mr-auto">
             <button class="btn btn-danger operate-schedule" data-type="0">取消安排</button>
-            <button class="btn btn-success mr-auto perate-schedule" data-type="1">已完成</button>
+            <button class="btn btn-success mr-auto operate-schedule" data-type="1">已完成</button>
           </span>
           <button type="button" class="btn btn-info" id="save-schedule" >提交内容</button>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
