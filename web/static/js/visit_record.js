@@ -2,10 +2,14 @@
 let tds = null;
 let detail = null;
 let identifier = null;
-//当前是否在修改数据
+//当前是在修改数据还是在添加新的拜访记录
 let isModifying = true;
 
-function modify_modal(e){
+/**
+ * 点击修改按钮后的填充模态框函数
+ * @param e
+ */
+function fillModal(e){
     //修改模态框标题
     $(".modal-title").text("修改拜访记录");
     //选择其他的兄弟
@@ -18,12 +22,15 @@ function modify_modal(e){
     }
     detail = e.parent('.operation').find('#detail');
     identifier = e.siblings('form').find('#identifier');
-    // identifier = e.parent('.operation').find('#identifier');
     $('#content').val(e.parent('.operation').find('#detail').val());
 }
 
+/**
+ * 添加新的拜访记录
+ */
 function wantToNewRecord() {
     isModifying = false;
+    $(".modal-title").text("添加拜访记录");
 }
 
 /*
@@ -56,8 +63,6 @@ function deleteRecord(element) {
 修改的那一行，然后捕捉到关闭模态框的状态，关闭模态框时将这一行的属性去掉；
  */
 function saveVisitedRecord(e){
-    let mod_title = $(".modal-title");
-
     let date = $('#date').val();
     let title = $('#title').val();
     let school = $('#school').val();
@@ -77,24 +82,6 @@ function saveVisitedRecord(e){
         id = parseInt(identifier.val());
         url = '/visit_record/edit';
     }else{
-        //模态框
-        /*
-        let total = parseInt($('#total').text()) + 1;
-        let insert_html =
-            `<tr><td>${total}</td><td>${date}</td><td><a>${title}</a></td><td>${school}</td> <td>${institution}</td> <td>${teacher}</td> 
-                <td class="operation">
-                    <button class="btn btn-info" href="#" data-toggle="modal" data-target="#exampleModal" onclick="modify_modal($(this));">修改</button>
-                    <form style="display: inline">
-                        <input type="hidden" id="csrf_token" value="{{ csrf_token() }}"/>
-                        <button class="btn btn-danger" href=# onclick="deleteRecord($(this));">删除</button>
-                    </form>
-                </td></tr>`;
-
-        let $tr=$("#tab tr").eq(-2);
-        $tr.after(insert_html);
-        //修改总数目
-        $('#total').text(total);
-         */
         url = '/visit_record/new';
     }
     tds = null;
@@ -116,9 +103,10 @@ function saveVisitedRecord(e){
         dataType: 'json'
     }).done(function (data) {
         console.log(data);
-        //是否成功
+        //添加新的拜访记录，则必须刷新页面
         if (!isModifying)
             window.location.reload();
     });
+    //隐藏模态框
     $('#exampleModal').modal('hide');
 }
