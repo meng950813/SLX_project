@@ -189,10 +189,10 @@ def info_modify():
     :return:
     """
     info = {
-        'title':request.form.get('title'),
-        'type':request.form.get('type'),
-        'target':request.form.get('target'),
-        'content':request.form.get('content')
+        'title': request.form.get('title'),
+        'type': request.form.get('type'),
+        'target': request.form.get('target'),
+        'content': request.form.get('content')
     }
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
     # 获取用户的uid
@@ -205,126 +205,35 @@ def info_modify():
     return json.dumps({'success': True})
 
 
-@school_agent_bp.route('/new_schedule', methods=['POST'])
-@login_required
-def new_schedule():
-    """
-    将用户新保存的拜访记录插入数据库
-    :return:
-    """
-    # 获取用户的id,
-
-    user_id = session['uid']
-
-    date = request.form.get('date')
-
-    # 获取当前的日期，并组合成字符串
-
-    current_day = datetime.datetime.now().date()
-
-    # current_date = str(current_year) + "-" + str(current_month) + "-" + str(current_day)
-    current_date = str(current_day)
-
-    # 前端所保存的提醒时间、日程内容、以及是否完成
-    remind_date = "2019-7-30"
-
-    schedule_content = "拜访罗军舟"
-
-    is_completed = False
-
-    mongo_operator = MongoOperator(**MongoDB_CONFIG)
-
-    schedule_col = mongo_operator.get_collection("schedule")
-    # 获取数据库中对应该user_id的文档
-    schedule_doc = schedule_col.find_one({"user_id": user_id})
-    # 获取数据库中的计划列表
-    schedule_list = schedule_doc["schedule"]
-    # 计算新的schedule_id
-    new_schedule_id = len(schedule_list) + 1
-
-    store_dict = {
-        "schedule_id": new_schedule_id,
-        "create_date": current_date,
-        "content": schedule_content,
-        "remind_date": remind_date,
-        "is_completed": str(is_completed)
-    }
-    # 更新计划列表
-    schedule_list.append(store_dict)
-    # 更新集合
-    schedule_col.update({"user_id": user_id}, {"$set": {"schedule": schedule_list}})
-
-
-
-
-@school_agent_bp.route('', methods=['POST'])
+@school_agent_bp.route('/edit_schedule', methods=['POST'])
 @login_required
 def edit_schedule():
     """
-    用户编辑schedule
+    创建新的日程安排或编辑已有的日程
     :return:
     """
+    # 获取用户的id,
+    user_id = session['uid']
+    
+    data = {
+        "schedule_id": request.form.get('id', type=int),
+        # 获取当前的日期，并组合成字符串
+        "create_date": str(datetime.datetime.now().date()),
+        # 详细内容
+        "content": request.form.get("content"),
+        "remind_date": request.form.get('date'),
+        #标识当前日程的状态: 0 => 未处理; 1 => 已完成; -1 => 已舍弃
+        "status": 0    
+    }
+    
+    insert_or_edit_schedule(data, user_id)
+    
 
-    uid = session["id"]
-    # TODO 获取修改后的时间以及内容,没做完
+@school_agent_bp.route('/operator_schedule', methods=['POST'])
+@login_required
+def operator_schedule():
+    pass
 
-    edit_date = request.form.get('date')
-    edit_content = request.form.get('content')
-    edit_is_completed = str(request.form.get('is_completed'))
-
-    print("0-----------------")
-    print(edit_date)
-    print(edit_content)
-    print(edit_is_completed)
-    # TODO 如何获取schedule_id
-    schedule_id = 1
-
-    mongo_operator = MongoOperator(**MongoDB_CONFIG)
-    # 获取schedule集合
-    schedule_col = mongo_operator.get_collection("schedule")
-    # 获取集合中的schedule列表
-    schedule_list = schedule_col.find_one({"user_id": uid})["schedule"]
-    # 查找对应的schedule_id
-    for schedule in schedule_list:
-        if schedule["schedule_id"] == schedule_id:
-            schedule["content"] = edit_content
-            schedule["remind_date"] = edit_date
-            schedule["is_completed"] = edit_is_completed
-            print("-----------已更新")
-            break
-
-    # 更新schedule_list
-    schedule_col.update({"user_id": uid}, {"$set": {"schedule": schedule_list}})
-
-
-def set_whether_completed_or_canceled(user_id, schedule_id, type):
-    """
-    设置该用户下的该计划是否完成或取消
-
-    :param user_id:
-    :param schedule_id:
-    :param type: ==0 表示未完成， ==1 表示已完成 ==-1表示该计划已经取消
-    :return: 返回true表示修改成功，否则失败
-    """
-
-    mongo_operator = MongoOperator(**MongoDB_CONFIG)
-    # 获取schedule集合
-    schedule_col = mongo_operator.get_collection("schedule")
-    # 获取集合中的schedule列表
-    schedule_list = schedule_col.find_one({"user_id": user_id})["schedule"]
-    # 查找对应的schedule_id
-    res = False
-    for schedule in schedule_list:
-        if schedule["schedule_id"] == schedule_id:
-            schedule["is_completed"] = str(type)
-            print("-----------已更新")
-            res = True
-            break
-
-    # 更新schedule_list
-    schedule_col.update({"user_id": user_id}, {"$set": {"schedule": schedule_list}})
-
-    return res
 
 @school_agent_bp.route('/info_reminder')
 @login_required
@@ -335,6 +244,7 @@ def info_reminder():
     """
     session['info_num'] = ""
     return render_template("info_reminder.html")
+
 
 def get_relations(school, institution):
     """
@@ -411,6 +321,72 @@ def format_relation_data(data):
         return False
 
 
+def insert_or_edit_schedule(data, uid):
+    """
+    根据 schedule_id 决定 插入/更新 日程数据
+    :param data: 具体数据
+    :param uid: 用户id
+    :return: 
+    """
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    schedule_col = mongo_operator.get_collection("schedule")
+
+    # 插入新数据
+    if data['schedule_id'] == -1:
+        # 返回当前日程数量
+        back = schedule_col.find_one({'user_id': uid}, {'schedule_num': 1})
+
+        # 当前用户没有日程数据，需创建
+        if back == None:
+            data['schedule_id'] = 0
+            result = schedule_col.insert_one({
+                "user_id": uid,
+                "schedule_num": 1,
+                "schedule": [data]
+            })
+            print("创建记录，result.insert_id= %s" % result.inserted_id)
+            return result.inserted_id
+
+        else:
+            num = back['schedule_num']
+            # 此前已有数据
+            data['schedule_id'], num = num, num+1
+            schedule_col.update_one({"user_id": uid}, {'$set': {'schedule_num': num}})
+            result = schedule_col.update_one({"user_id": uid}, {"$addToSet": {"schedule": data}})
+            print("插入到数组中: ", num, result.modified_count)
+            return result.modified_count
+
+    # 更新数据
+    else:
+        result = schedule_col.update_one(
+            {"user_id": uid, "schedule": {'$elemMatch': {"schedule_id": data['schedule_id']}}},
+            {'$set': {'schedule.$': data}})
+        print("更新数据： ", result.modified_count)
+        return result.modified_count
+    
+
+def set_whether_completed_or_canceled(user_id, schedule_id, status):
+    """
+    设置该用户下的该计划是否完成或取消
+    :param user_id:
+    :param schedule_id:
+    :param status: ==0 表示未完成， ==1 表示已完成 ==-1表示该计划已经取消
+    :return: 返回true表示修改成功，否则失败
+    """
+
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # 获取schedule集合
+    schedule_col = mongo_operator.get_collection("schedule")
+    
+    # 更新schedule_list
+    result = schedule_col.update_one(
+        {"user_id": user_id, "schedule": {'$elemMatch': {"schedule_id": schedule_id}}},
+        {"$set": {"schedule.$.status": status}})
+
+    return result.modified_count
+
+
+# TODO 更新OK, 插入尚有问题
 if __name__ == '__main__':
     # scholar_info(73927)
     # print(get_relations("北京大学", "化学生物学与生物技术学院"))
@@ -418,4 +394,15 @@ if __name__ == '__main__':
     # index()
     # edit_schedule()
     # set_whether_completed(100006,1,1)
-    pass
+    # pass
+    # print(set_whether_completed_or_canceled(100006, 0, 1))
+    print(set_whether_completed_or_canceled(100001, 1, 1))
+    # print(set_whether_completed_or_canceled(100006, 1, -1))
+    data = {
+        "schedule_id": -1,
+        "create_date": "2019-06-08",
+        "content": "测试插入函数的数据",
+        "remind_date": "2019-08-06",
+        "status": 0
+    }
+    # print(insert_or_edit_schedule(data, 100001))
