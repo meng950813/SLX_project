@@ -177,8 +177,25 @@ def delete_visit_record():
 @school_agent_bp.route('/schedule')
 @login_required
 def schedule():
-    print("显示日程安排页面")
-    return render_template("schedule.html")
+    """
+    显示日程安排页面
+    :return:
+    """
+    # 获取用户的id
+    user_id = session['uid']
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # 选定集合
+    schedule_col = mongo_operator.get_collection("schedule")
+    # 找到对应的user
+    schedule_doc = schedule_col.find_one({"user_id": user_id})
+    # 去除其下所有的日程（列表）
+    schedule_list = schedule_doc["schedule"]
+
+    # for per_schedule in schedule_list:
+    #     print(per_schedule)
+    return render_template("schedule.html", schedule_list=schedule_list)
+
+
 
 
 @school_agent_bp.route('/info_modify',methods=['POST'])
@@ -214,7 +231,7 @@ def edit_schedule():
     """
     # 获取用户的id,
     user_id = session['uid']
-    
+
     data = {
         "schedule_id": request.form.get('id', type=int),
         # 获取当前的日期，并组合成字符串
@@ -223,7 +240,7 @@ def edit_schedule():
         "content": request.form.get("content"),
         "remind_date": request.form.get('date'),
         #标识当前日程的状态: 0 => 未处理; 1 => 已完成; -1 => 已舍弃
-        "status": 0    
+        "status": 0
     }
     
     insert_or_edit_schedule(data, user_id)
@@ -406,3 +423,4 @@ if __name__ == '__main__':
         "status": 0
     }
     # print(insert_or_edit_schedule(data, 100001))
+
