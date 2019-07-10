@@ -20,3 +20,5 @@
 ## 3. 关于用户登录
 >1. 登录目前使用到了mysql，对应的配置文件为web/config.py。
 >2. 当用户登录成功后，会把该用户的用户名放入session['username']、uid放在session['uid']、type放在session['type']
+>3. 当用户登录成功后，每一次刷新页面，程序都会从数据库中查询是否
+>有自己的消息，如果有则显示，它已经注册到模板中，名称为unread_msg

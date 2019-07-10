@@ -5,7 +5,6 @@
 {% endblock %}
 {% block styles %}
     <link rel="stylesheet" href="../static/css/bootstrap_v4.min.css">
-    <script src="../static/js/bootstrap.min.js"></script>
     <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
 {% endblock %}
 
@@ -13,15 +12,15 @@
 
    <div class="container" style="margin: 20px auto;">
         <div class="row">
-            <button id="new-schedule" type="button" class="btn btn-primary ml-auto" data-toggle="scheduleModal" data-target="scheduleModal"><i class="mdui-icon material-icons">&#xe3c9;</i>发送消息</button>
+            <button id="new-schedule" type="button" class="btn btn-primary ml-auto" data-toggle="modal" data-target="#scheduleModal"><i class="mdui-icon material-icons">&#xe3c9;</i>发送消息</button>
         </div>
         {% if unchecked_message|length > 0 %}
         <h3>未读信息：</h3>
         {% endif %}
-        {% for i in unchecked_message %}
+        {% for message in unchecked_message %}
             <div class="alert alert-primary">
-                <strong>{{ i['date'] }}<br></strong>
-                <strong>{{ i['from_name'] }}：{{ i['detail'] }}</strong>
+                <strong>{{ message['date'] }}<br></strong>
+                <strong>{{ message['from_name'] }}：{{ message['detail'] }}</strong>
             </div>
         {% endfor %}
 
@@ -34,7 +33,6 @@
                 <strong>{{ i['from_name'] }}：{{ i['detail'] }}</strong>
             </div>
         {% endfor %}
-
    </div>
 
     <!-- 模态框 -->
@@ -45,12 +43,12 @@
         <!-- 模态框主体 -->
         <div class="modal-body">
             <form>
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" id="csrf_token">
+                <input type="hidden" value="{{ csrf_token() }}" id="csrf_token">
                 <div class="input-group flex-nowrap">
                     <div class="input-group-prepend">
                         <span class="input-group-text">接受者</span>
                     </div>
-                    <input id="receiver" name="receiver" class="form-control mod"  type="text" name="date">
+                    <input id="receiver" name="receiver" class="form-control mod"  type="text">
                 </div>
                 <br>
                 <div class="input-group">

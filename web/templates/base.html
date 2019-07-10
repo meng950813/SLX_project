@@ -45,11 +45,11 @@
                 {{ render_nav_item('schedule.schedule', '日程安排') }}
                 {{ render_nav_item('visit_record.manage_visit_record', '拜访记录') }}
                 <li>
-                    <a class="nav-item nav-link {% if request.endpoint == 'school_agent.info_reminder' %}active{% endif %}"
+                    <a class="nav-item nav-link {% if request.endpoint == 'reminder.info_reminder' %}active{% endif %}"
                        href="{{ url_for('reminder.info_reminder') }}">
                         消息提醒
-                        {% if session['message_num'] != 0 %}
-                            <span class="badge" style="background-color: red; color: white">{{ session['message_num'] }}</span>
+                        {% if unread_msg != 0 %}
+                            <span class="badge" style="background-color: red; color: white">{{ unread_msg }}</span>
                         {% endif %}
                     </a>
                 </li>
