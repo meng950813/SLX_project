@@ -16,7 +16,7 @@
         {% block styles %}{% endblock %}
         <style>
             #alert-box-success,
-            #alert-box-error{
+            #alert-box-danger{
                 position: fixed;
                 width: 270px;
                 top: 20%;
@@ -77,10 +77,10 @@
     {% endblock %}
 </main>
 <div id="alert-box-success" class="alert alert-success hidden">
-    <strong><i class="glyphicon glyphicon-ok"></i><span class="alert-message">提交成功，等待管理员审核</span></strong>
+    <strong><i class="mdui-icon material-icons">&#xe86c;</i><span class="alert-message">提交成功，等待管理员审核</span></strong>
 </div>
 <div id="alert-box-danger" class="alert alert-danger hidden">
-    <strong><i class="glyphicon glyphicon-remove"></i><span class="alert-message">提交失败，请稍后再试</span></strong>
+    <strong><i class="mdui-icon material-icons">&#xe000;</i><span class="alert-message">提交失败，请稍后再试</span></strong>
 </div>
 <footer>
     {% block footer %}
@@ -105,7 +105,7 @@ function toggle_alert(isSuccess, modal, message = ""){
         alert_error.hide();
         
         if(message){
-            alert_success.children('.alert-message').text(message);
+            alert_success.find('.alert-message').text(message);
         }
 
         alert_success.show(200);
@@ -116,7 +116,7 @@ function toggle_alert(isSuccess, modal, message = ""){
         alert_success.hide();
         
         if(message){
-            alert_error.children('.alert-message').text(message);
+            alert_error.find('.alert-message').text(message);
         }
 
         alert_error.show(200);
