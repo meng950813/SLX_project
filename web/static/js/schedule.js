@@ -38,8 +38,8 @@ $("#save-schedule").click((e) => {
         alert("内容不应为空");
         return;
     }
-
-    let data = {"csrf_token": $("#csrf_token").val(), "date": remind_date, "content": content, "id": id}
+    
+    let data = {"csrf_token": $("#csrf_token").val(), "date": remind_date, "content": content.replace("\n", "<br>"), "id": id}
 
     $.ajax({
         type: "post",
@@ -132,6 +132,7 @@ function remove_card(id){
  */
 function create_card(id, data){
     let target = $(`.card-title[data-id=${id}]`);
+    console.log(target, id)
     // 新id ==> 创建
     if(target.length == 0){
         $("#card-list").prepend(`
@@ -146,7 +147,8 @@ function create_card(id, data){
         `)
     }else{
         let card_body = target.parent();
-        $target.text(data.date);
+        console.log(card_body)
+        target.text(data.date);
         card_body.children(".schedule-detail").text(data.content);
         card_body.children(".create-time").text(`创建于 ${new Date().Format("yyyy-MM-dd")}`);
     }
