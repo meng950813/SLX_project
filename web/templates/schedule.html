@@ -25,7 +25,7 @@
           line-height: 1.6rem;
           margin-bottom: 30px;
       }
-      .create-time-box{
+      .create-time{
         position: absolute;
         bottom: 20px;
         right: 20px;
@@ -50,7 +50,7 @@
                     <button type="button" class="close" data-toggle="modal"><span aria-hidden="true"><i class="editor mdui-icon material-icons">&#xe3c9;</i></span></button>
                     <h5 class="card-title" data-id="{{schedule['_id'] | string}}">{{ schedule["remind_date"] }}</h5>
                     <p class="card-text schedule-detail">{{ schedule["content"] | safe}}</p>
-                    <p class="create-time-box text-right card-text"><small class="create-time">创建于{{ schedule["create_date"] }}</small></p>
+                    <small class="create-time">创建于{{ schedule["create_date"] }}</small>
                   </div>
                 </div>
             {% endif %}

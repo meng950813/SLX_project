@@ -138,16 +138,15 @@ function create_card(id, data){
         $("#card-list").prepend(`
             <div class="card">
                 <div class="card-body">
-                <button type="button" class="close" data-toggle="modal"><span aria-hidden="true"><i class="editor mdui-icon material-icons">&#xe3c9;</i></span></button>
-                <h5 class="card-title" data-id="${id}">${data.date}</h5>
-                <p class="card-text schedule-detail">${data.content}</p>
-                <p class="text-right card-text"><small class="create-time">创建于${new Date().Format("yyyy-MM-dd")}</small></p>
+                    <button type="button" class="close" data-toggle="modal"><span aria-hidden="true"><i class="editor mdui-icon material-icons">&#xe3c9;</i></span></button>
+                    <h5 class="card-title" data-id="${id}">${data.date}</h5>
+                    <p class="card-text schedule-detail">${data.content}</p>
+                    <small class="create-time">创建于${new Date().Format("yyyy-MM-dd")}</small>
                 </div>
             </div>
         `)
     }else{
         let card_body = target.parent();
-        console.log(card_body)
         target.text(data.date);
         card_body.children(".schedule-detail").text(data.content);
         card_body.children(".create-time").text(`创建于 ${new Date().Format("yyyy-MM-dd")}`);
