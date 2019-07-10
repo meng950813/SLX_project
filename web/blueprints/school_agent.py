@@ -190,11 +190,10 @@ def schedule():
     schedule_doc = schedule_col.find_one({"user_id": user_id})
     # 去除其下所有的日程（列表）
     schedule_list = schedule_doc["schedule"]
+    # 根据提醒日期对日程进行降序排序
+    schedule_list.sort(key=lambda x: x["remind_date"], reverse=True)
 
-    # for per_schedule in schedule_list:
-    #     print(per_schedule)
     return render_template("schedule.html", schedule_list=schedule_list)
-
 
 
 
