@@ -33,7 +33,10 @@
                             <li class="list-group-item list-group-item-action flex-column">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h5 class="text-primary mb-1">{{ message['from_name'] }}</h5>
-                                    <small class="float-right">{{ message['date'] }}</small>
+                                    <small class="float-right" data-toggle="tooltip" data-placement="top"
+                                           data-delay="500" data-timestamp="{{ message['date'].strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                                        {{ moment(message['date']).fromNow() }}
+                                    </small>
                                 </div>
                                 <p class="mb-1">{{ message['detail'] }}</p>
                                 <div class="float-right">
