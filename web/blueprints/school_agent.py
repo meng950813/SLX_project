@@ -27,11 +27,14 @@ def index():
     # 获取该商务的信息
     user_result = mongo_operator.find_one({"id": uid}, "user")
     # 获取负责的学校名称列表
-    schools = user_result['charge_school']
-    # 仅仅获取第一个学校的学院数组
-    collection = mongo_operator.get_collection("school")
-    school_result = collection.find_one({"name": schools[0]})
-    institutions = school_result['institutions']
+    schools = []
+    institutions = []
+    if "charge_school" in user_result:
+        schools = user_result['charge_school']
+        # 仅仅获取第一个学校的学院数组
+        collection = mongo_operator.get_collection("school")
+        school_result = collection.find_one({"name": schools[0]})
+        institutions = school_result['institutions']
 
     return render_template('personal.html', schools=schools, institutions=institutions)
 
