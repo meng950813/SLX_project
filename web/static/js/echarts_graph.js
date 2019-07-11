@@ -1,5 +1,7 @@
-// 全局变量，
+// 全局变量
 var SCHOOL_LIST = {};
+var SCHOOL_NAME= "";
+var INSTITUTION_NAME = ""; 
 
 
 //echarts 对象
@@ -10,10 +12,16 @@ let graphOption = {
     tooltip: {
         formatter: function (params) {
             if (params.dataType == "node") {
+                if(params.data.label == "我"){
+                    return "<strong>我</strong>";
+                }
                 //设置提示框的内容和格式 节点和边都显示name属性
-                return `<strong>节点属性</strong><hr>姓名：${params.data.label}</b><br>所属学校：${params.data.school}<br>所属学院：${params.data.insititution}`;
+                return `<strong>节点属性</strong><hr>姓名：${params.data.label}<br>所属学校：${SCHOOL_NAME}<br>所属学院：${INSTITUTION_NAME}`;
             }
             else{
+                if(params.data.visited){
+                    return  `<strong>关系属性</strong><hr>拜访次数：${params.data.visited}次`;
+                }
                 return `<strong>关系属性</strong><hr>
                 论文合作：${params.data.paper}次<br>专利合作：${params.data.patent}次<br>项目合作：${params.data.project}次<br>`;
             }
@@ -129,16 +137,17 @@ let treeOption = {
  */
 function reloadGraph(data){
     if(!"nodes" in data) return;
-    // console.log(data)
+    console.log(data)
     let nodes = data.nodes, links = data.links, cates = data.community;
     // console.log(nodes.length, links.length, cates.length);
     graphOption.series[0].data = nodes;
     graphOption.series[0].links = links;
 
     let categories = [];
-    for (let i = 0; i < cates.length; i++) {
+    categories[0] = {name: '我'};
+    for (let i = 1; i <= cates; i++) {
         categories[i] = {
-            name: '社区' + (i + 1)
+            name: '社区' + i
         };
     }
     graphOption.series[0].categories = categories;
@@ -175,8 +184,6 @@ function showGraph() {
     let institution = $('#select-institution').children("option:selected").text();
     getInstitutionGraphData(school,institution);
 }
-//TODO:初次调用显示关系图
-showGraph();
 
 /**
  * 显示行政关系
@@ -190,7 +197,7 @@ function showTree() {
     });
 }
 
-
+// 切换学校的响应事件
 $("#select-college").change(function(){
     let school = $(this).children("option:selected").text();
     // 
@@ -198,7 +205,7 @@ $("#select-college").change(function(){
         setInstitution(SCHOOL_LIST[school],school);
     }
     else{
-        getInstitution(school);
+        getInstitutions(school);
     }
 })
 
@@ -215,21 +222,25 @@ $("#select-institution").change(function () {
  * 根据学校名获取其所有学院信息
  * @param {String} school 学校名
  */
-function getInstitution(school){
+function getInstitutions(school){
     $.ajax({
         type: "get",
-        // TODO
-        url: "TODO",
+        url: "/change_school",
         data: {"school" : school},
         dataType: "json",
         success: function (response) {
-            let institution = JSON.parse(response);
-            setInstitution(institution, school);
+            console.log(response);
+            if(response.success == false){
+                toggle_alert(false, "", response.message);
+                return;
+            }
+            setInstitution(response, school);
             // 保存数据
             SCHOOL_LIST[school] = institution;
         },
         error: function(error){
             console.error(error);
+            toggle_alert(false, "", "服务器连接失败,请稍后再试");
         }
     });
 }
@@ -260,72 +271,23 @@ function setInstitution(institution_list, school){
  * @param {String} institution 
  */
 function getInstitutionGraphData(school, institution){
-    let file_path = `/static/relation_data/${school}${institution}.txt`;
     $.ajax({
         type: "get",
-        url: file_path,
+        url: "/change_institution",
+        data: {"school": school, "institution": institution},
         dataType: "json",
         success: function (response) {
-            reloadGraph(formatGraph(response));
+            // console.log(response);
+            if(response.success == false){
+                toggle_alert(false, "", response.message);
+                return;
+            }
+            SCHOOL_NAME = school;
+            INSTITUTION_NAME = institution;
+            reloadGraph(response);
         },
         error: function () {
-            toggle_alert(false, "", "该学院暂时无关系图");
+            toggle_alert(false, "", "服务器连接失败,请稍后再试");
         }
     });
 }
-
-
-/**
- * 规格化关系图数据，使之可以生成echarts可用的数据格式
- * @param data
- * @returns {{nodes: Array, links: Array, community: *}}
- */
-function formatGraph(data){
-    let back_data = {
-        "nodes" : [],
-        "links" : [],
-        "community" : data['community_data']
-    };
-
-    let nodes = data['nodes'];
-
-    for(let index in nodes){
-        let node = nodes[index];
-        node['label'] = node['name'];
-        node['name'] = String(node['teacherId']);
-        node['symbolSize'] = parseInt(node['centrality'] * 30 + 5);
-        node['category'] = node['class'] - 1;
-        node.draggable= true;
-
-        if(data.core_node.indexOf(node["teacherId"]) >= 0){
-            node["itemStyle"]= {
-                "normal": {
-                    "borderColor": 'yellow',
-                    "borderWidth": 5,
-                    "shadowBlur": 10,
-                    "shadowColor": 'rgba(0, 0, 0, 0.3)'
-                }
-            }
-        }
-
-        delete node["teacherId"];
-        delete node["class"];
-        delete node["centrality"];
-        back_data["nodes"].push(node);
-    }
-    
-    let links = data['edges'];
-    for(let index in links){   
-        let link = links[index];
-        if(!("source" in link && "target" in link))
-            continue;
-        link["source"] = String(link["source"]);
-        link["target"] = String(link["target"]);
-        link["value"] = link["weight"];
-        delete link["weight"];
-        back_data['links'].push(link)
-    }
-
-    return back_data;
-}
-

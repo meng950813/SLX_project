@@ -49,5 +49,5 @@ def login():
 @auth_bp.route('/logout')
 @login_required
 def logout():
-    session.pop('username', None)
+    session.clear()
     return redirect(url_for('auth.login'))
