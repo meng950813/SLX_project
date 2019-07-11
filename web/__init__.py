@@ -3,8 +3,13 @@ from flask import Flask, render_template, session
 
 from web.settings import configuration
 from web.blueprints.school_agent import school_agent_bp
+from web.blueprints.visit_record import visit_record_bp
+from web.blueprints.schedule import schedule_bp
 from web.blueprints.auth import auth_bp
+from web.blueprints.reminder import reminder_bp
 from web.extensions import bootstrap, csrf
+from web.utils.mongo_operator import MongoOperator
+from web.config import MongoDB_CONFIG
 
 
 def create_app(config_name=None):
@@ -40,6 +45,9 @@ def register_extensions(app):
 def register_blueprints(app):
     app.register_blueprint(school_agent_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(visit_record_bp)
+    app.register_blueprint(schedule_bp)
+    app.register_blueprint(reminder_bp)
 
 
 def register_errors(app):
@@ -52,9 +60,13 @@ def register_template_context(app):
     """注册模板上下文，使得变量可以在模板中使用"""
     @app.context_processor
     def make_template_context():
-        current_user = None
-        if "username" in session:
-            current_user = session['username']
-        return dict(current_user=current_user)
+        # 如果登录，则尝试拉取未读信息
+        unread_msg = 0
+        if 'username' in session:
+            uid = session['uid']
+            mongo_operator = MongoOperator(**MongoDB_CONFIG)
+            unread_msg = mongo_operator.find({"to_id": uid, "state": 0}, "message").count()
+
+        return dict(unread_msg=unread_msg)
 
 

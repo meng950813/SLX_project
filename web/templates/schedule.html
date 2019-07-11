@@ -23,6 +23,12 @@
       }
       .schedule-detail{
           line-height: 1.6rem;
+          margin-bottom: 30px;
+      }
+      .create-time{
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
       }
    </style>
     
@@ -34,7 +40,7 @@
     <div class="row">
         <button id="new-schedule" type="button" class="btn btn-primary ml-auto" data-target="#myModal"><i class="mdui-icon material-icons">&#xe148;</i>新建日程</button>
     </div>
-    <div class="row">
+    <div class="row" id="card-list">
 
         {% for schedule in schedule_list  %}
 
@@ -43,8 +49,8 @@
                   <div class="card-body">
                     <button type="button" class="close" data-toggle="modal"><span aria-hidden="true"><i class="editor mdui-icon material-icons">&#xe3c9;</i></span></button>
                     <h5 class="card-title" data-id="{{schedule['_id'] | string}}">{{ schedule["remind_date"] }}</h5>
-                    <p class="card-text schedule-detail">{{ schedule["content"] }}</p>
-                    <p class="text-right card-text"><small class="create-time">创建于{{ schedule["create_date"] }}</small></p>
+                    <p class="card-text schedule-detail">{{ schedule["content"] | safe}}</p>
+                    <small class="create-time">创建于{{ schedule["create_date"] }}</small>
                   </div>
                 </div>
             {% endif %}

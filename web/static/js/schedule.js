@@ -3,16 +3,10 @@
 */
 $(".editor").on("click", (e)=> {
     let $target = $(e.target);
-    // let title = $target.siblings("legend").text();
-    // $("#scheduleModal").text(title);
     let $card = $target.parent().parent().parent();
-    let remind_date = $card.children(".card-title").text();
-    let detail = $card.children(".schedule-detail").text();
-    let id = $card.children(".card-title").attr("data-id");
-    
-    $("#schedule-id").val(id);
-    $("#remind_date").val(remind_date);
-    $("#content").val(detail);
+    $("#schedule-id").val($card.children(".card-title").attr("data-id"));
+    $("#remind_date").val($card.children(".card-title").text());
+    $("#content").val($card.children(".schedule-detail").text());
     
     $("#scheduleModal").modal('show');
 
@@ -22,7 +16,7 @@ $(".editor").on("click", (e)=> {
  * 添加新日程
  */
 $("#new-schedule").click( (e) => {
-    // clear_modal();
+    clear_modal();
     $("#scheduleModal").modal('show');
 });
 
@@ -34,10 +28,6 @@ $("#save-schedule").click((e) => {
     // id=-1 ==> 创建新日程  id>0 ==> 编辑已有日程
     let id = $("#schedule-id").val();
 
-    if(id < -1){
-        alert("错误代码");
-        return;
-    }
     let remind_date = $("#remind_date").val();
     if(remind_date.trim().length !== 10){
         alert("时间格式错误");
@@ -48,8 +38,8 @@ $("#save-schedule").click((e) => {
         alert("内容不应为空");
         return;
     }
-
-    let data = {"csrf_token": $("#csrf_token").val(), "date": remind_date, "content": content, "id": id}
+    
+    let data = {"csrf_token": $("#csrf_token").val(), "date": remind_date, "content": content.replace("\n", "<br>"), "id": id}
 
     $.ajax({
         type: "post",
@@ -59,8 +49,11 @@ $("#save-schedule").click((e) => {
         success: function (response) {
             console.log(response);
             toggle_alert(response.success, "scheduleModal", response.message);
-
-
+            if(id.length == 24 || id.length == 12)
+                create_card(id, data);
+            else{
+                create_card(response.id, data);
+            }
         },
         error: function(error){
             console.log(error);
@@ -75,7 +68,7 @@ $("#save-schedule").click((e) => {
  */
 $(".operate-schedule").click((e)=>{
     let id = $("#schedule-id").val();
-    if(id == -1){
+    if(id == 0){
         clear_modal();
         return;
     }
@@ -97,10 +90,11 @@ $(".operate-schedule").click((e)=>{
             data: {"csrf_token": $("#csrf_token").val(), "id":id, "type":status},
             dataType: "json",
             success: function (response) {
+                console.log(response)
                 if(response.success){
                     remove_card(id);
                 }
-                toggle_alert(Response.success, "scheduleModal", response.message)
+                toggle_alert(response.success, "scheduleModal", response.message)
             },
             error: function(error){
                 console.log(error);
@@ -115,7 +109,7 @@ $(".operate-schedule").click((e)=>{
  * 清空模态框中的内容
  */
 function clear_modal(){
-    $("#schedule-id").val(-1);
+    $("#schedule-id").val("0");
     $("#remind_date").val("");
     $("#content").val("");
 }
@@ -138,21 +132,22 @@ function remove_card(id){
  */
 function create_card(id, data){
     let target = $(`.card-title[data-id=${id}]`);
+    console.log(target, id)
     // 新id ==> 创建
     if(target.length == 0){
-        $("#card-list").insert(`
+        $("#card-list").prepend(`
             <div class="card">
                 <div class="card-body">
-                <button type="button" class="close" data-toggle="modal"><span aria-hidden="true"><i class="editor mdui-icon material-icons">&#xe3c9;</i></span></button>
-                <h5 class="card-title" data-id="1">2019-06-27</h5>
-                <p class="card-text schedule-detail">${data.content}</p>
-                <p class="text-right card-text"><small class="create-time">创建于${new Date().Format("yyyy-MM-dd")}</small></p>
+                    <button type="button" class="close" data-toggle="modal"><span aria-hidden="true"><i class="editor mdui-icon material-icons">&#xe3c9;</i></span></button>
+                    <h5 class="card-title" data-id="${id}">${data.date}</h5>
+                    <p class="card-text schedule-detail">${data.content}</p>
+                    <small class="create-time">创建于${new Date().Format("yyyy-MM-dd")}</small>
                 </div>
             </div>
         `)
     }else{
         let card_body = target.parent();
-        $target.text(data.date);
+        target.text(data.date);
         card_body.children(".schedule-detail").text(data.content);
         card_body.children(".create-time").text(`创建于 ${new Date().Format("yyyy-MM-dd")}`);
     }
