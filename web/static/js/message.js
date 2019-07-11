@@ -17,7 +17,7 @@ $("#send_message").click((e) =>{
     }
     if (receiver_id == null)
     {
-        toggle_alert(false, "", "未找到对应的人，请确定名字后重试");
+        toggle_alert(false, "scheduleModal", "发送失败，请确定名字");
         return ;
     }
     $.ajax({
@@ -53,4 +53,11 @@ $.ajax({
     autocomplete(document.getElementById("receiver"), names);
 });
 
+
+function showModal(element) {
+    let name = element.data('name');
+    //填充模态框字段
+    $("#receiver").val(name);
+    $('#scheduleModal').modal("show");
+}
 
