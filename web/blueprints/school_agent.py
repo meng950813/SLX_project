@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, session, request
 from web.service.basic_info_service import search_teacher_basic_info
 import json
 import os
+import datetime
 
 from web.blueprints.auth import login_required
 from web.utils.mongo_operator import MongoOperator
@@ -61,7 +62,15 @@ def scholar_info(teacher_id):
     if "patent" in teacher_basic_info:
         length[1] = len(teacher_basic_info["patent"])
 
-    return render_template('detail.html', teacher_basic_info=teacher_basic_info, length=length)
+    # 计算教师年龄
+    birth_year = teacher_basic_info["birth_year"]
+    if birth_year == " ":
+        age = " "
+    else:
+        year = datetime.datetime.now().year
+        age = year - int(birth_year)
+
+    return render_template('detail.html', teacher_basic_info=teacher_basic_info, length=length, age=age)
 
 
 @school_agent_bp.route('/info_modify', methods=['POST'])
@@ -178,7 +187,7 @@ if __name__ == '__main__':
     # scholar_info(73927)
     # print(get_relations("北京大学", "化学生物学与生物技术学院"))
     # new_schedule()
-    index()
+    # index()
     # edit_schedule()
     # set_whether_completed(100006,1,1)
-    # pass
+    pass

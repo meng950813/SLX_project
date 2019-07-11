@@ -33,7 +33,9 @@ def search_teacher_basic_info(teacher_id):
             "date": 1,
             "title": 1,
             "id": 1,
-            "proposer": 1
+            "proposer": 1,
+            "phone_number": 1,
+            "office_number": 1
         })
         patent_list = list(patent_list)
 
@@ -51,7 +53,7 @@ def search_teacher_basic_info(teacher_id):
 
         # 删除基本信息中的_id
         del basic_info_dict["_id"]
-        
+
         """
         重点研发计划的部分未显示
         """

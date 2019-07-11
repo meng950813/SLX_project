@@ -15,19 +15,20 @@
             <i  title="编辑" class="editor mdui-icon material-icons">&#xe3c9;</i>
             <div id="basic-info" class="row">
                 <div class="img-container col-sm-3 col-md-2 align-middle">
-                    <div id="img-name" class="bg-primary align-middle">周</div>
+                    <div id="img-name" class="bg-primary align-middle">{{ teacher_basic_info["name"][0] }}</div>
                 </div>
                 <div class="col-sm-9 col-md-10">
                     <div class="scholar-name"> <strong> <a href="#" > {{ teacher_basic_info["name"] }} </a>  </strong> </div>
                     <div class="scholar-depart">{{ teacher_basic_info["school"] }} - {{ teacher_basic_info["institution"] }}</div>
                     <div class="scholar-depart half">邮箱： {{ teacher_basic_info["email"] }}</div>
-                    <div class="scholar-depart half">手机： 139xxxx3265</div>
-                    <div class="scholar-depart half">办公室电话： 0512-87654321</div>
+                    <div class="scholar-depart half">手机： {{ teacher_basic_info["phone_number"] }}</div>
+                    <div class="scholar-depart half">办公室电话： {{ teacher_basic_info["office_number"] }}</div>
                     <div class="scholar-tags">
-                        <span>院长</span>
-                        <span>46岁</span>
-                        <span>某重点实验室主任</span>
-                        <span>中国科学院院士</span>
+                        <span>{{ teacher_basic_info["other_title"] }}</span>
+                        {% if age != " " %}
+                            <span>{{ age }}岁</span>
+                        {% endif %}
+{#                        <span>某重点实验室主任</span>#}
 
                             {% for honor in teacher_basic_info["honor"] %}
                                 <span>
