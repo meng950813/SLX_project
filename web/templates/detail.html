@@ -21,13 +21,12 @@
                     <div class="scholar-name"> <strong> <a href="#" > {{ teacher_basic_info["name"] }} </a>  </strong> </div>
                     <div class="scholar-depart">{{ teacher_basic_info["school"] }} - {{ teacher_basic_info["institution"] }}</div>
                     <div class="scholar-depart half">邮箱： {{ teacher_basic_info["email"] }}</div>
-                    <div class="scholar-depart half">手机： 139xxxx3265</div>
-                    <div class="scholar-depart half">办公室电话： 0512-87654321</div>
+                    <div class="scholar-depart half">手机： {{ teacher_basic_info["phone_number"] }}</div>
+                    <div class="scholar-depart half">办公室电话： {{ teacher_basic_info["office_number"] }}</div>
                     <div class="scholar-tags">
-                        <span>院长</span>
-                        <span>46岁</span>
-                        <span>某重点实验室主任</span>
-                        <span>中国科学院院士</span>
+                        <span>{{ teacher_basic_info["other_title"] }}</span>
+                        <span>{{ teacher_basic_info["office_number"] }}岁</span>
+{#                        <span>某重点实验室主任</span>#}
 
                             {% for honor in teacher_basic_info["honor"] %}
                                 <span>
