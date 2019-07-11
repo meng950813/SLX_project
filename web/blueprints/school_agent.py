@@ -10,28 +10,33 @@ from web.config import MongoDB_CONFIG
 school_agent_bp = Blueprint('school_agent', __name__)
 
 
-@school_agent_bp.route('/')
-@school_agent_bp.route('/homepage')
-@login_required
+# @school_agent_bp.route('/')
+# @school_agent_bp.route('/homepage')
+# @login_required
 def index():
     """
     学校商务的个人主页
     :return:
     """
-
     # TODO 获取当前商务负责的学校 / 学院及其建立的关系
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
     # 获取用户的uid
-    uid = session['uid']
+    # uid = session['uid']
+    uid = 100000
 
     # 获取该商务的信息
-    user_result = mongo_operator.find_one({"id": uid}, "user")
+    user_info = mongo_operator.get_collection("user").find_one({"id": uid}, {"charge_school": 1, "related_teacher": 1})
     # 获取负责的学校名称列表
-    schools = user_result['charge_school']
+    schools = user_info['charge_school']
     # 仅仅获取第一个学校的学院数组
     collection = mongo_operator.get_collection("school")
-    school_result = collection.find_one({"name": schools[0]})
+    school_result = collection.find_one({"name": schools[0]}, {"institutions": 1})
+
     institutions = school_result['institutions']
+    # 按照学院被点击次数排序
+    institutions.sort(key=lambda k: k.get("visited"), reverse=True)
+
+    relation_data = get_relations(school=schools[0], institution=institutions[0]['name'])
 
     return render_template('personal.html', schools=schools, institutions=institutions)
 
@@ -84,11 +89,12 @@ def info_modify():
     return json.dumps({'success': True})
 
 
-def get_relations(school, institution):
+def get_relations(school, institution, realtion):
     """
     获取当前用户与某一学院之中的人员关系及其中的内部社区分布
     :param school: 学校名
-    :param institution:学院名
+    :param institution: 学院名
+    :param realtion: 商务自己建立的联系, [{id:xxx, name: xxx, weigth: 123},{...},....]
     :return: 可供echarts直接渲染的json文件 or False
     """
     file_path = "../static/relation_data/%s%s.txt" % (school, institution)
@@ -103,7 +109,7 @@ def get_relations(school, institution):
         print(type(data))
         relation_data = format_relation_data(data)
 
-        # TODOrelation_data 中
+        # TODO relation_data 中
 
         return json.dumps(relation_data)
 
@@ -118,10 +124,11 @@ def format_relation_data(data):
         """
             nodes 中舍弃 code, school, insititution, centrality, class 属性, 
             添加 label,symbolSize 属性
+            class 属性是指节点所属社区，从 1 开始
         """
         for node in data["nodes"]:
             node['label'], node['name'] = node['name'], str(node['teacherId'])
-            node['category'], node["draggable"] = node['class'] - 1, True
+            node['category'], node["draggable"] = node['class'], True
             node['symbolSize'] = (node['centrality'] * 30 + 5)
 
             # 核心节点
@@ -136,6 +143,8 @@ def format_relation_data(data):
                 }
             del node["teacherId"], node["class"], node["centrality"], node["code"], node["school"], node["insititution"]
 
+        data["nodes"].append()
+
         data["links"] = []
         for link in data["edges"]:
             if "source" not in link or "target" not in link:
@@ -146,9 +155,9 @@ def format_relation_data(data):
                 del link['weight']
                 data["links"].append(link)
 
-        data["community"] = []
+        data["community"] = [0]
         for cate in data["community_data"]:
-            data["community"].append(int(list(cate.keys())[0]) - 1)
+            data["community"].append(int(list(cate.keys())[0]))
 
         del data["community_data"], data["algorithm_compare"], data["core_node"], data["edges"]
 
@@ -158,12 +167,18 @@ def format_relation_data(data):
         print(e)
         return False
 
+def create_agent_node():
+    """
+    创建商务的节点
+    :return: {"":}
+    """
+#     TODO
 
 if __name__ == '__main__':
     # scholar_info(73927)
     # print(get_relations("北京大学", "化学生物学与生物技术学院"))
     # new_schedule()
-    # index()
+    index()
     # edit_schedule()
     # set_whether_completed(100006,1,1)
-    pass
+    # pass
