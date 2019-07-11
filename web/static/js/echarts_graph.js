@@ -1,7 +1,17 @@
 // 全局变量
 var SCHOOL_LIST = {};
 var SCHOOL_NAME= "";
-var INSTITUTION_NAME = ""; 
+var INSTITUTION_NAME = "";
+var DATA = {}; 
+
+/**
+ * 阻止右键默认事件
+ */
+$(document).ready(function(){
+    $(document).bind("contextmenu",function(e){
+        return false;
+    });
+});
 
 
 //echarts 对象
@@ -54,7 +64,7 @@ let graphOption = {
             label: {
                 normal: {
                     position: 'inside',
-                    show : false,
+                    show : true,
 
                     //回调函数，显示用户名
                     formatter: function(params){
@@ -63,9 +73,9 @@ let graphOption = {
                 }
             },
             force: {
-                repulsion : [10,100],//节点之间的斥力因子。支持数组表达斥力范围，值越大斥力越大。
-                gravity : 0.1,//节点受到的向中心的引力因子。该值越大节点越往中心点靠拢。
-                edgeLength :[10,80],//边的两个节点之间的距离，这个距离也会受 repulsion。[10, 50] 。值越小则长度越长
+                repulsion : [20,100],//节点之间的斥力因子。支持数组表达斥力范围，值越大斥力越大。
+                gravity : 0.05,//节点受到的向中心的引力因子。该值越大节点越往中心点靠拢。
+                edgeLength :[20,100],//边的两个节点之间的距离，这个距离也会受 repulsion。[10, 50] 。值越小则长度越长
                 layoutAnimation : true
             },
 
@@ -162,18 +172,56 @@ function reloadGraph(data){
 //添加点击跳转事件
 myChart.on('click', function (params) {
     //仅限节点类型
-    if (params.dataType == 'node')
-    {
+    if (params.dataType == 'node'){
         //页面
         window.open('/scholar/'+params.data.name);
         return;
     }
-    else if (params.dataType == 'main')
-    {
+    else if (params.dataType == 'main'){
         alert('点击了树的结点');
     }
 });
 
+
+/**
+ * 添加节点双击事件，用于隐藏非重要节点
+ */
+myChart.on("contextmenu", function(params){
+    //仅限核心节点类型
+    if (params.dataType == 'node'){
+        // console.log("双击节点", params);
+        toggle_unimportant_node(params.data.category);
+        reloadGraph(DATA);
+    }
+})
+
+
+/**
+ * 显示/隐藏统一社区的非核心节点
+ * @param {int} category 
+ * @param {boolean} toggle_all 若为真, 显示/隐藏全部非核心节点
+ */
+function toggle_unimportant_node(category, toggle_all = false){
+    // 关系数据为空
+    if(DATA.nodes == undefined){
+        console.log("DATA.nodes is ", DATA.nodes)
+        return;
+    }
+    for(let i in DATA.nodes){
+        let node = DATA.nodes[i];
+        // 核心节点，不隐藏
+        if(node.itemStyle){
+            continue;
+        }
+        if(toggle_all){
+            node.category *= -1;
+        }
+        else if(node.category == category || node.category == (category * -1)){
+            // console.log("change ", node.label)
+            node.category *= -1;
+        }
+    }
+}
 
 /**
  * 显示关系图
@@ -184,6 +232,14 @@ function showGraph() {
     let institution = $('#select-institution').children("option:selected").text();
     getInstitutionGraphData(school,institution);
 }
+
+/**
+ * 点击 显示/隐藏非核心节点 的事件
+ */
+$("#toggle-node-btn").click((e)=>{
+    toggle_unimportant_node(0, true);
+    reloadGraph(DATA);
+})
 
 /**
  * 显示行政关系
@@ -229,14 +285,14 @@ function getInstitutions(school){
         data: {"school" : school},
         dataType: "json",
         success: function (response) {
-            console.log(response);
+            // console.log(response);
             if(response.success == false){
                 toggle_alert(false, "", response.message);
                 return;
             }
             setInstitution(response, school);
             // 保存数据
-            SCHOOL_LIST[school] = institution;
+            SCHOOL_LIST[school] = response;
         },
         error: function(error){
             console.error(error);
@@ -284,6 +340,7 @@ function getInstitutionGraphData(school, institution){
             }
             SCHOOL_NAME = school;
             INSTITUTION_NAME = institution;
+            DATA = response;
             reloadGraph(response);
         },
         error: function () {
