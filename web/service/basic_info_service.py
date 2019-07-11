@@ -14,50 +14,54 @@ def search_teacher_basic_info(teacher_id):
     :param teacher_id:
     :return:
     """
-
-    mongo_operator = MongoOperator(**MongoDB_CONFIG)
-    # 指定集合
-    basic_info_dict = mongo_operator.find_one({"id": teacher_id}, "basic_info")
-
-    # 利用基本信息表中的patent索引_id 搜索patent集合中对应的数据
-    # 并将其加入到basic_info_dict中
-    if "patent_id" in basic_info_dict:
+    print("-------------------------开始搜索学者基本信息---------------------------------------")
+    try:
+        mongo_operator = MongoOperator(**MongoDB_CONFIG)
+        # 指定集合
+        basic_info_dict = mongo_operator.find_one({"id": teacher_id}, "basic_info")
+        # 获取基本信息集合中的教师专利的引用列表
         patent_id_list = basic_info_dict["patent_id"]
-        patent_info_list = []
-        for patent_id in patent_id_list:
-            patent_info = mongo_operator.find_one({"_id": patent_id}, "patent")
-            # print(patent)
-            del patent_info["_id"]
-            patent_info_list.append(patent_info)
+        # 将其装换为python的列表
+        patent_id_list = list(patent_id_list)
+        # print(patent_id_list)
 
-        basic_info_dict["patent"] = patent_info_list
+        # 获取专利集合
+        patent_col = mongo_operator.get_collection("patent")
+        # 获取有用的信息 删除其中的ObjectId对象
+        patent_list = patent_col.find({"_id": {"$in": patent_id_list}}, {
+            "_id": 0,
+            "author_list": 1,
+            "date": 1,
+            "title": 1,
+            "id": 1,
+            "proposer": 1
+        })
+        patent_list = list(patent_list)
 
-        del basic_info_dict["patent_id"]
-
-    # 利用基本信息表中的fund索引_id 搜索funds集合中对应的数据
-    # 并将其加入到basic_info_dict中
-    if "funds_id" in basic_info_dict:
+        # 获取基本信息集合中的教师基金的引用列表
         funds_id_list = basic_info_dict["funds_id"]
-        funds_info_list = []
+        # 获取基金集合
+        funds_col = mongo_operator.get_collection("funds")
+        # 删除其中的ObjectId对象
+        funds_list = funds_col.find({"_id": {"$in": funds_id_list}}, {"_id": 0})
+        funds_list = list(funds_list)
 
-        for funds_id in funds_id_list:
-            funds_info = mongo_operator.find_one({"_id": funds_id}, "funds")
-            del funds_info["_id"]
-            # print(funds_info)
+        # 添加入基本信息列表
+        basic_info_dict["patent"] = patent_list
+        basic_info_dict["funds"] = funds_list
 
-            funds_info_list.append(funds_info)
-        basic_info_dict["funds"] = funds_info_list
+        # 删除基本信息中的_id
+        del basic_info_dict["_id"]
+        
+        """
+        重点研发计划的部分未显示
+        """
+    except Exception as e:
+        print("------exception------  ", e)
 
-        del basic_info_dict["funds_id"]
-
-    # 由于MongoDB中的默认id是
-    del basic_info_dict["_id"]
-    """
-    重点研发计划的部分未显示
-    """
     return basic_info_dict
 
 
 if __name__ == '__main__':
     # p = Project()
-    search_teacher_basic_info(73932)
+    search_teacher_basic_info(73964)
