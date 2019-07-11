@@ -2,7 +2,6 @@ from flask import Blueprint, session, redirect, url_for, render_template, flash
 from web.forms import LoginForm
 import functools
 from web.service import user_service
-from web.service import message_service
 
 
 auth_bp = Blueprint('auth', __name__)

@@ -69,3 +69,19 @@ def insert_message():
     collection.insert_one(message)
 
     return json.dumps({"success": True, "message": "操作成功"})
+
+
+@reminder_bp.route('/get_agents')
+def get_agents():
+    """
+    获取所有的用户，并返回一个字典数组{name,id}
+    :return:
+    """
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    collection = mongo_operator.get_collection("user")
+    # 仅仅需要id和name
+    results = collection.find({}, {"name": 1, "id": 1, "_id": 0})
+    users = list(results)
+
+    return json.dumps(users, ensure_ascii=False)
+

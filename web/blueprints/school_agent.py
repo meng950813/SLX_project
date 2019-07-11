@@ -10,9 +10,9 @@ from web.config import MongoDB_CONFIG
 school_agent_bp = Blueprint('school_agent', __name__)
 
 
-# @school_agent_bp.route('/')
-# @school_agent_bp.route('/homepage')
-# @login_required
+@school_agent_bp.route('/')
+@school_agent_bp.route('/homepage')
+@login_required
 def index():
     """
     学校商务的个人主页
@@ -21,22 +21,22 @@ def index():
     # TODO 获取当前商务负责的学校 / 学院及其建立的关系
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
     # 获取用户的uid
-    # uid = session['uid']
-    uid = 100000
+    uid = session['uid']
+    # uid = 100000
 
     # 获取该商务的信息
     user_info = mongo_operator.get_collection("user").find_one({"id": uid}, {"charge_school": 1, "related_teacher": 1})
     # 获取负责的学校名称列表
-    schools = user_info['charge_school']
-    # 仅仅获取第一个学校的学院数组
-    collection = mongo_operator.get_collection("school")
-    school_result = collection.find_one({"name": schools[0]}, {"institutions": 1})
-
-    institutions = school_result['institutions']
-    # 按照学院被点击次数排序
-    institutions.sort(key=lambda k: k.get("visited"), reverse=True)
-
-    relation_data = get_relations(school=schools[0], institution=institutions[0]['name'])
+    schools = []
+    institutions = []
+    if "charge_school" in user_info:
+        schools = user_info['charge_school']
+        # 仅仅获取第一个学校的学院数组
+        collection = mongo_operator.get_collection("school")
+        school_result = collection.find_one({"name": schools[0]})
+        institutions = school_result['institutions']
+        # 按照学院被点击次数排序
+        institutions.sort(key=lambda k: k.get("visited"), reverse=True)
 
     return render_template('personal.html', schools=schools, institutions=institutions)
 
@@ -172,7 +172,7 @@ def create_agent_node():
     创建商务的节点
     :return: {"":}
     """
-#     TODO
+    # TODO
 
 if __name__ == '__main__':
     # scholar_info(73927)

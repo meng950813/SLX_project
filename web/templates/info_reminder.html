@@ -5,7 +5,7 @@
 {% endblock %}
 {% block styles %}
     <link rel="stylesheet" href="../static/css/bootstrap_v4.min.css">
-    <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+    <link rel="stylesheet" href="../static/css/autocomplete.css">
 {% endblock %}
 
 {% block main %}
@@ -42,7 +42,7 @@
 
         <!-- 模态框主体 -->
         <div class="modal-body">
-            <form>
+            <form autocomplete="off">
                 <input type="hidden" value="{{ csrf_token() }}" id="csrf_token">
                 <div class="input-group flex-nowrap">
                     <div class="input-group-prepend">
@@ -75,5 +75,7 @@
 
 {% block scripts %}
     <script src="../static/js/bootstrap_v4.min.js"></script>
+    <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+    <script src="../static/js/autocomplete.js"></script>
     <script src="../static/js/message.js"></script>
 {% endblock %}
