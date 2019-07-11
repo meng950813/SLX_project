@@ -50,7 +50,10 @@
                             <li class="list-group-item list-group-item-action flex-column">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h5 class="text-primary mb-1">{{ message['from_name'] }}</h5>
-                                    <small class="float-right">{{ message['date'] }}</small>
+                                    <small class="float-right" data-toggle="tooltip" data-placement="top"
+                                           data-delay="500" data-timestamp="{{ message['date'].strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                                        {{ moment(message['date']).fromNow() }}
+                                    </small>
                                 </div>
                                 <p class="mb-1">{{ message['detail'] }}</p>
                                 <div class="float-right">
@@ -110,8 +113,10 @@
 
 
 {% block scripts %}
-    <script src="../static/js/bootstrap_v4.min.js"></script>
+    {{ moment.include_moment() }}
+    {{ moment.locale('zh-cn') }}
     <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+    <script src="../static/js/bootstrap_v4.min.js"></script>
     <script src="../static/js/autocomplete.js"></script>
     <script src="../static/js/message.js"></script>
 {% endblock %}

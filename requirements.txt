@@ -1,13 +1,16 @@
-bson
 Bootstrap-Flask==1.0.10
+bson==0.5.8
 Click==7.0
 DBUtils==1.3
 Flask==1.0.3
+Flask-Moment==0.8.0
 Flask-WTF==0.14.2
 itsdangerous==1.1.0
 Jinja2==2.10.1
 MarkupSafe==1.1.1
 pymongo==3.8.0
 PyMySQL==0.9.3
+python-dateutil==2.8.0
+six==1.12.0
 Werkzeug==0.15.4
 WTForms==2.2.1

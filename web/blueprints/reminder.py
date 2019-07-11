@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, session, request
-import datetime
+from datetime import datetime
 import json
-import time
 
 from web.blueprints.auth import login_required
 from web.utils.mongo_operator import MongoOperator
@@ -46,7 +45,7 @@ def info_reminder():
 @login_required
 def insert_message():
     state = 0
-    date = str(time.strftime("%Y-%m-%d %H:%M:%S"))
+    date = datetime.utcnow()
     # 发送者
     from_id = session['uid']
     from_name = session['username']
