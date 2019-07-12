@@ -3,6 +3,7 @@ var SCHOOL_LIST = {};
 var SCHOOL_NAME= "";
 var INSTITUTION_NAME = "";
 var DATA = {}; 
+var CORE_NODE = [];
 
 /**
  * 阻止右键默认事件
@@ -147,7 +148,7 @@ let treeOption = {
  */
 function reloadGraph(data){
     if(!"nodes" in data) return;
-    console.log(data)
+    // console.log(data)
     let nodes = data.nodes, links = data.links, cates = data.community;
     // console.log(nodes.length, links.length, cates.length);
     graphOption.series[0].data = nodes;
@@ -191,37 +192,12 @@ myChart.on("contextmenu", function(params){
     if (params.dataType == 'node'){
         // console.log("双击节点", params);
         toggle_unimportant_node(params.data.category);
+        toggle_relation_with_core_node(params.data.name.toString());
+
         reloadGraph(DATA);
     }
 })
 
-
-/**
- * 显示/隐藏统一社区的非核心节点
- * @param {int} category 
- * @param {boolean} toggle_all 若为真, 显示/隐藏全部非核心节点
- */
-function toggle_unimportant_node(category, toggle_all = false){
-    // 关系数据为空
-    if(DATA.nodes == undefined){
-        console.log("DATA.nodes is ", DATA.nodes)
-        return;
-    }
-    for(let i in DATA.nodes){
-        let node = DATA.nodes[i];
-        // 核心节点，不隐藏
-        if(node.itemStyle){
-            continue;
-        }
-        if(toggle_all){
-            node.category *= -1;
-        }
-        else if(node.category == category || node.category == (category * -1)){
-            // console.log("change ", node.label)
-            node.category *= -1;
-        }
-    }
-}
 
 /**
  * 显示关系图
@@ -238,6 +214,7 @@ function showGraph() {
  */
 $("#toggle-node-btn").click((e)=>{
     toggle_unimportant_node(0, true);
+    toggle_relation_with_core_node(0, true);
     reloadGraph(DATA);
 })
 
@@ -342,9 +319,83 @@ function getInstitutionGraphData(school, institution){
             INSTITUTION_NAME = institution;
             DATA = response;
             reloadGraph(response);
+            // console.log("after load graph");
+            create_relation_with_core_node(DATA.core_node);
+            // console.log("create_relation_with_core_node");
+            // console.log(CORE_NODE);
+
         },
         error: function () {
             toggle_alert(false, "", "服务器连接失败,请稍后再试");
         }
     });
+}
+
+
+/**
+ * 显示/隐藏统一社区的非核心节点
+ * @param {int} category 
+ * @param {boolean} toggle_all 若为真, 显示/隐藏全部非核心节点
+ */
+function toggle_unimportant_node(category, toggle_all = false){
+    // 关系数据为空
+    if(DATA.nodes == undefined){
+        // console.log("DATA.nodes is ", DATA.nodes)
+        return;
+    }
+    for(let i in DATA.nodes){
+        let node = DATA.nodes[i];
+        // 核心节点，不隐藏
+        if(node.itemStyle){
+            continue;
+        }
+        if(toggle_all || node.category == category || node.category == (category * -1)){
+            // console.log("change ", node.label)
+            node.category *= -1;
+        }
+    }
+}
+
+
+/**
+ * 创建用户与核心节点的关系
+ * @param {json} core_node_data 
+ */
+function create_relation_with_core_node(core_node_data){
+    if(!core_node_data || core_node_data.length == 0) return;
+    
+    // 重置
+    CORE_NODE = [];
+
+    for(let id in core_node_data){
+        CORE_NODE.push({
+            "source":"0",
+            "target":`-${id}`,
+            "visited": `共${core_node_data[id]}`,
+            "lineStyle": {
+                "normal": {
+                    // TODO 根据拜访次数设定连线宽度
+                    "width": 10
+                }
+            }
+        })
+    }
+
+    DATA.links = DATA.links.concat(CORE_NODE);
+}
+
+/**
+ * 
+ * @param {string} t_id 
+ * @param {boolean} toggle_all 若为真, 显示/隐藏全部与核心节点的关系集合
+ */
+function toggle_relation_with_core_node(t_id, toggle_all = false){
+    // console.log("toggle_relation_with_core_node");
+    for(let i in CORE_NODE){
+        let node = CORE_NODE[i];
+        if(toggle_all || node.target == t_id || node.target == ("-" + t_id)){
+            node.target = (parseInt(node.target) * -1).toString()
+        }
+    }
+    // console.log(CORE_NODE);
 }

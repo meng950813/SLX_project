@@ -133,8 +133,8 @@ def format_relation_data(data, agent_relation):
             添加 label,symbolSize 属性
             class 属性是指节点所属社区，从 1 开始
         """
-        teacher_id_list = set()
-        class_id_set = set()
+        teacher_id_dict = dict()
+        class_id_dict = dict()
 
         for node in data["nodes"]:
             node['label'], node['name'] = node['name'], str(node['teacherId'])
@@ -151,9 +151,15 @@ def format_relation_data(data, agent_relation):
                         "shadowColor": 'rgba(0, 0, 0, 0.3)'
                     }
                 }
-            teacher_id_list.add(node['teacherId'])
-            class_id_set.add(node["class"])
+                
+                # 保存 class 的种类是为了划分社区 ==> 实现这一功能的前提是 class 值不存在断档
+                # 其值为该社区核心节点 id
+                class_id_dict[node["class"]] = node["teacherId"]
             
+            # 保存 teacherId => 判定商务创建的所有关系中有哪些属于当前社区;
+            # 以其 class 为值是为了更方便的在隐藏非核心节点时, 将商务与其的关系累加到核心节点上
+            teacher_id_dict[node['teacherId']] = node["class"]
+
             del node["teacherId"], node["class"], node["centrality"], node["code"], node["school"], node["insititution"]
 
         data["links"] = []
@@ -173,19 +179,24 @@ def format_relation_data(data, agent_relation):
             前提: nodes中的class连续 ==> 不会出现 1,2,5,...的情况
             传递社区总数
         """
-        data["community"] = len(class_id_set)
+        data["community"] = len(class_id_dict)
 
         # data["community"] = [0]
         # for cate in data["community_data"]:
         #     data["community"].append(int(list(cate.keys())[0]))
 
-        del data["community_data"], data["algorithm_compare"], data["core_node"], data["edges"]
-
         # 添加商务节点
         data["nodes"].append(create_agent_node())
+        
         # 添加商务创建的社交关系
         if agent_relation:
-            data["links"].extend(create_agent_relation(agent_relation, teacher_id_list))
+            agent_relation_data = create_agent_relation(agent_relation, teacher_id_dict, class_id_dict)
+
+            data["links"].extend(agent_relation_data[0])
+
+            data["core_node"] = agent_relation_data[1]
+
+        del data["community_data"], data["algorithm_compare"], data["edges"]
 
         return data
 
@@ -218,21 +229,30 @@ def create_agent_node():
     }
 
 
-def create_agent_relation(data, teacher_list):
+def create_agent_relation(data, teacher_dict, class_dict):
     """
     创建商务与当前学院中老师的关系
     :param data: 商务创建的所有联系, [{id:xxx, name: xxx, weight: 123},{...},....]
-    :param teacher_list: set 当前学院的教师id列表
-    :return: list [{source:"0",target:"xxx",normal:{lineStyle:{width:...}}}]
+    :param teacher_dict: dict 当前学院的教师id列表, 值为其所属社区号
+    :param class_dict: dict 当前学院中的社区号, 值为其中核心节点的 teacherId
+    :return: tuple (
+            [{source:"0",target:"xxx",normal:{lineStyle:{width:...}}}],
+            {"core_node_teacherId": totalWeight}
+        )
     """
     back = []
+    
+    # 用于保存商务与该社区所有老师的关系之和
+    # 格式为: {"core_node_teacherId": totalWeight}
+    core_node = {}
+
     for item in data:
-        if not item.get("id") in teacher_list:
+        if not item.get("id") in teacher_dict:
             continue
 
         if not("weight" in item):
             item["weight"] = 1
-
+        
         info = {
             "source": "0",
             "target": str(item['id']),
@@ -245,6 +265,41 @@ def create_agent_relation(data, teacher_list):
             }
         }
         back.append(info)
+
+        try:
+            # 防止取不到值
+            core_teacher = class_dict[teacher_dict[item['id']]]
+            if core_teacher in core_node:
+                core_node[core_teacher] += item["weight"]
+            else:
+                core_node[core_teacher] = item["weight"]
+        except Exception as e:
+            print("取不到正确的值")
+            print(e)
+    
+    return back, core_node
+
+
+def create_agent_relation_with_core_node(core_node):
+    """
+    创建商务与每个社区核心节点的关系, 该关系为商务与该社区中非核心节点关系的总和
+    :param core_node: dict 商务与核心节点的关系权重, 格式为: {"teacherId": weight, ...}
+    :return: list [{source:"0",target:"xxx", "core": True, normal:{lineStyle:{width:...}}}]
+    """
+    back = []
+    for teacherId, weight in core_node.items():
+        back.append({
+            "source": "0",
+            "target": "-" + str(teacherId),
+            "visited": "共" + str(weight),
+            "core": True,
+            "lineStyle": {
+                "normal": {
+                    # TODO 根据拜访次数设定连线宽度
+                    "width": 10
+                }
+            }
+        })
 
     return back
 
