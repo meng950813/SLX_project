@@ -18,14 +18,15 @@
             </select>
             <select id="select-institution" class="ml-3">
                 {% for institution in institutions %}
-                    <option>{{ institution.name }}</option>
+                    <option>{{ institution }}</option>
                 {% endfor %}
             </select>
             <button class="btn btn-default float-right" onclick="showTree()">行政关系</button>
             <button class="btn btn-primary mr-3 float-right" onclick="showGraph()">学术关系</button>
+            <button class="btn btn-primary mr-3 float-right" id="toggle-node-btn">显示/隐藏非核心节点</button>
         </div>
 
-        <div id="visited-record" class="float-right mt-3 mr-3">
+        <!-- <div id="visited-record" class="float-right mt-3 mr-3">
 
             <ul class="list-group ">
                 <li class="list-group-item"><b class="lead">拜访记录</b></li>
@@ -37,7 +38,7 @@
                 <li class="list-group-item"><a href="#"><span class="lead"> 王老五 </span> 院长 2019-5-8</a></li>
                 <li class="list-group-item clearfix"><a href="#" class="float-right">查看更多 > </a></li>
             </ul>
-        </div>
+        </div> -->
     </div>
 {% endblock %}
 
@@ -45,5 +46,10 @@
     <script src="../static/js/bootstrap_v4.min.js"></script>
     <script src="https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts.min.js"></script>
     <script src="../static/js/echarts_graph.js"></script>
+    <script>
+        SCHOOL_NAME= "{{ schools[0] }}";
+        INSTITUTION_NAME = "{{ institutions[0] }}";
+        getInstitutionGraphData(SCHOOL_NAME, INSTITUTION_NAME)
+    </script>
 {% endblock %}
 

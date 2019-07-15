@@ -18,9 +18,15 @@ $("#submit-btn").click((e) => {
  */
 function check_model_submit(){
     let target = $("#recipient-name").val();
-    if(target.trim().length == 0) return;
+    if(target.trim().length == 0){
+        toggle_alert(false, "", "修改项不能为空");
+        return;
+    }
     let content = $("#message-text").val();
-    if(content.trim().length == 0) return;
+    if(content.trim().length == 0){
+        toggle_alert(false, "", "请输入具体内容");
+        return;
+    } 
 
     let form_data = {
         "csrf_token": $('#csrf_token').val(),
@@ -31,7 +37,7 @@ function check_model_submit(){
     }
     $.ajax({
         type: "post",
-        url: "/info_modify",
+        url: "/feedback",
         data: form_data,
         dataType: "json",
         success: function (response) {

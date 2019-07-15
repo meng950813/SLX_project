@@ -1,5 +1,18 @@
-// 全局变量，
+// 全局变量
 var SCHOOL_LIST = {};
+var SCHOOL_NAME= "";
+var INSTITUTION_NAME = "";
+var DATA = {}; 
+var CORE_NODE = [];
+
+/**
+ * 阻止右键默认事件
+ */
+$(document).ready(function(){
+    $(document).bind("contextmenu",function(e){
+        return false;
+    });
+});
 
 
 //echarts 对象
@@ -10,10 +23,16 @@ let graphOption = {
     tooltip: {
         formatter: function (params) {
             if (params.dataType == "node") {
+                if(params.data.label == "我"){
+                    return "<strong>我</strong>";
+                }
                 //设置提示框的内容和格式 节点和边都显示name属性
-                return `<strong>节点属性</strong><hr>姓名：${params.data.label}</b><br>所属学校：${params.data.school}<br>所属学院：${params.data.insititution}`;
+                return `<strong>节点属性</strong><hr>姓名：${params.data.label}<br>所属学校：${SCHOOL_NAME}<br>所属学院：${INSTITUTION_NAME}`;
             }
             else{
+                if(params.data.visited){
+                    return  `<strong>关系属性</strong><hr>拜访次数：${params.data.visited}次`;
+                }
                 return `<strong>关系属性</strong><hr>
                 论文合作：${params.data.paper}次<br>专利合作：${params.data.patent}次<br>项目合作：${params.data.project}次<br>`;
             }
@@ -46,7 +65,7 @@ let graphOption = {
             label: {
                 normal: {
                     position: 'inside',
-                    show : false,
+                    show : true,
 
                     //回调函数，显示用户名
                     formatter: function(params){
@@ -55,9 +74,9 @@ let graphOption = {
                 }
             },
             force: {
-                repulsion : [10,100],//节点之间的斥力因子。支持数组表达斥力范围，值越大斥力越大。
-                gravity : 0.1,//节点受到的向中心的引力因子。该值越大节点越往中心点靠拢。
-                edgeLength :[10,80],//边的两个节点之间的距离，这个距离也会受 repulsion。[10, 50] 。值越小则长度越长
+                repulsion : [20,100],//节点之间的斥力因子。支持数组表达斥力范围，值越大斥力越大。
+                gravity : 0.05,//节点受到的向中心的引力因子。该值越大节点越往中心点靠拢。
+                edgeLength :[20,100],//边的两个节点之间的距离，这个距离也会受 repulsion。[10, 50] 。值越小则长度越长
                 layoutAnimation : true
             },
 
@@ -136,9 +155,10 @@ function reloadGraph(data){
     graphOption.series[0].links = links;
 
     let categories = [];
-    for (let i = 0; i < cates.length; i++) {
+    categories[0] = {name: '我'};
+    for (let i = 1; i <= cates; i++) {
         categories[i] = {
-            name: '社区' + (i + 1)
+            name: '社区' + i
         };
     }
     graphOption.series[0].categories = categories;
@@ -153,17 +173,30 @@ function reloadGraph(data){
 //添加点击跳转事件
 myChart.on('click', function (params) {
     //仅限节点类型
-    if (params.dataType == 'node')
-    {
+    if (params.dataType == 'node'){
         //页面
         window.open('/scholar/'+params.data.name);
         return;
     }
-    else if (params.dataType == 'main')
-    {
+    else if (params.dataType == 'main'){
         alert('点击了树的结点');
     }
 });
+
+
+/**
+ * 添加节点双击事件，用于隐藏非重要节点
+ */
+myChart.on("contextmenu", function(params){
+    //仅限核心节点类型
+    if (params.dataType == 'node'){
+        // console.log("双击节点", params);
+        toggle_unimportant_node(params.data.category);
+        toggle_relation_with_core_node(params.data.name.toString());
+
+        reloadGraph(DATA);
+    }
+})
 
 
 /**
@@ -175,8 +208,15 @@ function showGraph() {
     let institution = $('#select-institution').children("option:selected").text();
     getInstitutionGraphData(school,institution);
 }
-//TODO:初次调用显示关系图
-showGraph();
+
+/**
+ * 点击 显示/隐藏非核心节点 的事件
+ */
+$("#toggle-node-btn").click((e)=>{
+    toggle_unimportant_node(0, true);
+    toggle_relation_with_core_node(0, true);
+    reloadGraph(DATA);
+})
 
 /**
  * 显示行政关系
@@ -190,7 +230,7 @@ function showTree() {
     });
 }
 
-
+// 切换学校的响应事件
 $("#select-college").change(function(){
     let school = $(this).children("option:selected").text();
     // 
@@ -198,7 +238,7 @@ $("#select-college").change(function(){
         setInstitution(SCHOOL_LIST[school],school);
     }
     else{
-        getInstitution(school);
+        getInstitutions(school);
     }
 })
 
@@ -215,21 +255,25 @@ $("#select-institution").change(function () {
  * 根据学校名获取其所有学院信息
  * @param {String} school 学校名
  */
-function getInstitution(school){
+function getInstitutions(school){
     $.ajax({
         type: "get",
-        // TODO
-        url: "TODO",
+        url: "/change_school",
         data: {"school" : school},
         dataType: "json",
         success: function (response) {
-            let institution = JSON.parse(response);
-            setInstitution(institution, school);
+            // console.log(response);
+            if(response.success == false){
+                toggle_alert(false, "", response.message);
+                return;
+            }
+            setInstitution(response, school);
             // 保存数据
-            SCHOOL_LIST[school] = institution;
+            SCHOOL_LIST[school] = response;
         },
         error: function(error){
             console.error(error);
+            toggle_alert(false, "", "服务器连接失败,请稍后再试");
         }
     });
 }
@@ -260,72 +304,98 @@ function setInstitution(institution_list, school){
  * @param {String} institution 
  */
 function getInstitutionGraphData(school, institution){
-    let file_path = `/static/relation_data/${school}${institution}.txt`;
     $.ajax({
         type: "get",
-        url: file_path,
+        url: "/change_institution",
+        data: {"school": school, "institution": institution},
         dataType: "json",
         success: function (response) {
-            reloadGraph(formatGraph(response));
+            // console.log(response);
+            if(response.success == false){
+                toggle_alert(false, "", response.message);
+                return;
+            }
+            SCHOOL_NAME = school;
+            INSTITUTION_NAME = institution;
+            DATA = response;
+            reloadGraph(response);
+            // console.log("after load graph");
+            create_relation_with_core_node(DATA.core_node);
+            // console.log("create_relation_with_core_node");
+            // console.log(CORE_NODE);
+
         },
         error: function () {
-            toggle_alert(false, "", "该学院暂时无关系图");
+            toggle_alert(false, "", "服务器连接失败,请稍后再试");
         }
     });
 }
 
 
 /**
- * 规格化关系图数据，使之可以生成echarts可用的数据格式
- * @param data
- * @returns {{nodes: Array, links: Array, community: *}}
+ * 显示/隐藏统一社区的非核心节点
+ * @param {int} category 
+ * @param {boolean} toggle_all 若为真, 显示/隐藏全部非核心节点
  */
-function formatGraph(data){
-    let back_data = {
-        "nodes" : [],
-        "links" : [],
-        "community" : data['community_data']
-    };
-
-    let nodes = data['nodes'];
-
-    for(let index in nodes){
-        let node = nodes[index];
-        node['label'] = node['name'];
-        node['name'] = String(node['teacherId']);
-        node['symbolSize'] = parseInt(node['centrality'] * 30 + 5);
-        node['category'] = node['class'] - 1;
-        node.draggable= true;
-
-        if(data.core_node.indexOf(node["teacherId"]) >= 0){
-            node["itemStyle"]= {
-                "normal": {
-                    "borderColor": 'yellow',
-                    "borderWidth": 5,
-                    "shadowBlur": 10,
-                    "shadowColor": 'rgba(0, 0, 0, 0.3)'
-                }
-            }
-        }
-
-        delete node["teacherId"];
-        delete node["class"];
-        delete node["centrality"];
-        back_data["nodes"].push(node);
+function toggle_unimportant_node(category, toggle_all = false){
+    // 关系数据为空
+    if(DATA.nodes == undefined){
+        // console.log("DATA.nodes is ", DATA.nodes)
+        return;
     }
-    
-    let links = data['edges'];
-    for(let index in links){   
-        let link = links[index];
-        if(!("source" in link && "target" in link))
+    for(let i in DATA.nodes){
+        let node = DATA.nodes[i];
+        // 核心节点，不隐藏
+        if(node.itemStyle){
             continue;
-        link["source"] = String(link["source"]);
-        link["target"] = String(link["target"]);
-        link["value"] = link["weight"];
-        delete link["weight"];
-        back_data['links'].push(link)
+        }
+        if(toggle_all || node.category == category || node.category == (category * -1)){
+            // console.log("change ", node.label)
+            node.category *= -1;
+        }
     }
-
-    return back_data;
 }
 
+
+/**
+ * 创建用户与核心节点的关系
+ * @param {json} core_node_data 
+ */
+function create_relation_with_core_node(core_node_data){
+    if(!core_node_data || core_node_data.length == 0) return;
+    
+    // 重置
+    CORE_NODE = [];
+
+    for(let id in core_node_data){
+        CORE_NODE.push({
+            "source":"0",
+            "target":`-${id}`,
+            "visited": `共${core_node_data[id]}`,
+            "lineStyle": {
+                "normal": {
+                    // TODO 根据拜访次数设定连线宽度
+                    "width": 10
+                }
+            }
+        })
+    }
+
+    DATA.links = DATA.links.concat(CORE_NODE);
+}
+
+/**
+ * 
+ * @param {string} t_id 
+ * @param {boolean} toggle_all 若为真, 显示/隐藏全部与核心节点的关系集合
+ */
+function toggle_relation_with_core_node(t_id, toggle_all = false){
+    // console.log("toggle_relation_with_core_node");
+    for(let i in CORE_NODE){
+        let node = CORE_NODE[i];
+        if(toggle_all || node.target == t_id || node.target == ("-" + t_id)){
+            node.target = (parseInt(node.target) * -1).toString()
+        }
+    }
+    // console.log(CORE_NODE);
+}
