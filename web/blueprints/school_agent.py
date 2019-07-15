@@ -105,8 +105,7 @@ def get_relations(school, institution, agent_relation):
     :param agent_relation: 商务自己建立的联系, [{id:xxx, name: xxx, weight: 123},{...},....]
     :return: 可供echarts直接渲染的json文件 or False
     """
-    # TODO: by xiaoniu 由于部署问题，该路径可能需要修改
-    file_path = os.path.join(basedir, 'static', 'relation_data', '%s%s.txt' % (school, institution))
+    file_path = os.path.join(basedir, 'web', 'static', 'relation_data', '%s%s.txt' % (school, institution))
 
     # 判断该学院社区网络文件是否存在
     if not os.path.exists(file_path):
