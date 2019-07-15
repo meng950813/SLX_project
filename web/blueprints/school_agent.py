@@ -7,6 +7,8 @@ import datetime
 from web.blueprints.auth import login_required
 from web.utils.mongo_operator import MongoOperator
 from web.config import MongoDB_CONFIG
+from web.settings import basedir
+
 
 school_agent_bp = Blueprint('school_agent', __name__)
 
@@ -106,7 +108,8 @@ def get_relations(school, institution, realtion):
     :param realtion: 商务自己建立的联系, [{id:xxx, name: xxx, weigth: 123},{...},....]
     :return: 可供echarts直接渲染的json文件 or False
     """
-    file_path = "../static/relation_data/%s%s.txt" % (school, institution)
+    file_path = os.path.join(basedir, 'static', 'relation_data', '%s%s.txt' % (school, institution))
+    # file_path = "../static/relation_data/%s%s.txt" % (school, institution)
 
     # 判断该学院社区网络文件是否存在
     if not os.path.exists(file_path):
