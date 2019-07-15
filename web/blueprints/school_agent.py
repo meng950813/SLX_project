@@ -45,7 +45,7 @@ def index():
 
     if schools:
         # 仅仅获取第一个学校的学院数组
-        institutions = get_institution(schools[0])
+        institutions = get_institutions_list(schools[0])
 
         return render_template('personal.html', schools=schools, institutions=institutions)
     else:
@@ -56,7 +56,7 @@ def index():
 @login_required
 def change_school():
     school = request.args.get("school")
-    institutions = get_institution(school)
+    institutions = get_institutions_list(school)
     if institutions:
         return json.dumps(institutions)
     return json.dumps({"success": False, "message": "学校名有误"})
@@ -67,10 +67,6 @@ def change_school():
 def change_institution():
     school = request.args.get("school")
     institution = request.args.get("institution")
-    # print(school, institution)
-
-    if not ("related_teacher" in session):
-        return json.dumps({"success": False, "message": "请登陆"})
 
     json_data = get_relations(school, institution, session.get("related_teacher"))
 
@@ -80,7 +76,7 @@ def change_institution():
         return json.dumps({"success": False, "message": "暂无当前学院的社交网络数据"})
 
 
-def get_institution(school):
+def get_institutions_list(school):
     """
     获取学校所有的学院信息，按 visited 排序
     :param school: str 学校名
@@ -89,7 +85,7 @@ def get_institution(school):
     back = MongoOperator(**MongoDB_CONFIG).get_collection("school").find_one({"name": school}, {"institutions": 1})
     if not back or not ("institutions" in back):
         return False
-
+    
     institutions = back['institutions']
     # 按照学院被点击次数排序 ==> [{"visited":xx, "name":xx}, ...]
     institutions.sort(key=lambda k: k.get("visited"), reverse=True)
@@ -312,5 +308,5 @@ if __name__ == '__main__':
     # index()
     # edit_schedule()
     # set_whether_completed(100006,1,1)
-    get_institution("清华大学")
+    get_institutions_list("清华大学")
     # pass
