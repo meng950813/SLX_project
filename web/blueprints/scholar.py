@@ -7,10 +7,10 @@ from web.blueprints.auth import login_required
 from web.utils.mongo_operator import MongoOperator
 from web.config import MongoDB_CONFIG
 
-scholar_detail_bp = Blueprint('scholar_detail', __name__)
+scholar_bp = Blueprint('scholar', __name__)
 
 
-@scholar_detail_bp.route('/scholar/<int:teacher_id>')
+@scholar_bp.route('/scholar/<int:teacher_id>')
 @login_required
 def scholar_info(teacher_id):
     """
@@ -41,7 +41,7 @@ def scholar_info(teacher_id):
     return render_template('detail.html', teacher_basic_info=teacher_basic_info, length=length, age=age)
 
 
-@scholar_detail_bp.route('/feedback', methods=['POST'])
+@scholar_bp.route('/feedback', methods=['POST'])
 @login_required
 def agent_feedback():
     """
