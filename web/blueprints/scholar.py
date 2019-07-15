@@ -38,7 +38,7 @@ def scholar_info(teacher_id):
         year = datetime.datetime.now().year
         age = year - int(birth_year)
 
-    return render_template('detail.html', teacher_basic_info=teacher_basic_info, length=length, age=age)
+    return render_template('scholar_detail.html', teacher_basic_info=teacher_basic_info, length=length, age=age)
 
 
 @scholar_bp.route('/feedback', methods=['POST'])
@@ -66,5 +66,20 @@ def agent_feedback():
     return json.dumps({"success": False})
 
 
-if __name__ == '__main__':
-    pass
+@scholar_bp.route('/search', methods=['GET'])
+def search():
+    teachers = []
+    teacher_name = ""
+
+    if 'teacher-name' in request.args:
+        teacher_name = request.args.get('teacher-name')
+        # 查询数据库
+        mongo_operator = MongoOperator(**MongoDB_CONFIG)
+        condition = {'name': teacher_name}
+        scope = {'title': 1, 'school': 1, 'institution': 1, 'name': 1, '_id': 0, 'id': 1}
+        generator = mongo_operator.get_collection('basic_info').find(condition, scope)
+        teachers = list(generator)
+
+    return render_template('scholar_search.html', teachers=teachers, teacher_name=teacher_name)
+
+

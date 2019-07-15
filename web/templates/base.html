@@ -43,6 +43,7 @@
     <div class="collapse navbar-collapse" id="navbarColor01">
         {% if "username" in session %}
             <ul class="navbar-nav ml-auto">
+                {{ render_nav_item('scholar.search', '专家检索') }}
                 {{ render_nav_item('schedule.schedule', '日程安排') }}
                 {{ render_nav_item('visit_record.manage_visit_record', '拜访记录') }}
                 <li>
