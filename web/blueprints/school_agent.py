@@ -5,6 +5,7 @@ import os
 from web.blueprints.auth import login_required
 from web.utils.mongo_operator import MongoOperator
 from web.config import MongoDB_CONFIG
+from web.settings import basedir
 
 school_agent_bp = Blueprint('school_agent', __name__)
 
@@ -31,10 +32,10 @@ def index():
         # 获取该商务的信息
         user_info = mongo_operator.get_collection("user").find_one({"id": uid})
 
-        if not("related_teacher" in user_info):
+        if not ("related_teacher" in user_info):
             user_info["related_teacher"] = None
 
-        if not("charge_school" in user_info):
+        if not ("charge_school" in user_info):
             user_info["charge_school"] = None
 
         session["charge_school"] = user_info['charge_school']
@@ -82,7 +83,7 @@ def get_institutions_list(school):
     :return: [xxx,xxx,xxx...] or False
     """
     back = MongoOperator(**MongoDB_CONFIG).get_collection("school").find_one({"name": school}, {"institutions": 1})
-    if not back or not("institutions" in back):
+    if not back or not ("institutions" in back):
         return False
     
     institutions = back['institutions']
@@ -100,7 +101,7 @@ def get_relations(school, institution, agent_relation):
     :param agent_relation: 商务自己建立的联系, [{id:xxx, name: xxx, weight: 123},{...},....]
     :return: 可供echarts直接渲染的json文件 or False
     """
-    file_path = "static/relation_data/%s%s.txt" % (school, institution)
+    file_path = os.path.join(basedir, 'web', 'static', 'relation_data', '%s%s.txt' % (school, institution))
 
     # 判断该学院社区网络文件是否存在
     if not os.path.exists(file_path):
@@ -147,11 +148,11 @@ def format_relation_data(data, agent_relation):
                         "shadowColor": 'rgba(0, 0, 0, 0.3)'
                     }
                 }
-                
+
                 # 保存 class 的种类是为了划分社区 ==> 实现这一功能的前提是 class 值不存在断档
                 # 其值为该社区核心节点 id
                 class_id_dict[node["class"]] = node["teacherId"]
-            
+
             # 保存 teacherId => 判定商务创建的所有关系中有哪些属于当前社区;
             # 以其 class 为值是为了更方便的在隐藏非核心节点时, 将商务与其的关系累加到核心节点上
             teacher_id_dict[node['teacherId']] = node["class"]
@@ -183,7 +184,7 @@ def format_relation_data(data, agent_relation):
 
         # 添加商务节点
         data["nodes"].append(create_agent_node())
-        
+
         # 添加商务创建的社交关系
         if agent_relation:
             agent_relation_data = create_agent_relation(agent_relation, teacher_id_dict, class_id_dict)
@@ -237,7 +238,7 @@ def create_agent_relation(data, teacher_dict, class_dict):
         )
     """
     back = []
-    
+
     # 用于保存商务与该社区所有老师的关系之和
     # 格式为: {"core_node_teacherId": totalWeight}
     core_node = {}
@@ -246,9 +247,9 @@ def create_agent_relation(data, teacher_dict, class_dict):
         if not item.get("id") in teacher_dict:
             continue
 
-        if not("weight" in item):
+        if not ("weight" in item):
             item["weight"] = 1
-        
+
         info = {
             "source": "0",
             "target": str(item['id']),
@@ -272,7 +273,7 @@ def create_agent_relation(data, teacher_dict, class_dict):
         except Exception as e:
             print("取不到正确的值")
             print(e)
-    
+
     return back, core_node
 
 
