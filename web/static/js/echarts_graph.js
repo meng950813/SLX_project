@@ -173,9 +173,9 @@ function reloadGraph(data){
 //添加点击跳转事件
 myChart.on('click', function (params) {
     //仅限节点类型
-    if (params.dataType == 'node'){
+    if (params.dataType == 'node' && params.data.name != "0"){
         //页面
-        window.open('/scholar/'+params.data.name);
+        window.open('/scholar/'+params.data.name, "_self");
         return;
     }
     else if (params.dataType == 'main'){
