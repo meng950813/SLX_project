@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    专家检索
+{% endblock %}
+
+{% block styles %}
+<style type="text/css">
+    .page-header {
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+<div class="container">
+    <div class="row page-header">
+        <div class="col-sm-12" style="text-align:center">
+            <span class="h2">专家</span>
+            <img src="../static/images/logo.png" style="display: inline-block;vertical-align:bottom">
+            <span class="h2">检索</span>
+        </div>
+    </div>
+    <br>
+    <br>
+    <div class="row">
+        <div class="col-sm-8 offset-sm-2">
+            <form method="get" action="">
+                <div class="input-group">
+                    <input type="text" id="teacher-name" name="teacher-name" class="form-control"
+                           value="{{ teacher_name }}" placeholder="Search for experts...">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit">Go!</button>
+                    </span>
+                </div><!-- /input-group -->
+            </form>
+        </div>
+    </div>
+    <br>
+    <br>
+    {% if teacher_name and teachers | length == 0 %}
+        <div class="row">
+            <div class="col-sm-8 offset-sm-2" id="search-results">
+                <h5>
+                    未找到<strong>{{ teacher_name }}</strong>, 点击
+                    <a href="{{ url_for('.info_feedback') }}">添加</a>
+                </h5>
+            </div>
+        </div>
+    {% endif %}
+
+    {% for teacher in teachers %}
+        <div class="row">
+            <div class="col-sm-8 offset-sm-2" id="search-results">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">
+                            <span class="text-primary">
+                                <a href="{{ url_for('.scholar_info', teacher_id=teacher.id) }}">{{ teacher.name }}</a>
+                            </span>
+                            <small class="float-right text-muted">
+                                {{ teacher.school }} {{ teacher.institution }}
+                            </small>
+                        </h3>
+                        <p class="card-text">专业领域：暂无</p>
+                        <small>头衔：
+                            <span class="text-primary">
+                                {% if 'title' in teacher %}{{ teacher.title }}{% endif %}
+                            </span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+    {% endfor %}
+</div>
+{% endblock %}
