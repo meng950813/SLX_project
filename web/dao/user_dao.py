@@ -16,7 +16,7 @@ def do_login(telephone=None, email=None, u_id=None, pwd=""):
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
     # TODO: 目前查询最多有一个查询该用户的日程安排
     # 条件
-    condition = {'password': pwd, "status": 1}
+    condition = {'password': pwd, "status": "1"}
 
     if telephone:
         condition['tel_number'] = telephone
@@ -24,8 +24,10 @@ def do_login(telephone=None, email=None, u_id=None, pwd=""):
         condition['email'] = email
     elif u_id:
         condition['id'] = u_id
+    else:
+        return None
 
-    result = mongo_operator.find_one(condition, 'user')
+    result = mongo_operator.get_collection('user').find_one(condition)
     # 删除mongo的id
     if result:
         del result['_id']

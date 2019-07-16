@@ -90,27 +90,9 @@ class MongoOperator:
         else:
             return self.db.get_collection(collection_name)
 
-    def get_user_relations(self, u_id):
-        # TODO
-        try:
-            back = self.db.user.find({"id": u_id}).aggregate([{
-                "$lookup":
-                    {
-                        "from": "university",
-                        "localField": "charge_school",
-                        "foreignField": "name",
-                        "as": "school"
-                    }
-            }])
-            print("back data : ", back)
-        except Exception as e:
-            print("^" * 89)
-            print(e)
-
 
 if __name__ == '__main__':
     pass
     # funds_col = db.get_collection()
     # print(funds_col.find_one({"id": 73927}))
 
-    # db.get_user_relations(100000)

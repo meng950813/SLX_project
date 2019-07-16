@@ -37,6 +37,7 @@ def login():
         user = user_service.check_user(username, password)
         # 检验账号密码
         if user:
+            print(user)
             session['username'] = user["name"]
             session['uid'] = user["id"]
             session["type"] = user["type"]
