@@ -12,7 +12,7 @@
     <div class="container">
         <fieldset class="card-mine">
             <legend>基本信息</legend>
-            <i  title="编辑" class="editor mdui-icon material-icons">&#xe3c9;</i>
+            <i title="编辑" data-id="{{ teacher_basic_info['id'] }}" class="editor mdui-icon material-icons">&#xe3c9;</i>
             <div id="basic-info" class="row">
                 <div class="img-container col-sm-3 col-md-2 align-middle">
                     <div id="img-name" class="bg-primary align-middle">{{ teacher_basic_info["name"][0] }}</div>
@@ -44,33 +44,17 @@
 
         <fieldset id="edu-exp" class="row card-mine">
             <legend>教育经历</legend>
-            <i  title="编辑" class="editor mdui-icon material-icons">&#xe3c9;</i>
             <p>{{ teacher_basic_info["edu_exp"] }}</p>
 
         </fieldset>
 
         <fieldset id="team-info" class="row card-mine">
             <legend>团队信息</legend>
-            <i  title="编辑" class="editor mdui-icon material-icons">&#xe3c9;</i>
 
         </fieldset>
-
-        <fieldset id="team-info" class="row card-mine">
-            <legend>学会兼职</legend>
-            <i  title="编辑" class="editor mdui-icon material-icons">&#xe3c9;</i>
-            <ol class="tab-pane">
-                <li>
-                    <span>中国人工智能学会</span>
-                    <span>(第七届)</span>
-                    <span>常务理事、理事</span>
-                </li>
-            </ol>
-        </fieldset>
-
 
         <fieldset id="achieve-info" class="row card-mine">
             <legend>学术成果</legend>
-            <i  title="编辑" class="editor mdui-icon material-icons">&#xe3c9;</i>
             <ul class="nav nav-pills nav-fill">
                 <li class="nav-item">
                     <a href="#project-list" class="nav-link active" data-toggle="tab">
@@ -139,52 +123,6 @@
             </div>
         </fieldset>
 
-    </div>
-
-    <div class="modal fade" id="modifiyInfoModal" tabindex="-1" role="dialog" aria-labelledby="modifiyInfoModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">操作 <span id="modifiyInfoModalLabel">基本信息</span> </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <input type="hidden" id="csrf_token" value="{{ csrf_token() }}">
-                        <label class="col-form-label">选择操作类型</label>
-                        <div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="add-modify-delete" id="option-add" value="add">
-                                <label class="form-check-label text-success" for="option-add">添加</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" checked name="add-modify-delete" id="option-modify" value="modify">
-                                <label class="form-check-label text-info" for="option-modify">修改</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="add-modify-delete" id="option-delete" value="delete">
-                                <label class="form-check-label text-danger" for="option-delete">删除</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="recipient-name" class="col-form-label">修改项:</label>
-                        <input type="text" class="form-control" id="recipient-name" required placeholder="例如：手机号 / 学会兼职等">
-                    </div>
-                    <div class="form-group">
-                        <label for="message-text" class="col-form-label">详细内容/操作理由:</label>
-                        <textarea class="form-control" id="message-text" required></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-                    <button id="submit-btn" type="submit" class="btn btn-primary">提交</button>
-                </div>
-                
-            </div>
-        </div>
     </div>
 
 {% endblock %}

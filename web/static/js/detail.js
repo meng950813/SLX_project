@@ -2,10 +2,8 @@
 * 针对修改不同版块，修改模态框的标题
 */
 $(".editor").on("click", (e)=> {
-    let $target = $(e.target);
-    let title = $target.siblings("legend").text();
-    $("#modifiyInfoModalLabel").text(title);
-    $("#modifiyInfoModal").modal('show');
+    let id = $(e.target).attr("data-id");
+    window.open(`/info_feedback?tid=${id}`)
 });
 
 $("#submit-btn").click((e) => { 
