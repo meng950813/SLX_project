@@ -32,7 +32,7 @@ function  reloadInstitutions() {
     timeoutID = null;
     //判断是否需要重新请求获取学院
     let school = $('#school').val();
-    if (school != cur_school) {
+    if (school != "" && school != cur_school) {
         cur_school = school;
         //请求获取学院
         $.ajax({
