@@ -7,6 +7,7 @@ from web.blueprints.auth import login_required
 from web.utils.mongo_operator import MongoOperator
 from web.config import MongoDB_CONFIG
 from web.forms import ScholarForm
+from web.blueprints.school_agent import get_institutions_list
 
 scholar_bp = Blueprint('scholar', __name__)
 
@@ -126,3 +127,36 @@ def search():
         teachers = list(generator)
 
     return render_template('scholar_search.html', teachers=teachers, teacher_name=teacher_name)
+
+
+@scholar_bp.route('/get_schools', methods=['GET'])
+@login_required
+def get_schools():
+    """
+    获取所有的学校的名称
+    :return:
+    """
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    scope = {'_id': 0, 'name': 1}
+    generator = mongo_operator.get_collection('school').find({}, scope)
+
+    schools = []
+    for school in generator:
+        schools.append(school['name'])
+
+    return json.dumps(schools)
+
+
+@scholar_bp.route('/get_institutions/<school>', methods=['GET'])
+@login_required
+def get_institutions(school):
+    """
+    根据学校的名称获取学院列表
+    :param school:
+    :return:
+    """
+    results = get_institutions_list(school)
+    if results is False:
+        results = []
+
+    return json.dumps(results)
