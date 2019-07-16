@@ -8,6 +8,7 @@ from web.utils.mongo_operator import MongoOperator
 from web.config import MongoDB_CONFIG
 from web.forms import ScholarForm
 from web.blueprints.school_agent import get_institutions_list
+from web.utils import redirect_back
 
 scholar_bp = Blueprint('scholar', __name__)
 
@@ -72,11 +73,20 @@ def agent_feedback():
 @login_required
 def info_feedback():
     form = ScholarForm()
+
+    teacher_id = request.args.get('tid', type=int, default=None)
     # 当前类型 add modify
-    cur_type = 'add'
+    cur_type = 'modify' if teacher_id else 'add'
 
     # if form.validate_on_submit():
-    if request.method == 'POST':
+    if request.method == 'GET' and teacher_id:
+        # 传入数据库
+        mongo_operator = MongoOperator(**MongoDB_CONFIG)
+        result = mongo_operator.db['basic_info'].find_one({'id': teacher_id}, {'_id': 0})
+        # 设置数据
+        form.set_data(result)
+
+    elif request.method == 'POST':
         # 出现错误，则交给flash
         if not form.validate():
             warning = []
@@ -84,25 +94,16 @@ def info_feedback():
                 warning.extend(errors)
             flash(','.join(warning), 'warning')
         else:
-            datum = {
-                'name': form.name.data,
-                'school': form.school.data,
-                'institution': form.institution.data,
-                'birth_year': form.birth_year.data,
-                'title': form.title.data,
-                'honors': form.honor.data,
-                'email': form.email.data,
-                'phone_number': form.phone_number.data,
-                'office_number': form.office_number.data,
-                'edu_exp': form.edu_exp.data,
-                'type': cur_type,
-                'status': 0,
-                'username': session['username'],
-            }
-            # 传入数据库
+            datum = form.get_data()
+            datum['type'] = cur_type
+            datum['status'] = 0
+            datum['username'] = session['username']
+            # 写入数据库
             mongo_operator = MongoOperator(**MongoDB_CONFIG)
             result = mongo_operator.db['agent_feedback'].insert_one(datum)
             flash('插入成功，感谢您的反馈', 'success')
+
+            return redirect_back()
 
     return render_template('scholar_feedback.html', form=form, cur_type=cur_type)
 

@@ -24,3 +24,32 @@ class ScholarForm(FlaskForm):
     edu_exp = TextAreaField('教育经历：')
     submit = SubmitField('提交')
 
+    def set_data(self, datum):
+        self.name.data = datum['name']
+        self.school.data = datum['school']
+        self.institution.data = datum['institution']
+        self.birth_year.data = datum['birth_year'].strip()
+        self.title.data = datum['title']
+        if 'honors' in datum:
+            self.honor.data = datum['honors']
+
+        self.email.data = datum['email'].strip()
+        self.phone_number.data = datum['phone_number'].strip()
+        self.office_number.data = datum['office_number'].strip()
+        self.edu_exp.data = datum['edu_exp']
+
+    def get_data(self):
+        datum = {
+            'name': self.name.data,
+            'school': self.school.data,
+            'institution': self.institution.data,
+            'birth_year': self.birth_year.data,
+            'title': self.title.data,
+            'honors': self.honor.data,
+            'email': self.email.data,
+            'phone_number': self.phone_number.data,
+            'office_number': self.office_number.data,
+            'edu_exp': self.edu_exp.data,
+        }
+        return datum
+

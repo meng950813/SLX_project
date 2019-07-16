@@ -14,6 +14,10 @@ $.ajax({
     /*传递参数*/
     autocomplete(document.getElementById("school"), schools);
 });
+//如果存在学校名称，则尝试获取
+if ($('#school').val()){
+    reloadInstitutions();
+}
 
 //学校输入框失去焦点绑定事件
 $('#school').on('blur', function () {
