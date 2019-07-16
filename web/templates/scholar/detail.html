@@ -5,14 +5,14 @@
 {% endblock %}
 
 {% block styles %}
-    <link rel="stylesheet" type="text/css" href="../../static/css/detail.css">
+    <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/detail.css')}}">
 {% endblock %}
 
 {% block main %}
     <div class="container">
         <fieldset class="card-mine">
             <legend>基本信息</legend>
-            <i title="编辑" data-id="{{ teacher_basic_info['id'] }}" class="editor mdui-icon material-icons">&#xe3c9;</i>
+            <a href="/info_feedback?tid={{ teacher_basic_info['id'] }}" target="_target"><i title="编辑" class="editor mdui-icon material-icons">&#xe3c9;</i></a>
             <div id="basic-info" class="row">
                 <div class="img-container col-sm-3 col-md-2 align-middle">
                     <div id="img-name" class="bg-primary align-middle">{{ teacher_basic_info["name"][0] }}</div>
@@ -131,6 +131,5 @@
     <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
     <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
-    <script src="../../static/js/bootstrap_v4.min.js"></script>
-    <script src="../../static/js/detail.js"></script>
+    <script src="{{url_for('static',filename='js/bootstrap_v4.min.js')}}"></script>
 {% endblock %}
