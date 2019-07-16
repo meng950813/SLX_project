@@ -18,7 +18,7 @@
     <div class="row page-header">
         <div class="col-sm-12" style="text-align:center">
             <span class="h2">专家</span>
-            <img src="../static/images/logo.png" style="display: inline-block;vertical-align:bottom">
+            <img src="../../static/images/logo.png" style="display: inline-block;vertical-align:bottom">
             <span class="h2">检索</span>
         </div>
     </div>
@@ -44,7 +44,7 @@
             <div class="col-sm-8 offset-sm-2" id="search-results">
                 <h5>
                     未找到<strong>{{ teacher_name }}</strong>, 点击
-                    <a href="{{ url_for('.info_feedback') }}">添加</a>
+                    <a href="{{ url_for('.info_feedback', next=request.full_path) }}">添加</a>
                 </h5>
             </div>
         </div>
@@ -57,7 +57,9 @@
                     <div class="card-body">
                         <h3 class="card-title">
                             <span class="text-primary">
-                                <a href="{{ url_for('.scholar_info', teacher_id=teacher.id) }}">{{ teacher.name }}</a>
+                                <a href="{{ url_for('.scholar_info', teacher_id=teacher.id) }}">
+                                    {{ teacher.name }}
+                                </a>
                             </span>
                             <small class="float-right text-muted">
                                 {{ teacher.school }} {{ teacher.institution }}

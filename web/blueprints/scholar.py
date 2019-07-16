@@ -41,7 +41,7 @@ def scholar_info(teacher_id):
         year = datetime.datetime.now().year
         age = year - int(birth_year)
 
-    return render_template('scholar_detail.html', teacher_basic_info=teacher_basic_info, length=length, age=age)
+    return render_template('scholar/detail.html', teacher_basic_info=teacher_basic_info, length=length, age=age)
 
 
 @scholar_bp.route('/feedback', methods=['POST'])
@@ -98,6 +98,7 @@ def info_feedback():
             datum['type'] = cur_type
             datum['status'] = 0
             datum['username'] = session['username']
+            datum['timestamp'] = datetime.datetime.utcnow()
             # 写入数据库
             mongo_operator = MongoOperator(**MongoDB_CONFIG)
             result = mongo_operator.db['agent_feedback'].insert_one(datum)
@@ -105,7 +106,7 @@ def info_feedback():
 
             return redirect_back()
 
-    return render_template('scholar_feedback.html', form=form, cur_type=cur_type)
+    return render_template('scholar/feedback.html', form=form, cur_type=cur_type)
 
 
 @scholar_bp.route('/search', methods=['GET'])
@@ -127,7 +128,7 @@ def search():
         generator = mongo_operator.get_collection('basic_info').find(condition, scope)
         teachers = list(generator)
 
-    return render_template('scholar_search.html', teachers=teachers, teacher_name=teacher_name)
+    return render_template('scholar/search.html', teachers=teachers, teacher_name=teacher_name)
 
 
 @scholar_bp.route('/get_schools', methods=['GET'])
