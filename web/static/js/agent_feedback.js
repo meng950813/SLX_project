@@ -50,7 +50,7 @@ function  reloadInstitutions() {
 $('#submit').click(function (e) {
     //TODO: 判断学校相同 niuniu
     if (cur_school == $('#school').val() && schools.indexOf(cur_school) != -1
-        && institutions.indexOf($('#institution').val())){
+        && institutions.indexOf($('#institution').val() != -1)){
         $('form').submit();
     }
     else{

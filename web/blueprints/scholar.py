@@ -99,10 +99,11 @@ def info_feedback():
             datum['status'] = 0
             datum['username'] = session['username']
             datum['timestamp'] = datetime.datetime.utcnow()
+            datum['teacher_id'] = teacher_id
             # 写入数据库
             mongo_operator = MongoOperator(**MongoDB_CONFIG)
             result = mongo_operator.db['agent_feedback'].insert_one(datum)
-            flash('插入成功，感谢您的反馈', 'success')
+            flash('操作成功，感谢您的反馈', 'success')
 
             return redirect_back()
 

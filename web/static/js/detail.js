@@ -3,7 +3,9 @@
 */
 $(".editor").on("click", (e)=> {
     let id = $(e.target).attr("data-id");
-    window.open(`/info_feedback?tid=${id}`)
+    let next = window.location.href;
+    window.location.href = `/info_feedback?tid=${id}&next=${next}`;
+    //window.open(`/info_feedback?tid=${id}`)
 });
 
 $("#submit-btn").click((e) => { 
