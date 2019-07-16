@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session, request
+from flask import Blueprint, render_template, session, request, flash
 from web.service.basic_info_service import search_teacher_basic_info
 import datetime
 import json
@@ -6,6 +6,7 @@ import json
 from web.blueprints.auth import login_required
 from web.utils.mongo_operator import MongoOperator
 from web.config import MongoDB_CONFIG
+from web.forms import ScholarForm
 
 scholar_bp = Blueprint('scholar', __name__)
 
@@ -49,25 +50,69 @@ def agent_feedback():
     :return:
     """
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
-    
+
     back = mongo_operator.db['agent_feedback'].insert_one(
         {
             "user_id": session['uid'],
             'title': request.form.get('title'),
             'type': request.form.get('type'),
             'target': request.form.get('target'),
-            'content': request.form.get('content').replace("\n","<br>"),
+            'content': request.form.get('content').replace("\n", "<br>"),
             "status": 0
         })
-    
+
     print(back.inserted_id)
     if back.inserted_id:
         return json.dumps({'success': True})
     return json.dumps({"success": False})
 
 
+@scholar_bp.route('/info_feedback', methods=['GET', 'POST'])
+@login_required
+def info_feedback():
+    form = ScholarForm()
+    # 当前类型 add modify
+    cur_type = 'add'
+
+    # if form.validate_on_submit():
+    if request.method == 'POST':
+        # 出现错误，则交给flash
+        if not form.validate():
+            warning = []
+            for _, errors in form.errors.items():
+                warning.extend(errors)
+            flash(','.join(warning), 'warning')
+        else:
+            datum = {
+                'name': form.name.data,
+                'school': form.school.data,
+                'institution': form.institution.data,
+                'birth_year': form.birth_year.data,
+                'title': form.title.data,
+                'honors': form.honor.data,
+                'email': form.email.data,
+                'phone_number': form.phone_number.data,
+                'office_number': form.office_number.data,
+                'edu_exp': form.edu_exp.data,
+                'type': cur_type,
+                'status': 0,
+                'username': session['username'],
+            }
+            # 传入数据库
+            mongo_operator = MongoOperator(**MongoDB_CONFIG)
+            result = mongo_operator.db['agent_feedback'].insert_one(datum)
+            flash('插入成功，感谢您的反馈', 'success')
+
+    return render_template('scholar_feedback.html', form=form, cur_type=cur_type)
+
+
 @scholar_bp.route('/search', methods=['GET'])
+@login_required
 def search():
+    """
+    老师检索
+    :return:
+    """
     teachers = []
     teacher_name = ""
 
@@ -81,5 +126,3 @@ def search():
         teachers = list(generator)
 
     return render_template('scholar_search.html', teachers=teachers, teacher_name=teacher_name)
-
-

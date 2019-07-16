@@ -42,7 +42,10 @@
     {% if teacher_name and teachers | length == 0 %}
         <div class="row">
             <div class="col-sm-8 offset-sm-2" id="search-results">
-                <h5>未找到<strong>{{ teacher_name }}</strong>, 点击<a href="">添加</a> </h5>
+                <h5>
+                    未找到<strong>{{ teacher_name }}</strong>, 点击
+                    <a href="{{ url_for('.info_feedback') }}">添加</a>
+                </h5>
             </div>
         </div>
     {% endif %}
