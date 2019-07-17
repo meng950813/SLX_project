@@ -5,6 +5,12 @@ from web.config import MAIL_CONFIG
 basedir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
 
+class Operations:
+    CONFIRM = 'confirm'
+    RESET_PASSWORD = 'reset-password'
+    CHANGE_EMAIL = 'change-email'
+
+
 class BaseConfig(object):
     # wtform库用于CSRF
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev key')
@@ -15,6 +21,7 @@ class BaseConfig(object):
     MAIL_USERNAME = MAIL_CONFIG['username']
     MAIL_PASSWORD = MAIL_CONFIG['password']
     MAIL_DEFAULT_SENDER = ('三螺旋', MAIL_CONFIG['sender'])
+    MAIL_SUBJECT_PREFIX = '三螺旋'
 
 
 class DevelopmentConfig(BaseConfig):
