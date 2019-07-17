@@ -1,15 +1,11 @@
 from flask import Blueprint, session, redirect, url_for, render_template, flash, request
 import functools
 
-from web.service import user_service
 from web.utils import redirect_back, generate_token, validate_token
 from web.forms import LoginForm, ForgetPasswordForm, ResetPasswordForm
-from web.settings import Operations
+from web.settings import Operations, AGNET_TYPE
 from web.emails import send_reset_password_email
-from web.utils.mongo_operator import MongoOperator
-from web.config import MongoDB_CONFIG
 import web.service.user_service as user_service
-from web.config import AGNET_TYPE
 
 
 auth_bp = Blueprint('auth', __name__)
@@ -54,7 +50,7 @@ def login():
             else:
                 # TODO 企业商务主页
                 flash('暂不支持企业商务登陆', 'danger')
-                return render_template('login.html', form=form)
+                return render_template('auth/login.html', form=form)
         flash('登录失败，请检测账号或者密码后重新输入', 'danger')
     return render_template('auth/login.html', form=form)
 
