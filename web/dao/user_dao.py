@@ -26,7 +26,7 @@ def do_login(telephone=None, email=None, u_id=None, pwd=""):
     else:
         return None
 
-    result = mongo_operator.get_collection('user').find_one(condition)
+    result = mongo_operator.get_collection('user').find_one(condition, {"id": 1, "name": 1, "type": 1})
     # 删除mongo的id
     if result:
         del result['_id']
