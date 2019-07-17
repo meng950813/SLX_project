@@ -3,7 +3,7 @@ from flask import Flask, render_template, session
 
 from web.settings import configuration
 from web.blueprints.school_agent import school_agent_bp
-from web.blueprints.scholar_detail import scholar_detail_bp
+from web.blueprints.scholar import scholar_bp
 from web.blueprints.visit_record import visit_record_bp
 from web.blueprints.schedule import schedule_bp
 from web.blueprints.auth import auth_bp
@@ -46,7 +46,7 @@ def register_extensions(app):
 
 def register_blueprints(app):
     app.register_blueprint(school_agent_bp)
-    app.register_blueprint(scholar_detail_bp)
+    app.register_blueprint(scholar_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(visit_record_bp)
     app.register_blueprint(schedule_bp)

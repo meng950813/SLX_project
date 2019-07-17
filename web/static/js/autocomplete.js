@@ -6,7 +6,12 @@ function autocomplete(inp, arr) {
       var a, b, i, val = this.value;
       /*关闭已经打开的自动完成值列表*/
       closeAllLists();
-      if (!val) { return false;}
+      //TODO:没有值的时候显示所有数据
+      /*
+      if (!val) {
+          return false;
+      }
+       */
       currentFocus = -1;
       /*创建列表*/
       a = document.createElement("DIV");
@@ -17,7 +22,7 @@ function autocomplete(inp, arr) {
       /*循环数组...*/
       for (i = 0; i < arr.length; i++) {
         /*检查选项是否以与文本字段值相同的字母开头*/
-        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+        if (!val || arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
           /*为匹配元素创建 DIV*/
           b = document.createElement("DIV");
           /*使匹配字母变粗体*/

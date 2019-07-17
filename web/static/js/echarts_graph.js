@@ -205,8 +205,8 @@ myChart.on("contextmenu", function(params){
 function showGraph() {
     //默认请求的是关系图
     let school = $("#select-college").children("option:selected").text();
-    let institution = $('#select-institution').children("option:selected").text();
-    getInstitutionGraphData(school,institution);
+    let institution = $('#select-institution').children("option:selected");
+    getInstitutionGraphData(school,institution.text(), institution.data("times"));
 }
 
 /**
@@ -243,12 +243,7 @@ $("#select-college").change(function(){
 })
 
 // 切换学院的响应事件
-$("#select-institution").change(function () {
-    let school = $("#select-college").children("option:selected").text();
-    let institution = $(this).children("option:selected").text();
-    // console.log(school,institution);
-    getInstitutionGraphData(school,institution);
-});
+$("#select-institution").change(showGraph);
 
 
 /**
@@ -262,7 +257,7 @@ function getInstitutions(school){
         data: {"school" : school},
         dataType: "json",
         success: function (response) {
-            // console.log(response);
+            console.log(response);
             if(response.success == false){
                 toggle_alert(false, "", response.message);
                 return;
@@ -281,7 +276,7 @@ function getInstitutions(school){
 
 /**
  * 将学院信息填充到下拉框中
- * @param {array} institution_list 学院数组
+ * @param {object} institution_list 学院数据 [{"name":xxx, "visited":1},...]
  * @param {String} school 学校
  */
 function setInstitution(institution_list, school){
@@ -291,10 +286,12 @@ function setInstitution(institution_list, school){
     }
     let options = "";
     for (let i = 0; i < institution_list.length; i++) {
-        options += `<option>${institution_list[i]}</option>`;
+        // options += `<option>${institution_list[i]}</option>`;
+        options += `<option data-times="${institution_list[i].visited}">${institution_list[i].name}</option>`;
     }
     $("#select-institution").html(options);
-    getInstitutionGraphData(school, institution_list[0]);
+    // getInstitutionGraphData(school, institution_list[0]);
+    getInstitutionGraphData(school, institution_list[0].name, institution_list[1].visited);
 }
 
 
@@ -302,15 +299,16 @@ function setInstitution(institution_list, school){
  * 根据学校名及学院名，获取学院内的关系数据
  * @param {String} school 
  * @param {String} institution 
+ * @param {int} visited 被访问次数
  */
-function getInstitutionGraphData(school, institution){
+function getInstitutionGraphData(school, institution, visited){
     $.ajax({
         type: "get",
         url: "/change_institution",
-        data: {"school": school, "institution": institution},
+        data: {"school": school, "institution": institution, "visited": visited},
         dataType: "json",
         success: function (response) {
-            // console.log(response);
+            console.log(response);
             if(response.success == false){
                 toggle_alert(false, "", response.message);
                 return;
