@@ -14,9 +14,13 @@
 >1. Bootstrap-Flask:<br>
 >该库是对bootstrap4的简单封装，提供了几个常用的宏(jinja中的函数)。
 >官网:https://bootstrap-flask.readthedocs.io/en/latest/
->2. flask-wtf<br>
+>2. flask-wtf:<br>
 >flask-wtf是对form表单的封装，带有csrf令牌的安全表单。
 >官网:http://www.pythondoc.com/flask-wtf/
+>3. flask-mail:<br>
+>简化发送邮件
+>4. flask-moment
+> 简化时间的显示
 ## 3. 关于用户登录
 >1. 登录目前使用到了mysql，对应的配置文件为web/config.py。
 >2. 当用户登录成功后，会把该用户的用户名放入session['username']、uid放在session['uid']、type放在session['type']

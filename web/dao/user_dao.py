@@ -1,4 +1,3 @@
-import pymongo
 from web.config import MongoDB_CONFIG
 from web.utils.mongo_operator import MongoOperator
 

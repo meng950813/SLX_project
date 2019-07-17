@@ -8,7 +8,7 @@ from web.blueprints.visit_record import visit_record_bp
 from web.blueprints.schedule import schedule_bp
 from web.blueprints.auth import auth_bp
 from web.blueprints.reminder import reminder_bp
-from web.extensions import bootstrap, csrf, moment
+from web.extensions import bootstrap, csrf, moment, mail
 from web.utils.mongo_operator import MongoOperator
 from web.config import MongoDB_CONFIG
 
@@ -42,6 +42,7 @@ def register_extensions(app):
     bootstrap.init_app(app)
     csrf.init_app(app)
     moment.init_app(app)
+    mail.init_app(app)
 
 
 def register_blueprints(app):
