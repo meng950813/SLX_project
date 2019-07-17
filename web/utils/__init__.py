@@ -4,7 +4,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from urllib.parse import urljoin, urlparse
 
 from web.settings import Operations
-import web.service.user_service as user_service
+# import web.service.user_service as user_service
 
 
 def generate_token(user, operation, expire_in=None, **kwargs):

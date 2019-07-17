@@ -154,6 +154,7 @@ function deleteRecord(element) {
 修改，点击保存时改变所选那一行的数据 给要修改的那一行添加一个属性，利用这个属性去选择正在
 修改的那一行，然后捕捉到关闭模态框的状态，关闭模态框时将这一行的属性去掉；
  */
+let teacher_id
 function saveVisitedRecord(e){
     let date = $('#date').val();
     let title = $('#title').val();
@@ -163,7 +164,9 @@ function saveVisitedRecord(e){
     let content = $('#content').val();
     let csrf_token = $('#csrf_token').val();
     let id = null;
-    let teacher_id = $('#teacher').val();
+    teacher_id = $('#teacher').attrs("teacher_id");
+    console.log("!!!!!!!!!!!!"+ teacher_id)
+    // let teacher_name = $('#teacher').val();
 
     let url = '';
     //回写

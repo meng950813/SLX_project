@@ -191,4 +191,47 @@ def get_teacher_id():
         print('--'*50, uid)
         print('--'*50, school, institution, teacher)
         print(teacher_id)
-        return json.dumps({"success": True, "teacher_id": teacher_id})
+        # 将用户和教师新增的关系入库
+        add_relation(teacher_id, uid)
+
+    return json.dumps({"success": True, "teacher_id": teacher_id})
+
+
+def add_relation(teacher_id, uid):
+    """
+    将新建的拜访记录的用户与教师的关系存入数据库
+    :param teacher_id:
+    :param uid:
+    :return:
+    """
+    print("-----------------------add_relation-------------------------------")
+    print(teacher_id)
+    mongo = MongoOperator(**MongoDB_CONFIG)
+    # 获取教师基本信息集合
+    basic_info_col = mongo.get_collection("basic_info")
+    # 获取用户的集合
+    user_col = mongo.get_collection("user")
+    # 获取对应用户的文档
+    user_doc = user_col.find_one({"id": uid, "related_teacher": {"$elemMatch": {"id": teacher_id}}}, {"related_teacher": 1, "_id": 0})
+    if user_doc is None:
+        # print("---")
+        user_doc = user_col.find_one({"id": uid}, {"related_teacher": 1, "_id": 0})
+        name = basic_info_col.find_one({"id": teacher_id}, {"name": 1, "_id": 0})["name"]
+        teacher_list = user_doc["related_teacher"]
+        teacher_list.append({
+            "id": teacher_id,
+            "name": name,
+            "weight": 1
+        })
+        user_col.update({"id": uid}, {"$set": {"related_teacher": teacher_list}})
+
+    else:
+        for d in user_doc["related_teacher"]:
+            if d["id"] == teacher_id:
+                w = d["weight"]
+                d["weight"] = w+1
+                break
+        user_col.update({"id": uid}, {"$set": {"related_teacher": user_doc["related_teacher"]}})
+
+    # print(user_col.find_one({"id": uid, "related_teacher": {"$elemMatch": {"id": teacher_id}}}, {"related_teacher": 1, "_id": 0}))
+
