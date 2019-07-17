@@ -12,7 +12,9 @@
     <div class="container">
         <fieldset class="card-mine">
             <legend>基本信息</legend>
-            <a href="/info_feedback?tid={{ teacher_basic_info['id'] }}" target="_target"><i title="编辑" class="editor mdui-icon material-icons">&#xe3c9;</i></a>
+            <a href="{{ url_for('scholar.feedback', tid=teacher_basic_info['id'], next=request.full_path) }}" target="_self">
+                <i title="编辑" class="editor mdui-icon material-icons">&#xe3c9;</i>
+            </a>
             <div id="basic-info" class="row">
                 <div class="img-container col-sm-3 col-md-2 align-middle">
                     <div id="img-name" class="bg-primary align-middle">{{ teacher_basic_info["name"][0] }}</div>
