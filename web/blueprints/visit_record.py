@@ -82,10 +82,14 @@ def delete_visit_record():
     :return:
     """
     # 获取当前的id
+    print("----------------------------准备删除拜访记录-------------------------")
     record_id = request.form.get('id')
-    mongo_operator = MongoOperator(**MongoDB_CONFIG)
-    # 设置条件
-    condition = {"_id": ObjectId(record_id)}
-    mongo_operator.db['visit_record'].update_one(condition, {"$set":  {"status": 0}})
+    csrf_token = request.form.get('csrf_token')
+    print("------------------------------", record_id)
+    print("------------------------------", csrf_token)
+    # mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # # 设置条件
+    # condition = {"_id": ObjectId(record_id)}
+    # mongo_operator.db['visit_record'].update_one(condition, {"$set":  {"status": 0}})
 
     return json.dumps({"success": True})

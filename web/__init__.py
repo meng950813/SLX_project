@@ -65,7 +65,7 @@ def register_template_context(app):
     def make_template_context():
         # 如果登录，则尝试拉取未读信息
         unread_msg = 0
-        if 'username' in session:
+        if 'username' in session and 'uid' in session:
             uid = session['uid']
             mongo_operator = MongoOperator(**MongoDB_CONFIG)
             unread_msg = mongo_operator.find({"to_id": uid, "state": 0}, "message").count()

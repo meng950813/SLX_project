@@ -16,7 +16,8 @@ def login_required(func):
     def wrapper(*args, **kw):
         # 当前未登陆
         user = session.get('username')
-        if user is None:
+        uid = session.get('uid')
+        if user is None or uid is None:
             return redirect(url_for('auth.login'))
         return func(*args, **kw)
     return wrapper
@@ -24,7 +25,7 @@ def login_required(func):
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    if 'username' in session:
+    if 'username' in session and 'uid' in session:
         return redirect(url_for('school_agent.index'))
 
     form = LoginForm()

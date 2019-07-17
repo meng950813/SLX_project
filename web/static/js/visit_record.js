@@ -53,7 +53,7 @@ function deleteRecord(element) {
         dataType: 'json'
     }).done(function (data) {
         if(data.success){
-            toggle_alert(true, "", "删除成功");
+            toggle_alert(true, "", "删除成功!!");
             //删除此条记录
             element.parents('tr').remove();
             $('#total').text(parseInt($('#total').text()) - 1);
@@ -73,6 +73,7 @@ function saveVisitedRecord(e){
     let content = $('#content').val();
     let csrf_token = $('#csrf_token').val();
     let id = null;
+
     let url = '';
     //回写
     if (isModifying){
