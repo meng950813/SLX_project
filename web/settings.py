@@ -11,6 +11,12 @@ class Operations:
     CHANGE_EMAIL = 'change-email'
 
 
+AGNET_TYPE = {
+    "SCHOOL_AGENT": "0",
+    "BUSINESS_AGENT" : "1"
+}
+
+
 class BaseConfig(object):
     # wtform库用于CSRF
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev key')

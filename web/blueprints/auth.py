@@ -1,13 +1,10 @@
 from flask import Blueprint, session, redirect, url_for, render_template, flash, request
 import functools
 
-from web.service import user_service
 from web.utils import redirect_back, generate_token, validate_token
 from web.forms import LoginForm, ForgetPasswordForm, ResetPasswordForm
-from web.settings import Operations
+from web.settings import Operations, AGNET_TYPE
 from web.emails import send_reset_password_email
-from web.utils.mongo_operator import MongoOperator
-from web.config import MongoDB_CONFIG
 import web.service.user_service as user_service
 
 
@@ -45,12 +42,16 @@ def login():
         user = user_service.check_user(username, password)
         # 检验账号密码
         if user:
-            print(user)
             session['username'] = user["name"]
             session['uid'] = user["id"]
             session["type"] = user["type"]
             # flash('登录成功，欢迎回来', 'success')
-            return redirect_back('school_agent.index')
+            if user["type"] == AGNET_TYPE["SCHOOL_AGENT"]:
+                return redirect_back('school_agent.index')
+            else:
+                # TODO 企业商务主页
+                flash('暂不支持企业商务登陆', 'danger')
+                return render_template('auth/login.html', form=form)
         flash('登录失败，请检测账号或者密码后重新输入', 'danger')
     return render_template('auth/login.html', form=form)
 
