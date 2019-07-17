@@ -163,3 +163,32 @@ def get_institutions(school):
         results = []
 
     return json.dumps(results)
+
+
+@scholar_bp.route('/get_teacher_id', methods=['POST'])
+@login_required
+def get_teacher_id():
+    """
+    根据教师的学校，学院，名字获取其id
+    :param teacher_id:
+    :return:
+    """
+    uid = session['uid']
+    school = request.form.get("school")
+    institution = request.form.get("institution")
+    teacher = request.form.get("teacher")
+
+    mongo = MongoOperator(**MongoDB_CONFIG)
+    basic_info_col = mongo.get_collection("basic_info")
+    outcome = basic_info_col.find_one({"name": teacher, "school": school, "institution": institution})
+
+    if type(outcome) == None:
+        return json.dumps({"success": False, "teacher_id": None})
+    else:
+        print(outcome)
+        teacher_id = outcome["id"]
+
+        print('--'*50, uid)
+        print('--'*50, school, institution, teacher)
+        print(teacher_id)
+        return json.dumps({"success": True, "teacher_id": teacher_id})

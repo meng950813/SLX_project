@@ -6,6 +6,7 @@
 
 {% block styles %}
     <script src="https://cdn.bootcss.com/twitter-bootstrap/4.0.0-beta.3/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../../static/css/autocomplete.css">
     <style type="text/css">
         .form-group input{
             width: 300px;
@@ -147,4 +148,6 @@
 
 {% block scripts %}
     <script src="../static/js/visit_record.js"></script>
+
+    <script src="{{ url_for('static', filename='js/autocomplete.js') }}"></script>
 {% endblock %}

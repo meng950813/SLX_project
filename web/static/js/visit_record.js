@@ -34,6 +34,96 @@ function wantToNewRecord() {
 }
 
 /**
+ * 添加新的拜访记录时自动补全，并将教师的id存下
+ * @param element
+ */
+//请求获取所有的学校名称
+let schools = [];
+let institutions = [];
+//当前选中的学校
+let cur_school = null;
+let timeoutID = null;
+let res = null;
+
+$.ajax({
+    url:'/get_schools',
+    type: 'GET',
+    dataType: 'json'
+}).done(function (data) {
+    schools = data;
+    //传参
+    autocomplete(document.getElementById('school'), schools);
+});
+
+if ($('#school').val()){
+    reloadInstitutions();
+}
+
+//学校输入框失去焦点绑定事件
+$('#school').on('blur', function () {
+    if (timeoutID)
+        clearTimeout(timeoutID);
+
+    timeoutID = setTimeout(reloadInstitutions, 500);
+});
+
+
+function  reloadInstitutions() {
+    timeoutID = null;
+    //判断是否需要重新请求获取学院
+    let school = $('#school').val();
+    if (school != "" && school != cur_school) {
+        cur_school = school;
+        //请求获取学院
+        $.ajax({
+            url: '/get_institutions/' + cur_school,
+            type: 'GET',
+            dataType: 'json'
+        }).done(function (data) {
+            institutions = data;
+            /*传递参数*/
+            autocomplete(document.getElementById("institution"), institutions);
+        });
+    }
+}
+
+$('#teacher').on('blur', function () {
+
+    if ($('#institution').val() && $('#teacher').val()){
+        console.log("________比较ins and tea")
+        school = $('#school').val();
+        institution = $('#institution').val();
+        teacher = $('#teacher').val();
+        tranferID(school, institution, teacher);
+    }
+})
+
+
+
+function tranferID(school, institution, teacher) {
+    teacher_info = {
+        "csrf_token": $("#csrf_token").val(),
+        "school": school,
+        "institution": institution,
+        "teacher": teacher
+    }
+    console.log("--------", teacher_info);
+    $.ajax({
+        url: '/get_teacher_id',
+        type: 'POST',
+        data: teacher_info,
+        dataType: 'json',
+        success: function (response) {
+            let teacher_id = response["teacher_id"];
+            res = response;
+            console.log("-----teacher_id", teacher_id)
+            $('#teacher').attr('teacher_id', teacher_id);
+        }
+    });
+}
+
+
+/**
  * 删除拜访记录
  * @param element
  */
@@ -73,6 +163,7 @@ function saveVisitedRecord(e){
     let content = $('#content').val();
     let csrf_token = $('#csrf_token').val();
     let id = null;
+    let teacher_id = $('#teacher').val();
 
     let url = '';
     //回写
@@ -103,6 +194,7 @@ function saveVisitedRecord(e){
             content: content,
             title: title,
             csrf_token: csrf_token,
+            teacher_id: teacher_id,
         },
         dataType: 'json'
     }).done(function (data) {
