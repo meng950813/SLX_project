@@ -20,8 +20,8 @@ class BaseConfig(object):
     MAIL_USE_SSL = True
     MAIL_USERNAME = MAIL_CONFIG['username']
     MAIL_PASSWORD = MAIL_CONFIG['password']
-    MAIL_DEFAULT_SENDER = ('三螺旋', MAIL_CONFIG['sender'])
-    MAIL_SUBJECT_PREFIX = '三螺旋'
+    MAIL_DEFAULT_SENDER = MAIL_CONFIG['username']
+    MAIL_SUBJECT_PREFIX = '三螺旋 '
 
 
 class DevelopmentConfig(BaseConfig):

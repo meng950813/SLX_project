@@ -4,12 +4,13 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from urllib.parse import urljoin, urlparse
 
 from web.settings import Operations
+import web.service.user_service as user_service
 
 
-def generate_token(user_id, operation, expire_in=None, **kwargs):
+def generate_token(user, operation, expire_in=None, **kwargs):
     """
     生成令牌
-    :param user_id: 用户的user id
+    :param user: 用户字典
     :param operation: 目前进行的操作
     :param expire_in: 过期时间
     :param kwargs:
@@ -17,7 +18,7 @@ def generate_token(user_id, operation, expire_in=None, **kwargs):
     """
     s = Serializer(current_app.config['SECRET_KEY'], expire_in)
 
-    data = {'id': user_id, 'operation': operation}
+    data = {'id': user['id'], 'operation': operation}
     data.update(**kwargs)
     return s.dumps(data)
 
@@ -39,18 +40,17 @@ def validate_token(user, token, operation, new_password=None):
     except (SignatureExpired, BadSignature):
         return False
     # 需要存在两个键
-    if operation != data.get('operation') or user.id != data.get('id'):
+    if operation != data.get('operation') or user['id'] != data.get('id'):
         return False
     # 重置密码
     if operation == Operations.RESET_PASSWORD:
-        user.set_password(new_password)
+        return user_service.set_password(user, new_password)
     # 改变邮箱
     elif operation == Operations.CHANGE_EMAIL:
         new_email = data.get('new_email')
         user.email = new_email
     else:
         return False
-    # 数据库修改
     return True
 
 

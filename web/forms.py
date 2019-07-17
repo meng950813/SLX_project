@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, \
     SelectField, SelectMultipleField, IntegerField
-from wtforms.validators import DataRequired, Length, Email, Optional
+from wtforms.validators import DataRequired, Length, Email, Optional, EqualTo
 
 
 class LoginForm(FlaskForm):
@@ -53,3 +53,15 @@ class ScholarForm(FlaskForm):
         }
         return datum
 
+
+class ForgetPasswordForm(FlaskForm):
+    email = StringField('', validators=[DataRequired(), Length(1, 254), Email()])
+    submit = SubmitField('确认')
+
+
+class ResetPasswordForm(FlaskForm):
+    email = StringField('邮箱', validators=[DataRequired(), Length(1, 254), Email()])
+    password = PasswordField('密码', validators=[
+        DataRequired(), Length(8, 128), EqualTo('password2')])
+    password2 = PasswordField('确认密码', validators=[DataRequired()])
+    submit = SubmitField('确认')

@@ -1,6 +1,8 @@
 from web.dao import user_dao
 from web.utils import encrypt
 import re
+from web.config import MongoDB_CONFIG
+from web.utils.mongo_operator import MongoOperator
 
 
 def check_user(username, password):
@@ -32,3 +34,35 @@ def check_user(username, password):
 
     # 返回查询结果
     return back
+
+
+def get_user_by_email(email):
+    """
+    根据email获取对应的用户，如果邮箱不存在则返回None
+    :param email:
+    :return:
+    """
+    # 数据库查询
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    collection = mongo_operator.get_collection("user")
+    user = collection.find_one({'email': email})
+
+    return user
+
+
+def set_password(user, new_password):
+    """
+    为某个用户赋予新的密码
+    :param user: 用户字典
+    :param new_password: 新的密码
+    :return: 操作成功则返回True
+    """
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    collection = mongo_operator.get_collection("user")
+    # 为密码加密
+    password_hash = encrypt.encryption(new_password)
+    # 更新数据库
+    condition = {'id': user['id']}
+    user['password'] = password_hash
+    result = collection.update_one(condition, {'$set': user})
+    return result.modified_count == 1

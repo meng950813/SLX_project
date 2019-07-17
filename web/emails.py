@@ -31,22 +31,24 @@ def send_mail(subject, to, template, **kwargs):
     return thr
 
 
-def send_reset_password_email(token, to):
+def send_reset_password_email(user, token, to):
     """
     发送重置密码的邮件
+    :param user: 用户字典
     :param token: 验证令牌
     :param to: 接收者
     :return:
     """
-    send_mail(subject='重置密码', to=to, template='emails/reset_password', token=token)
+    send_mail(subject='重置密码', to=to, template='emails/reset_password', token=token, user=user)
 
 
-def send_change_email_email(token, to):
+def send_change_email_email(user, token, to):
     """
     发送重置邮箱的邮件
+    :param user: 用户字典
     :param token: 验证令牌
     :param to: 接收者
     :return:
     """
-    send_mail(subject='改变邮箱', to=to, template='emails/change_email', token=token)
+    send_mail(subject='改变邮箱', to=to, template='emails/change_email', token=token, user=user)
 
