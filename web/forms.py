@@ -56,7 +56,7 @@ class ScholarForm(FlaskForm):
 
 class ForgetPasswordForm(FlaskForm):
     email = StringField('', validators=[DataRequired(), Length(1, 254), Email()])
-    submit = SubmitField('确认')
+    submit = SubmitField('下一步')
 
 
 class ResetPasswordForm(FlaskForm):
