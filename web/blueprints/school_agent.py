@@ -45,7 +45,7 @@ def index():
 
     if schools:
         # 仅仅获取第一个学校的学院数组
-        institutions = get_institutions_list(schools[0])
+        institutions = get_institutions_dict(schools[0])
 
         return render_template('personal.html', schools=schools, institutions=institutions)
     else:
@@ -56,7 +56,7 @@ def index():
 @login_required
 def change_school():
     school = request.args.get("school")
-    institutions = get_institutions_list(school)
+    institutions = get_institutions_dict(school)
     if institutions:
         return json.dumps(institutions)
     return json.dumps({"success": False, "message": "学校名有误"})
@@ -67,8 +67,17 @@ def change_school():
 def change_institution():
     school = request.args.get("school")
     institution = request.args.get("institution")
+    visited = request.args.get("visited", type=int)
 
     json_data = get_relations(school, institution, session.get("related_teacher"))
+
+    try:
+        if visited:
+            # 该学院增加一次点击
+            MongoOperator(**MongoDB_CONFIG).get_collection("school").update_one({"name": school, "institutions.name": institution}, {"$set": {"institutions.$.visited": visited + 1}})
+    except Exception as e:
+        print("点击次数加一失败， visited=%s" % visited)
+        print(e)
 
     if json_data:
         return json_data
@@ -76,11 +85,11 @@ def change_institution():
         return json.dumps({"success": False, "message": "暂无当前学院的社交网络数据"})
 
 
-def get_institutions_list(school):
+def get_institutions_dict(school):
     """
     获取学校所有的学院信息，按 visited 排序
     :param school: str 学校名
-    :return: [xxx,xxx,xxx...] or False
+    :return: [{"name":xxx, "visited": 132},...] or False
     """
     back = MongoOperator(**MongoDB_CONFIG).get_collection("school").find_one({"name": school}, {"institutions": 1})
     if not back or not ("institutions" in back):
@@ -89,6 +98,17 @@ def get_institutions_list(school):
     institutions = back['institutions']
     # 按照学院被点击次数排序 ==> [{"visited":xx, "name":xx}, ...]
     institutions.sort(key=lambda k: k.get("visited"), reverse=True)
+    # 取出学院名，转为dict
+    return institutions
+
+
+def get_institutions_list(school):
+    """
+    获取学校所有的学院信息，按 visited 排序
+    :param school: str 学校名
+    :return: [xxx,xxx,xxx...] or False
+    """
+    institutions = get_institutions_dict(school)
     # 取出学院名，转为list
     return [item["name"] for item in institutions]
 

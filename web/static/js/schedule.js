@@ -6,7 +6,7 @@ $(".editor").on("click", (e)=> {
     let $card = $target.parent().parent().parent();
     $("#schedule-id").val($card.children(".card-title").attr("data-id"));
     $("#remind_date").val($card.children(".card-title").text());
-    $("#content").val($card.children(".schedule-detail").text());
+    $("#content").val($card.children(".schedule-detail").html().split("<br>").join("\n"));
     
     $("#scheduleModal").modal('show');
 
@@ -15,7 +15,7 @@ $(".editor").on("click", (e)=> {
 /**
  * 添加新日程
  */
-$("#new-schedule").click( (e) => {
+$("#new-schedule").on("click", (e) => {
     clear_modal();
     $("#scheduleModal").modal('show');
 });
@@ -24,7 +24,7 @@ $("#new-schedule").click( (e) => {
 /**
  * 提交内容
  */
-$("#save-schedule").click((e) => {
+$("#save-schedule").on("click", (e) => {
     // id=-1 ==> 创建新日程  id>0 ==> 编辑已有日程
     let id = $("#schedule-id").val();
 
@@ -39,7 +39,7 @@ $("#save-schedule").click((e) => {
         return;
     }
     
-    let data = {"csrf_token": $("#csrf_token").val(), "date": remind_date, "content": content.replace("\n", "<br>"), "id": id}
+    let data = {"csrf_token": $("#csrf_token").val(), "date": remind_date, "content": content.split("\n").join("<br>"), "id": id}
 
     $.ajax({
         type: "post",
@@ -66,7 +66,7 @@ $("#save-schedule").click((e) => {
 /**
  * 日程标记完成/取消
  */
-$(".operate-schedule").click((e)=>{
+$(".operate-schedule").on("click", (e)=>{
     let id = $("#schedule-id").val();
     if(id == 0){
         clear_modal();
@@ -138,7 +138,6 @@ function create_card(id, data){
         $("#card-list").prepend(`
             <div class="card">
                 <div class="card-body">
-                    <button type="button" class="close" data-toggle="modal"><span aria-hidden="true"><i class="editor mdui-icon material-icons">&#xe3c9;</i></span></button>
                     <h5 class="card-title" data-id="${id}">${data.date}</h5>
                     <p class="card-text schedule-detail">${data.content}</p>
                     <small class="create-time">创建于${new Date().Format("yyyy-MM-dd")}</small>
@@ -148,7 +147,7 @@ function create_card(id, data){
     }else{
         let card_body = target.parent();
         target.text(data.date);
-        card_body.children(".schedule-detail").text(data.content);
+        card_body.children(".schedule-detail").html(data.content);
         card_body.children(".create-time").text(`创建于 ${new Date().Format("yyyy-MM-dd")}`);
     }
 }
