@@ -2,6 +2,7 @@ from flask import Blueprint, session, redirect, url_for, render_template, flash
 from web.forms import LoginForm
 import functools
 from web.service import user_service
+from web.config import AGNET_TYPE
 
 
 auth_bp = Blueprint('auth', __name__)
@@ -37,12 +38,16 @@ def login():
         user = user_service.check_user(username, password)
         # 检验账号密码
         if user:
-            print(user)
             session['username'] = user["name"]
             session['uid'] = user["id"]
             session["type"] = user["type"]
             # flash('登录成功，欢迎回来', 'success')
-            return redirect(url_for('school_agent.index'))
+            if user["type"] == AGNET_TYPE["SCHOOL_AGENT"]:
+                return redirect(url_for('school_agent.index'))
+            else:
+                # TODO 企业商务主页
+                flash('暂不支持企业商务登陆', 'danger')
+                return render_template('login.html', form=form)
         flash('登录失败，请检测账号或者密码后重新输入', 'danger')
     return render_template('login.html', form=form)
 
