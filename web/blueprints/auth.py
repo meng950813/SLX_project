@@ -1,7 +1,9 @@
-from flask import Blueprint, session, redirect, url_for, render_template, flash
+from flask import Blueprint, session, redirect, url_for, render_template, flash, request
 from web.forms import LoginForm
 import functools
+
 from web.service import user_service
+from web.utils import redirect_back
 
 
 auth_bp = Blueprint('auth', __name__)
@@ -17,7 +19,7 @@ def login_required(func):
         # 当前未登陆
         user = session.get('username')
         if user is None:
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('auth.login', next=request.full_path))
         return func(*args, **kw)
     return wrapper
 
@@ -25,7 +27,7 @@ def login_required(func):
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if 'username' in session:
-        return redirect(url_for('school_agent.index'))
+        return redirect_back('school_agent.index')
 
     form = LoginForm()
     # 提交表单
@@ -42,7 +44,7 @@ def login():
             session['uid'] = user["id"]
             session["type"] = user["type"]
             # flash('登录成功，欢迎回来', 'success')
-            return redirect(url_for('school_agent.index'))
+            return redirect_back('school_agent.index')
         flash('登录失败，请检测账号或者密码后重新输入', 'danger')
     return render_template('login.html', form=form)
 

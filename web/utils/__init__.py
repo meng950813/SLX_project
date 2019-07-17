@@ -71,6 +71,7 @@ def redirect_back(default='school_agent.index', **kwargs):
     for target in request.args.get('next'), request.referrer:
         if not target:
             continue
-        if is_safe_url(target):
+        # 为同域名且是不同路由时，才进行重定向
+        if is_safe_url(target) and urlparse(target).path != urlparse(request.full_path).path:
             return redirect(target)
     return redirect(url_for(default, **kwargs))
