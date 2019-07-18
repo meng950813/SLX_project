@@ -31,15 +31,15 @@
                     </div>
                 </div>
                 <p>结果：</p>
-                <div class="form-row">
-                    <div class="col-md-11 form-group">
-                        <input type="text" placeholder="">
-                        <input type="text">
-                        <input type="file">
-                    </div>
-                    <div class="col-md-1">
-                        <i class="mdui-icon material-icons">&#xe148;</i>
-                        <i class="mdui-icon material-icons">&#xe15d;</i>
+                <div>
+                    <div class="form-row">
+                        <div class="col-md-12 form-group">
+                            <input type="text" id="partner1" placeholder="合作人">
+                            <input type="text" id="partner2" placeholder="合作人">
+                            <input type="file" id="agreement">
+                            <i class="mdui-icon material-icons" onclick="addNewRow($(this));">&#xe148;</i>
+                            <i class="mdui-icon material-icons">&#xe15d;</i>
+                        </div>
                     </div>
                 </div>
             </form>

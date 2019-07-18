@@ -1,21 +1,19 @@
-/**
- * 增/删参数项
- */
-$("#params-list").on("click", (e)=>{
-    let $target = $(e.target);
-    // 添加参数项
-    if($target.hasClass("plus-icon")){
-        let insert_content = `
-        <div class="param-items">
-            <input type="text" class="params-key" placeholder="参数名">
-            <input type="text" class="params-value" placeholder="参数值">
-            <i class="fa fa-plus-circle plus-icon"></i>
-            <i class="fa fa-minus-circle minus-icon"></i>
-        </div>`;
-        $target.parent().after(insert_content);
-    }
-    else if ($target.hasClass("minus-icon")){
-        $target.parent().remove();
-    }
-});
 
+function addNewRow(target) {
+    // 添加参数项
+    let insert_content = `
+        <div class="form-row">
+            <div class="col-md-12 form-group">
+                <input type="text" id="partner1" placeholder="合作人">
+                <input type="text" id="partner2" placeholder="合作人">
+                <input type="file" id="agreement">
+                <i class="mdui-icon material-icons" onclick="addNewRow($(this));">&#xe148;</i>
+                <i class="mdui-icon material-icons" onclick="removeRow($(this));">&#xe15d;</i>
+            </div>
+        </div>`;
+    target.parent().parent().after(insert_content);
+}
+
+function removeRow(target) {
+    target.parent().parent().remove();
+}
