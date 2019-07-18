@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, \
-    SelectField, SelectMultipleField, IntegerField
+    SelectField, SelectMultipleField, IntegerField, DateTimeField
 from wtforms.validators import DataRequired, Length, Email, Optional, EqualTo
 
 
@@ -65,3 +65,10 @@ class ResetPasswordForm(FlaskForm):
         DataRequired(), Length(8, 128), EqualTo('password2')])
     password2 = PasswordField('确认密码', validators=[DataRequired()])
     submit = SubmitField('确认')
+
+
+class ActivityForm(FlaskForm):
+    title = StringField('活动名：', validators=[DataRequired()])
+    location = StringField('活动地点：', validators=[DataRequired()])
+    date = DateTimeField('日期：')
+    content = TextAreaField('内容：')
