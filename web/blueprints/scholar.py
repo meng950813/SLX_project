@@ -173,16 +173,20 @@ def get_teacher_id():
     :param teacher_id:
     :return:
     """
+    print("----------获取教师id------------------")
     uid = session['uid']
     school = request.form.get("school")
     institution = request.form.get("institution")
     teacher = request.form.get("teacher")
 
+    print("teacher   ", teacher)
+
     mongo = MongoOperator(**MongoDB_CONFIG)
     basic_info_col = mongo.get_collection("basic_info")
     outcome = basic_info_col.find_one({"name": teacher, "school": school, "institution": institution})
 
-    if type(outcome) == None:
+    if outcome == None:
+        print("---------未找到此人")
         return json.dumps({"success": False, "teacher_id": None})
     else:
         print(outcome)

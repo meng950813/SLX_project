@@ -110,21 +110,33 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"  id="addon-wrapping">学校</span>
                             </div>
-                            <input type="text" name="school" id="school" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
+{#                            将输入框改成下拉框#}
+{#                            <input type="text" name="school" id="school" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">#}
+                            <select id="select-college">
+{#                                {% for school in schools %}#}
+{#                                    <option>{{ school }}</option>#}
+{#                                {% endfor %}#}
+                            </select>
                         </div>
                         <br>
                         <div class="input-group flex-nowrap">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="addon-wrapping">学院</span>
                             </div>
-                            <input type="text" name="institution" id="institution" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
+{#                            <input type="text" name="institution" id="institution" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">#}
+                            <select id="select-institution" class="ml-3">
+{#                                {% for institution in institutions %}#}
+{#                                    <option>{{ institution }}</option>#}
+{#                                {% endfor %}#}
+                            </select>
+
                         </div>
                         <br>
                         <div class="input-group flex-nowrap">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="addon-wrapping">教师</span>
                             </div>
-                            <input type="text" name="teacher" id="teacher" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
+                            <input type="text" name="teacher" id="teacher" data-id="" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
                         </div>
                         <br>
                         <div class="input-group">

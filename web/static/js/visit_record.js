@@ -4,6 +4,10 @@ let detail = null;
 let identifier = null;
 //当前是在修改数据还是在添加新的拜访记录
 let isModifying = true;
+var SCHOOL_LIST = {};
+
+
+
 
 /**
  * 点击修改按钮后的填充模态框函数
@@ -14,16 +18,23 @@ function fillModal(e){
     $(".modal-title").text("修改拜访记录");
     //选择其他的兄弟
     tds = e.parent().siblings();
+    console.log("tds    : ", tds);
     isModifying = true;
     //将表格中的内容逐个取出，然后填到表单中去
     let input_model = $("#exampleModal .mod");
-    for(let i = 1;i < tds.length;i++){
-        input_model[i - 1].value = tds[i].innerText;
-    }
+
+    input_model[0].value = tds[1].innerText;
+    input_model[1].value = tds[2].innerText;
+    input_model[2].value = tds[5].innerText;
+
+
     detail = e.parent('.operation').find('#detail');
+
     identifier = e.siblings('form').find('#identifier');
     $('#content').val(e.parent('.operation').find('#detail').val());
 }
+
+
 
 /**
  * 添加新的拜访记录
@@ -33,68 +44,199 @@ function wantToNewRecord() {
     $(".modal-title").text("添加拜访记录");
 }
 
+
+
 /**
  * 添加新的拜访记录时自动补全，并将教师的id存下
  * @param element
  */
+
 //请求获取所有的学校名称
 let schools = [];
 let institutions = [];
 //当前选中的学校
 let cur_school = null;
+let cur_institution = null;
 let timeoutID = null;
 let res = null;
 
+
+/**
+ * 获取所有学校的列表，用于填充模态框中的下拉框
+ * @param element
+ */
 $.ajax({
     url:'/get_schools',
     type: 'GET',
     dataType: 'json'
 }).done(function (data) {
     schools = data;
-    //传参
-    autocomplete(document.getElementById('school'), schools);
+    // autocomplete(document.getElementById('school'), schools);
+    // console.log("schools------------  :", schools);
+    var html;
+    for(var i = 0; i < schools.length; i++){
+        school = schools[i];
+        html += '<option>'+ school + '</option>';
+    }
+    $('#select-college').html(html);
+
+    // 如果没有点击学校，则选取默认的学校进行其学院的加载
+    loadInstitution();
 });
+
+
 
 if ($('#school').val()){
-    reloadInstitutions();
+    // reloadInstitutions();
+    loadInstitution();
 }
 
-//学校输入框失去焦点绑定事件
-$('#school').on('blur', function () {
+/**
+ * 点击学校之后加载学院数据
+ * @param element
+ */
+$('#select-college').click(function () {
+    console.log("---------点击学校");
+    // 如果点击了学校下拉框，则对学院进行重新加载
     if (timeoutID)
         clearTimeout(timeoutID);
+    timeoutID = setTimeout(500);
+    loadInstitution();
+})
 
-    timeoutID = setTimeout(reloadInstitutions, 500);
-});
+/**
+ * 加载当前学校的所有学院数据
+ * @param element
+ */
+function loadInstitution(){
 
+    cur_school = $('#select-college').children("option:selected").text();
 
-function  reloadInstitutions() {
-    timeoutID = null;
-    //判断是否需要重新请求获取学院
-    let school = $('#school').val();
-    if (school != "" && school != cur_school) {
-        cur_school = school;
-        //请求获取学院
-        $.ajax({
-            url: '/get_institutions/' + cur_school,
-            type: 'GET',
-            dataType: 'json'
-        }).done(function (data) {
-            institutions = data;
-            /*传递参数*/
-            autocomplete(document.getElementById("institution"), institutions);
-        });
-    }
+    console.log("schools   :", schools)
+    console.log("????cur_school    :", cur_school);
+
+    getInstitutions(cur_school);
 }
 
-$('#teacher').on('blur', function () {
 
-    if ($('#institution').val() && $('#teacher').val()){
-        console.log("________比较ins and tea")
-        school = $('#school').val();
-        institution = $('#institution').val();
+/**
+ * 根据学校名获取其所有学院信息
+ * @param {String} school 学校名
+ */
+function getInstitutions(school){
+    $.ajax({
+        type: "get",
+        url: "/change_school",
+        data: {"school" : school},
+        dataType: "json",
+        success: function (response) {
+            console.log(response);
+            if(response.success == false){
+                toggle_alert(false, "", response.message);
+                return;
+            }
+            setInstitution(response, school);
+            // 保存数据
+            SCHOOL_LIST[school] = response;
+        },
+        error: function(error){
+            console.error(error);
+            toggle_alert(false, "", "服务器连接失败,请稍后再试");
+        }
+    });
+}
+
+/**
+ * 将学院信息填充到下拉框中
+ * @param {object} institution_list 学院数据 [{"name":xxx, "visited":1},...]
+ * @param {String} school 学校
+ */
+function setInstitution(institution_list, school){
+    if(institution_list.length <= 0){
+        alert("学院数据为空");
+        return;
+    }
+    let options = "";
+    for (let i = 0; i < institution_list.length; i++) {
+        // options += `<option>${institution_list[i]}</option>`;
+        options += `<option data-times="${institution_list[i].visited}">${institution_list[i].name}</option>`;
+    }
+    $("#select-institution").html(options);
+}
+
+
+$('#select-institution').click(function () {
+    // console.log("-----点击学院");
+    if (timeoutID)
+        clearTimeout(timeoutID);
+    timeoutID = setTimeout(500);
+    cur_school = $('#select-college').children("option:selected").text();
+    cur_institution = $(this).children("option:selected").text();
+
+    // console.log("school adn insi---------", cur_school, cur_institution);
+})
+//学校输入框失去焦点绑定事件
+// $('#select-college').on('blur', function () {
+//     // if (timeoutID)
+//     //     clearTimeout(timeoutID);
+//     // timeoutID = setTimeout(reloadInstitutions, 500);
+//     console.log("schools   :", schools)
+//     let school = $(this).children("option").text();
+//     console.log("cur_school    :", school);
+//     if(school in schools){
+//         $.ajax({
+//             url: '/get_institutions',
+//             type: 'GET',
+//             data: {"school": school},
+//             dataType: 'json'
+//         }).done(function (data) {
+//             institutions = data;
+//
+//             console.log("institutions   :", institutions)
+//
+//             var html;
+//             for(var i = 0; i < institutions.length; i++){
+//                 html += '<option>' + institutions[i] + '</option>';
+//             }
+//             $('#select-institution').html(
+//                 html
+//             );
+//         })
+//     }
+// });
+
+
+// function  reloadInstitutions() {
+//     timeoutID = null;
+//     //判断是否需要重新请求获取学院
+//     let school = $('#school').val();
+//     if (school != "" && school != cur_school) {
+//         cur_school = school;
+//         //请求获取学院
+//         $.ajax({
+//             url: '/get_institutions/' + cur_school,
+//             type: 'GET',
+//             dataType: 'json'
+//         }).done(function (data) {
+//
+//             console.log("----------测试");
+//             institutions = data;
+//             /*传递参数*/
+//             // autocomplete(document.getElementById("institution"), institutions);
+//         });
+//     }
+// }
+
+
+
+$('#teacher').on('blur', function () {
+    cur_school = $('#select-college').children("option:selected").text();
+    cur_institution = $('#select-institution').children("option:selected").text();
+    if (cur_school && cur_institution){
+
         teacher = $('#teacher').val();
-        tranferID(school, institution, teacher);
+        // console.log(">>>>>>>>", cur_school, cur_institution, teacher);
+        tranferID(cur_school, cur_institution, teacher);
     }
 })
 
@@ -107,7 +249,6 @@ function tranferID(school, institution, teacher) {
         "institution": institution,
         "teacher": teacher
     }
-    console.log("--------", teacher_info);
     $.ajax({
         url: '/get_teacher_id',
         type: 'POST',
@@ -116,8 +257,7 @@ function tranferID(school, institution, teacher) {
         success: function (response) {
             let teacher_id = response["teacher_id"];
             res = response;
-            console.log("-----teacher_id", teacher_id)
-            $('#teacher').attr('teacher_id', teacher_id);
+            $('#teacher').attr('data-id', teacher_id);
         }
     });
 }
@@ -158,32 +298,27 @@ let teacher_id
 function saveVisitedRecord(e){
     let date = $('#date').val();
     let title = $('#title').val();
-    let school = $('#school').val();
-    let institution = $('#institution').val();
+    // let school = $('#school').val();
+    // let institution = $('#institution').val();
+    let school = $('#select-college').children("option:selected").text();
+    let institution = $('#select-institution').children("option:selected").text();
+
     let teacher = $('#teacher').val();
     let content = $('#content').val();
     let csrf_token = $('#csrf_token').val();
     let id = null;
-    teacher_id = $('#teacher').attrs("teacher_id");
-    console.log("!!!!!!!!!!!!"+ teacher_id)
-    // let teacher_name = $('#teacher').val();
+    teacher_id = $('#teacher').attr("data-id");
 
     let url = '';
     //回写
     if (isModifying){
-        //模态框
-        let input_model = $("#exampleModal .mod");
-        for(let i = 1;i < tds.length;i++){
-            tds[i].innerHTML = input_model[i - 1].value;
-        }
-        detail.val(content);
+
         id = identifier.val();
         url = '/visit_record/edit';
     }else{
         url = '/visit_record/new';
     }
-    tds = null;
-    detail = null;
+
     //发送事件
     $.ajax({
         url: url,
@@ -191,8 +326,8 @@ function saveVisitedRecord(e){
         data: {
             id: id,
             date: date,
-            school: school,
-            institution: institution,
+            school: cur_school,
+            institution: cur_institution,
             teacher: teacher,
             content: content,
             title: title,
@@ -201,10 +336,12 @@ function saveVisitedRecord(e){
         },
         dataType: 'json'
     }).done(function (data) {
-        console.log(data);
+        //显示新修改的记录
+
         //新的拜访记录添加成功
         if (!isModifying){
-            if (!data.success){
+            console.log("------------- teacher_id  :"+teacher_id)
+            if (!data.success || typeof(teacher_id) == undefined){
                 toggle_alert(false, "exampleModal", "拜访记录添加失败");
                 return ;
             }
@@ -229,10 +366,35 @@ function saveVisitedRecord(e){
             toggle_alert(true, "exampleModal", "拜访记录添加成功");
         }
         else if(data.success){
+            if(isModifying){
+                //模态框
+                let input_model = $("#exampleModal .mod");
+                // console.log("---tds   :", tds)
+                if(tds != null){
+                    // for(let i = 1;i < tds.length;i++){
+                    //     tds[i].innerHTML = input_model[i - 1].value;
+                    // }
+                    tds[1].innerHTML = input_model[0].value;
+                    tds[2].innerHTML = input_model[1].value;
+                    tds[3].innerHTML = cur_school;
+                    tds[4].innerHTML = cur_institution;
+                    tds[5].innerHTML = input_model[2].value;
+                }
+                console.log(">>>>>>>>", school, institution, teacher);
+
+                // console.log("--detail  :", detail);
+                // console.log("--content  :", content);
+                if(detail != null)
+                    detail.val(content);
+            }
             toggle_alert(true, "exampleModal", "修改成功");
+        }else if(!data.success ||  typeof(teacher_id) == undefined){
+            toggle_alert(false, "exampleModal", "修改记录添加失败");
+            return ;
         }
     });
+
     //隐藏模态框
-    //$('#exampleModal').modal('hide');
+    $('#exampleModal').modal('hide');
 }
 

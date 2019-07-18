@@ -29,6 +29,7 @@ def new_visit_record():
     :return:
     """
     # 获取用户的uid
+    print("------------------------------插入拜访记录-----------------------------")
     uid = session['uid']
     record = {
         'institution': request.form.get('institution'),
@@ -40,11 +41,21 @@ def new_visit_record():
         "user_id": uid,
         "status": 1,
     }
+    teacher_id = request.form.get("teacher_id")
+    # print(id)
+    if teacher_id is None:
+        print("-------------未插入")
+        return json.dumps({'success': False, 'record_id': str("")})
+
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
     # 获取拜访记录集合
     collection = mongo_operator.get_collection("visit_record")
+    print("-----------------已插入")
     result = collection.insert_one(record)
     record_id = result.inserted_id
+
+    print("new visit record---------------------------")
+    print(teacher_id)
 
     return json.dumps({'success': True, 'record_id': str(record_id)})
 
@@ -56,6 +67,7 @@ def edit_visit_record():
     修改拜访记录
     :return:
     """
+    print("---------------修改拜访记录-----------------")
     # 获取当前的id
     record_id = request.form.get('id')
     datum = {
@@ -66,11 +78,19 @@ def edit_visit_record():
         'teacher': request.form.get('teacher'),
         'title': request.form.get('title'),
     }
+
+    teacher_id = request.form.get("teacher_id")
+    # print(id)
+    print("teacher_id", teacher_id)
+    print(type(teacher_id))
+    if teacher_id is None or teacher_id is '':
+        print("-------------未修改")
+        return json.dumps({'success': False})
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
     # 更新
     condition = {"_id": ObjectId(record_id)}
     result = mongo_operator.db['visit_record'].update_one(condition, {"$set":  datum})
-
+    print("--------已修改")
     return json.dumps({'success': True})
 
 
