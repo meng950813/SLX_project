@@ -22,15 +22,11 @@ def do_login(telephone=None, email=None, u_id=None, pwd=""):
     elif email:
         condition['email'] = email
     elif u_id:
-        condition['id'] = u_id
+        condition['id'] = int(u_id)
     else:
         return None
 
-    result = mongo_operator.get_collection('user').find_one(condition, {"id": 1, "name": 1, "type": 1})
-    # 删除mongo的id
-    if result:
-        del result['_id']
-
+    result = mongo_operator.get_collection('user').find_one(condition, {"_id": 0, "id": 1, "name": 1, "type": 1})
     return result
 
 
