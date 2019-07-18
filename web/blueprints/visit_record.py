@@ -1,6 +1,7 @@
-from flask import Blueprint, session, render_template, request
+from flask import Blueprint, render_template, request
 from bson.objectid import ObjectId
 import json
+from flask_login import current_user
 
 from web.blueprints.auth import login_required
 from web.config import MongoDB_CONFIG
@@ -15,7 +16,7 @@ visit_record_bp = Blueprint('visit_record', __name__)
 def manage_visit_record():
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
     # 获取用户的uid
-    uid = session['uid']
+    uid = current_user.id
     # 查询询该用户的日程安排
     generator = mongo_operator.find({'user_id': uid, 'status': 1}, 'visit_record')
     return render_template('visit_record.html', visited_records=list(generator))
@@ -29,7 +30,7 @@ def new_visit_record():
     :return:
     """
     # 获取用户的uid
-    uid = session['uid']
+    uid = current_user.id
     record = {
         'institution': request.form.get('institution'),
         'school': request.form.get('school'),

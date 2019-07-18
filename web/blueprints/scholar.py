@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, session, request, flash
+from flask import Blueprint, render_template, request, flash
+from flask_login import current_user
 from web.service.basic_info_service import search_teacher_basic_info
 import datetime
 import json
@@ -72,7 +73,7 @@ def feedback():
             datum = form.get_data()
             datum['type'] = cur_type
             datum['status'] = 0
-            datum['username'] = session['username']
+            datum['username'] = current_user.name
             datum['timestamp'] = datetime.datetime.utcnow()
             datum['teacher_id'] = teacher_id
             # 写入数据库

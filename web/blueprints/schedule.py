@@ -1,12 +1,12 @@
-from flask import Blueprint, render_template, session, request
+from flask import Blueprint, render_template, request
 import json
+from flask_login import current_user
 
 from web.blueprints.auth import login_required
 from web.utils.mongo_operator import MongoOperator
 from web.config import MongoDB_CONFIG
 import datetime
 from bson.objectid import ObjectId
-
 
 schedule_bp = Blueprint('schedule', __name__)
 
@@ -19,9 +19,8 @@ def schedule():
     :return:
     """
 
-    print("------------------------显示日程安排的页面------------------------------")
     # 获取用户的id
-    user_id = session['uid']
+    user_id = current_user.id
 
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
     # 选定集合
@@ -45,7 +44,7 @@ def edit_schedule():
     schedule_id = request.form.get('id')
     data = {
         # 获取用户的id,
-        "user_id": session['uid'],
+        "user_id": current_user.id,
         # 获取当前的日期，并组合成字符串
         "create_date": str(datetime.datetime.now().date()),
         # 详细内容
@@ -118,16 +117,17 @@ def set_whether_completed_or_canceled(schedule_id, status):
     schedule_col = MongoOperator(**MongoDB_CONFIG).get_collection("schedule")
 
     status = 1 if status == 1 else -1
-    
+
     try:
         # 更新schedule_list
-        result = schedule_col.update_one({"_id": ObjectId(schedule_id)},{"$set": {"status": status}})
+        result = schedule_col.update_one({"_id": ObjectId(schedule_id)}, {"$set": {"status": status}})
         # print(result.modified_count, result.matched_count)
         # print(result)
         return result.modified_count
     except Exception as e:
         print("schedule_id 不符合标准", e)
         return 0
+
 
 if __name__ == "__main__":
     # print(set_whether_completed_or_canceled(100006, 0, 1))

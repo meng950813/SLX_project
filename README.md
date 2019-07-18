@@ -21,10 +21,15 @@
 >简化发送邮件
 >4. flask-moment
 > 简化时间的显示
+>5. flask-login
+> 简化登录
 ## 3. 关于用户登录
->1. 登录目前使用到了mysql，对应的配置文件为web/config.py。
->2. 当用户登录成功后，会把该用户的用户名放入session['username']、uid放在session['uid']、type放在session['type']
+>1. 登录目前使用到了mongodb，对应的配置文件为web/config.py。
+>2. 当用户登录成功后，会把user字典中的所有数据都保存在类为User的一个对象
+>受flask_login的影响，可以通过current_user来访问到这个对象。该对象可以通过
+>from flask_login import current_user来访问；在jinja中，直接访问current_user即可。
 >3. 当用户登录成功后，每一次刷新页面，程序都会从数据库中查询是否
 >有自己的消息，如果有则显示，它已经注册到模板中，名称为unread_msg
+> 4. 应当避免使用session中的user_id 和remember_token字段
 ## 4. 控制台输出
 >程序输出尽量使用logging库，这样在使用docker部署服务器时可以docker logs [name] 直接观察到输出的内容(logging.warning及以上)

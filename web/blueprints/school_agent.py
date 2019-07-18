@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, session, request
+from flask import Blueprint, render_template, request
 import json
 import os
+from flask_login import current_user
 
 from web.blueprints.auth import login_required
 from web.utils.mongo_operator import MongoOperator
@@ -21,12 +22,12 @@ def index():
     # 获取当前商务负责的学校 / 学院及其建立的关系
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
     # 获取用户的uid
-    uid = session['uid']
+    uid = current_user.id
 
-    if "charge_school" in session:
+    if "charge_school" in current_user:
         user_info = {
-            'charge_school': session['charge_school'],
-            "related_teacher": session['related_teacher']
+            'charge_school': current_user['charge_school'],
+            "related_teacher": current_user['related_teacher']
         }
     else:
         # 获取该商务的信息
@@ -38,8 +39,8 @@ def index():
         if not ("charge_school" in user_info):
             user_info["charge_school"] = None
 
-        session["charge_school"] = user_info['charge_school']
-        session["related_teacher"] = user_info["related_teacher"]
+        current_user["charge_school"] = user_info['charge_school']
+        current_user["related_teacher"] = user_info["related_teacher"]
 
     schools = user_info['charge_school']
 
@@ -69,7 +70,7 @@ def change_institution():
     institution = request.args.get("institution")
     visited = request.args.get("visited", type=int)
 
-    json_data = get_relations(school, institution, session.get("related_teacher"))
+    json_data = get_relations(school, institution, current_user.get("related_teacher"))
 
     try:
         if visited:

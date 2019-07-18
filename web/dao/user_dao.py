@@ -26,7 +26,8 @@ def do_login(telephone=None, email=None, u_id=None, pwd=""):
     else:
         return None
 
-    result = mongo_operator.get_collection('user').find_one(condition, {"_id": 0, "id": 1, "name": 1, "type": 1})
+    # 除_id 外全部获取
+    result = mongo_operator.get_collection('user').find_one(condition, {"_id": 0})
     return result
 
 
