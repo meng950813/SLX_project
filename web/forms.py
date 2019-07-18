@@ -30,8 +30,8 @@ class ScholarForm(FlaskForm):
         self.institution.data = datum['institution']
         self.birth_year.data = datum['birth_year'].strip()
         self.title.data = datum['title']
-        if 'honors' in datum:
-            self.honor.data = datum['honors']
+        if 'honor' in datum:
+            self.honor.data = datum['honor']
 
         self.email.data = datum['email'].strip()
         self.phone_number.data = datum['phone_number'].strip()
@@ -45,7 +45,7 @@ class ScholarForm(FlaskForm):
             'institution': self.institution.data,
             'birth_year': self.birth_year.data,
             'title': self.title.data,
-            'honors': self.honor.data,
+            'honor': self.honor.data,
             'email': self.email.data,
             'phone_number': self.phone_number.data,
             'office_number': self.office_number.data,
