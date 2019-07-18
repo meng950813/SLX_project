@@ -1,5 +1,6 @@
 import os
 from flask import Flask, render_template, session
+from flask_login import current_user
 
 from web.settings import configuration
 from web.blueprints.school_agent import school_agent_bp
@@ -8,7 +9,8 @@ from web.blueprints.visit_record import visit_record_bp
 from web.blueprints.schedule import schedule_bp
 from web.blueprints.auth import auth_bp
 from web.blueprints.reminder import reminder_bp
-from web.extensions import bootstrap, csrf, moment, mail
+from web.blueprints.activity import activity_bp
+from web.extensions import bootstrap, csrf, moment, mail, login_manager
 from web.utils.mongo_operator import MongoOperator
 from web.config import MongoDB_CONFIG
 
@@ -43,6 +45,7 @@ def register_extensions(app):
     csrf.init_app(app)
     moment.init_app(app)
     mail.init_app(app)
+    login_manager.init_app(app)
 
 
 def register_blueprints(app):
@@ -52,6 +55,7 @@ def register_blueprints(app):
     app.register_blueprint(visit_record_bp)
     app.register_blueprint(schedule_bp)
     app.register_blueprint(reminder_bp)
+    app.register_blueprint(activity_bp, url_prefix='/activity')
 
 
 def register_errors(app):
@@ -66,8 +70,9 @@ def register_template_context(app):
     def make_template_context():
         # 如果登录，则尝试拉取未读信息
         unread_msg = 0
-        if 'username' in session and 'uid' in session:
-            uid = session['uid']
+
+        if current_user.is_authenticated:
+            uid = current_user.id
             mongo_operator = MongoOperator(**MongoDB_CONFIG)
             unread_msg = mongo_operator.find({"to_id": uid, "state": 0}, "message").count()
 

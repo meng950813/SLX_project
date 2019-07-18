@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/form.html' import render_field %}
+
+{% block title %}
+    添加活动
+{% endblock %}
+
+{% block main %}
+<div class="container">
+    <div class="row" style="padding-top: 30px;">
+        <div class="col-md-10 offset-1">
+            <h2 class="text-center">添加活动</h2>
+            <form method="post">
+                {{ form.hidden_tag() }}
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        {{ render_field(form.title) }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        {{ render_field(form.location) }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        {{ render_field(form.date) }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col">
+                        {{ render_field(form.content, rows='5') }}
+                    </div>
+                </div>
+                <p>结果：</p>
+                <div>
+                    <div class="form-row">
+                        <div class="col-md-12 form-group">
+                            <input type="text" id="partner1" placeholder="合作人">
+                            <input type="text" id="partner2" placeholder="合作人">
+                            <input type="file" id="agreement">
+                            <i class="mdui-icon material-icons" onclick="addNewRow($(this));">&#xe148;</i>
+                            <i class="mdui-icon material-icons">&#xe15d;</i>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/new_activity.js')}}"></script>
+{% endblock %}

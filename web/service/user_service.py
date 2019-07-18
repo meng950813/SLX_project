@@ -3,6 +3,7 @@ from web.utils import encrypt
 import re
 from web.config import MongoDB_CONFIG
 from web.utils.mongo_operator import MongoOperator
+from web.models import User
 
 
 def check_user(username, password):
@@ -33,7 +34,9 @@ def check_user(username, password):
         back = user_dao.do_login(u_id=username, pwd=password)
 
     # 返回查询结果
-    return back
+    if back:
+        return User(**back)
+    return None
 
 
 def get_user_by_email(email):
@@ -46,6 +49,23 @@ def get_user_by_email(email):
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
     collection = mongo_operator.get_collection("user")
     user = collection.find_one({'email': email})
+
+    return user
+
+
+def get_user_by_id(user_id):
+    """
+    根据user_id 获取对应的用户，如果不存在返回None
+    :param user_id:
+    :return: User对象或者None
+    """
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    collection = mongo_operator.get_collection("user")
+    datum = collection.find_one({'id': int(user_id)})
+    # 转化成对象
+    user = None
+    if datum:
+        user = User(**datum)
 
     return user
 

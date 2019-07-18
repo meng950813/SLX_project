@@ -24,12 +24,19 @@
                             {{ form.hidden_tag() }}
                             {{ render_field(form.username, placeholder='请输入邮箱/手机号') }}
                             {{ render_field(form.password, placeholder='请输入密码') }}
-                            {{ render_field(form.remember) }}
+                            <div class="row">
+                                <div class="col">
+                                    {{ render_field(form.remember) }}
+                                </div>
+                                <div class="col">
+                                    <a class="small float-right text-muted"
+                                       href="{{ url_for('.forget_password') }}">忘记密码？</a>
+                                </div>
+                            </div>
                             {{ render_field(form.submit, class="btn btn-primary btn-block") }}
                         </form>
                     </div>
                     <hr>
-                    <p class="small"><a href="{{ url_for('.forget_password') }}">忘记密码？</a></p>
                 </div>
             </div>
         </div>

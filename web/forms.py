@@ -1,13 +1,13 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, \
-    SelectField, SelectMultipleField, IntegerField
+    SelectField, SelectMultipleField, IntegerField, DateTimeField
 from wtforms.validators import DataRequired, Length, Email, Optional, EqualTo
 
 
 class LoginForm(FlaskForm):
     username = StringField('用户名', validators=[DataRequired(), Length(1, 20)])
     password = PasswordField('密码', validators=[DataRequired(), Length(1, 128, message='密码最少为8位')])
-    remember = BooleanField('记住我')
+    remember = BooleanField('七天免登陆')
     submit = SubmitField('登录')
 
 
@@ -56,7 +56,7 @@ class ScholarForm(FlaskForm):
 
 class ForgetPasswordForm(FlaskForm):
     email = StringField('', validators=[DataRequired(), Length(1, 254), Email()])
-    submit = SubmitField('确认')
+    submit = SubmitField('下一步')
 
 
 class ResetPasswordForm(FlaskForm):
@@ -65,3 +65,10 @@ class ResetPasswordForm(FlaskForm):
         DataRequired(), Length(8, 128), EqualTo('password2')])
     password2 = PasswordField('确认密码', validators=[DataRequired()])
     submit = SubmitField('确认')
+
+
+class ActivityForm(FlaskForm):
+    title = StringField('活动名：', validators=[DataRequired()])
+    location = StringField('活动地点：', validators=[DataRequired()])
+    date = DateTimeField('日期：')
+    content = TextAreaField('内容：')

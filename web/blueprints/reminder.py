@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, session, request
+from flask import Blueprint, render_template, request
+from flask_login import current_user
 from datetime import datetime
 import json
 
@@ -17,12 +18,12 @@ def info_reminder():
     进入消息提醒页面
     :return:
     """
-    uid = session['uid']
-    session['message_num'] = 0
+    uid = current_user.id
 
     # 获取发送给该用户的所有信息
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
-    messages = mongo_operator.find({"to_id": uid}, "message")
+    collection = mongo_operator.get_collection('message')
+    messages = collection.find({"to_id": uid}).sort([('date', -1)])
     unchecked_message = []
     checked_message = []
 
@@ -38,7 +39,7 @@ def info_reminder():
     collection.update_many({"to_id": uid}, {"$set": {"state": 1}})
 
     return render_template("info_reminder.html",
-                           checked_message=checked_message[0:5], unchecked_message=unchecked_message)
+                           checked_message=checked_message, unchecked_message=unchecked_message)
 
 
 @reminder_bp.route('/add_message', methods=['POST'])
@@ -47,8 +48,8 @@ def insert_message():
     state = 0
     date = datetime.utcnow()
     # 发送者
-    from_id = session['uid']
-    from_name = session['username']
+    from_id = current_user.id
+    from_name = current_user.name
     # 接受者
     receiver = request.form.get("receiver")
     receiver_id = request.form.get('receiver_id', type=int)

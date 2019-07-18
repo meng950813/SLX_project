@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, session, request, flash
+from flask import Blueprint, render_template, request, flash
+from flask_login import current_user
 from web.service.basic_info_service import search_teacher_basic_info
 import datetime
 import json
@@ -44,34 +45,9 @@ def scholar_info(teacher_id):
     return render_template('scholar/detail.html', teacher_basic_info=teacher_basic_info, length=length, age=age)
 
 
-@scholar_bp.route('/feedback', methods=['POST'])
+@scholar_bp.route('/feedback', methods=['GET', 'POST'])
 @login_required
-def agent_feedback():
-    """
-    保存商务反馈的信息
-    :return:
-    """
-    mongo_operator = MongoOperator(**MongoDB_CONFIG)
-
-    back = mongo_operator.db['agent_feedback'].insert_one(
-        {
-            "user_id": session['uid'],
-            'title': request.form.get('title'),
-            'type': request.form.get('type'),
-            'target': request.form.get('target'),
-            'content': request.form.get('content').replace("\n", "<br>"),
-            "status": 0
-        })
-
-    print(back.inserted_id)
-    if back.inserted_id:
-        return json.dumps({'success': True})
-    return json.dumps({"success": False})
-
-
-@scholar_bp.route('/info_feedback', methods=['GET', 'POST'])
-@login_required
-def info_feedback():
+def feedback():
     form = ScholarForm()
 
     teacher_id = request.args.get('tid', type=int, default=None)
@@ -97,7 +73,7 @@ def info_feedback():
             datum = form.get_data()
             datum['type'] = cur_type
             datum['status'] = 0
-            datum['username'] = session['username']
+            datum['username'] = current_user.name
             datum['timestamp'] = datetime.datetime.utcnow()
             datum['teacher_id'] = teacher_id
             # 写入数据库

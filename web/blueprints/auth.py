@@ -1,35 +1,19 @@
-from flask import Blueprint, session, redirect, url_for, render_template, flash, request
-import functools
+from flask import Blueprint, redirect, url_for, render_template, flash
+from flask_login import login_required, current_user, login_user, logout_user
 
 from web.utils import redirect_back, generate_token, validate_token
 from web.forms import LoginForm, ForgetPasswordForm, ResetPasswordForm
 from web.settings import Operations, AGNET_TYPE
 from web.emails import send_reset_password_email
-import web.service.user_service as user_service
+from web.service import user_service
 
 
 auth_bp = Blueprint('auth', __name__)
 
 
-def login_required(func):
-    """
-    装饰函数，如果需要某函数需要登陆后操作，则可以装饰上此函数
-    如@login_required
-    """
-    @functools.wraps(func)
-    def wrapper(*args, **kw):
-        # 当前未登陆
-        user = session.get('username')
-
-        if user is None:
-            return redirect(url_for('auth.login', next=request.full_path))
-        return func(*args, **kw)
-    return wrapper
-
-
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    if 'username' in session:
+    if current_user.is_authenticated:
         return redirect_back('school_agent.index')
 
     form = LoginForm()
@@ -39,14 +23,12 @@ def login():
         password = form.password.data
         remember = form.remember.data
 
-        user = user_service.check_user(username, password)
         # 检验账号密码
+        user = user_service.check_user(username, password)
         if user:
-            session['username'] = user["name"]
-            session['uid'] = user["id"]
-            session["type"] = user["type"]
             # flash('登录成功，欢迎回来', 'success')
             if user["type"] == AGNET_TYPE["SCHOOL_AGENT"]:
+                login_user(user, remember)
                 return redirect_back('school_agent.index')
             else:
                 # TODO 企业商务主页
@@ -59,7 +41,7 @@ def login():
 @auth_bp.route('/logout')
 @login_required
 def logout():
-    session.clear()
+    logout_user()
     return redirect(url_for('auth.login'))
 
 
@@ -74,6 +56,7 @@ def forget_password():
     if form.validate_on_submit():
         # 获取邮箱 并查询数据库
         email = form.email.data.lower()
+        # TODO: user不是User对象
         user = user_service.get_user_by_email(email)
 
         # 发送到邮箱

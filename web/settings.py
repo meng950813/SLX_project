@@ -1,4 +1,5 @@
 import os
+import datetime
 from web.config import MAIL_CONFIG
 
 
@@ -28,6 +29,9 @@ class BaseConfig(object):
     MAIL_PASSWORD = MAIL_CONFIG['password']
     MAIL_DEFAULT_SENDER = MAIL_CONFIG['username']
     MAIL_SUBJECT_PREFIX = '三螺旋 '
+
+    # flask-login 会话过期时长
+    REMEMBER_COOKIE_DURATION = datetime.timedelta(days=7)
 
 
 class DevelopmentConfig(BaseConfig):
