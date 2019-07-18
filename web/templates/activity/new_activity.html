@@ -13,7 +13,7 @@
             <form method="post">
                 {{ form.hidden_tag() }}
                 <div class="form-row">
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-12">
                         {{ render_field(form.title) }}
                     </div>
                 </div>
@@ -32,12 +32,12 @@
                 </div>
                 <p>结果：</p>
                 <div class="form-row">
-                    <div class="col-md-10 form-group">
+                    <div class="col-md-11 form-group">
                         <input type="text" placeholder="">
                         <input type="text">
                         <input type="file">
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <i class="mdui-icon material-icons">&#xe148;</i>
                         <i class="mdui-icon material-icons">&#xe15d;</i>
                     </div>
@@ -49,5 +49,6 @@
 {% endblock %}
 
 {% block scripts %}
-    <script type="text/javascript" src="url_for('static', filename='js/new_activity.js')"></script>
+    {{ super() }}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/new_activity.js')}}"></script>
 {% endblock %}

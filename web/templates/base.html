@@ -27,6 +27,9 @@
             .hidden{
                 display: none;
             }
+        body{
+            background: #f6f6f6;
+        }
         </style>
         <link rel="icon" type="image/x-icon" href="../static/images/favicon.ico">
     {% endblock %}
@@ -42,24 +45,46 @@
 
     <div class="collapse navbar-collapse" id="navbarColor01">
         {% if "username" in session %}
-            <ul class="navbar-nav ml-auto">
+            <ul class="navbar-nav mr-auto">
                 {{ render_nav_item('activity.add_activity', '活动安排') }}
-                {{ render_nav_item('scholar.search', '专家检索') }}
                 {{ render_nav_item('schedule.schedule', '日程安排') }}
                 {{ render_nav_item('visit_record.manage_visit_record', '拜访记录') }}
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <form class="form-inline" method="get" action="{{ url_for('scholar.search') }}">
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control" name="teacher-name" placeholder="Search for experts..."
+                               aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="submit">
+                                <i class="mdui-icon material-icons">&#xe8b6;</i>
+                            </button>
+                        </span>
+                    </div><!-- /input-group -->
+                </form>
                 <li>
                     <a class="nav-item nav-link {% if request.endpoint == 'reminder.info_reminder' %}active{% endif %}"
                        href="{{ url_for('reminder.info_reminder') }}">
-                        消息提醒
+                        <i class="mdui-icon material-icons">&#xe7f4;</i>
                         {% if unread_msg != 0 %}
                             <span class="badge" style="background-color: red; color: white">{{ unread_msg }}</span>
-                        {% endif %}
+                        {% endif %}&nbsp;
                     </a>
                 </li>
-                <li><a class="nav-item nav-link " >{{ session["username"] }}</a></li>
-                {{ render_nav_item('school_agent.index', '个人中心') }}
-                {{ render_nav_item('auth.logout', '注销') }}
-            </ul>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
+                       aria-haspopup="true" aria-expanded="false">
+                        {{ session['username'] }}
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" role="menu">
+                        <a class="dropdown-item" href="{{ url_for('school_agent.index') }}">
+                            <i class="mdui-icon material-icons">&#xe88a;</i>个人中心
+                        </a>
+                        <a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                           <i class="mdui-icon material-icons">&#xe8ac;</i>注销
+                        </a>
+                    </div>
+                </li>
         {% else %}
             <ul class="navbar-nav ml-auto">
                 <li class="clearfix"><a class="nav-item nav-link active float-right" href="{{ url_for('auth.login') }}"><i class="mdui-icon material-icons">&#xe7fd;</i></a></li>
@@ -130,6 +155,7 @@ function toggle_alert(isSuccess, modal, message = ""){
 }
 </script>
 {% block scripts %}
+    <script src="../static/js/bootstrap_v4.min.js"></script>
 {% endblock %}
 </body>
 </html>
