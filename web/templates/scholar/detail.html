@@ -26,11 +26,12 @@
                     <div class="scholar-depart half">手机： {{ teacher_basic_info["phone_number"] }}</div>
                     <div class="scholar-depart half">办公室电话： {{ teacher_basic_info["office_number"] }}</div>
                     <div class="scholar-tags">
+
                         <span>{{ teacher_basic_info["other_title"] }}</span>
                         {% if age != " " %}
                             <span>{{ age }}岁</span>
                         {% endif %}
-{#                        <span>某重点实验室主任</span>#}
+                        {#<span>某重点实验室主任</span>#}
 
                             {% for honor in teacher_basic_info["honor"] %}
                                 <span title="{{ honor['year'] }}获得">
@@ -40,6 +41,13 @@
 
                         <span>{{ teacher_basic_info["title"] }}</span>
                     </div>
+                    {% if teacher_basic_info["domain"] %}
+                        <div class="scholar-tags">
+                            {% for item in teacher_basic_info['domain'] %}
+                                <span>{{ item }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </fieldset>
