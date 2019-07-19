@@ -77,11 +77,11 @@
             </ul>
             <div class="tab-content">
                 <ul class="tab-pane fade in active show" id="project-list">
-                    <li>
-                        {% if "funds" in teacher_basic_info %}
-                            {% for fund in teacher_basic_info["funds"] %}
+                    {% if "funds" in teacher_basic_info %}
+                        {% for fund in teacher_basic_info["funds"] %}
+                            <li>
                                 <div class="d-inline">
-                                    <i class="glyphicon glyphicon-tasks"></i> {{ fund["title"] }}              </div>
+                                    <i class="glyphicon glyphicon-tasks"></i> {{ fund["title"] }}</div>
                                 <div class="d-inline">
                                     <span>{{ fund["belong"] }}</span>
                                     <span>资金：{{ fund["money"] }}万元</span>
@@ -89,14 +89,14 @@
                                     <span>{{ fund["year"] }}</span>
                                     <span>负责人：{{ fund["name"] }}</span><br>
                                 </div>
+                            </li>
                             {% endfor %}
                         {% endif %}
-                    </li>
                 </ul>
                 <ul class="tab-pane fade in" id="patent-list">
-                    <li>
-                        {% if "patent" in teacher_basic_info %}
-                            {% for patent in teacher_basic_info["patent"] %}
+                    {% if "patent" in teacher_basic_info %}
+                        {% for patent in teacher_basic_info["patent"] %}
+                            <li>
                                 <div class="d-inline">
                                     <i class="glyphicon glyphicon-hdd"></i> {{ patent["title"] }}
                                 </div>
@@ -105,13 +105,13 @@
                                     <span>{{ patent["date"]}}</span>
                                     <span>作者: {{ patent["author_list"] }}</span><br>
                                 </div>
-                            {% endfor %}
-                        {% endif %}
-                    </li>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
                 </ul>
                 <ul class="tab-pane fade in" id="paper-list">
                     <li>
-                        <div class="d-inline">
+                        <!-- <div class="d-inline">
                             <i class="glyphicon glyphicon-book"></i> 《基于因果发现的神经网络集成方法》
                         </div>
                         <div class="d-inline">
@@ -119,7 +119,7 @@
                             <span>发表自《软件学报》</span>
                             <span>引用次数：30</span>
                             <span>作者:  凌锦江 周志华</span>
-                        </div>
+                        </div> -->
                     </li>
                 </ul>
             </div>
