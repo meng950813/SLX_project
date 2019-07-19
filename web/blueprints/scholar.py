@@ -8,7 +8,6 @@ from web.blueprints.auth import login_required
 from web.utils.mongo_operator import MongoOperator
 from web.config import MongoDB_CONFIG
 from web.forms import ScholarForm
-from web.blueprints.school_agent import get_institutions_list
 from web.utils import redirect_back
 
 scholar_bp = Blueprint('scholar', __name__)
@@ -49,28 +48,12 @@ def scholar_info(teacher_id):
 @scholar_bp.route('/feedback', methods=['GET', 'POST'])
 @login_required
 def feedback():
-    form = ScholarForm()
 
     teacher_id = request.args.get('tid', type=int, default=None)
     # 当前类型 添加or修改 add modify
     cur_type = 'modify' if teacher_id else 'add'
-    # 传入数据库
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
-    cur_school = None
-    cur_institution = None
-
-    # 设置数据
-    if teacher_id:
-        result = mongo_operator.get_collection('basic_info').find_one({'id': teacher_id}, {'_id': 0})
-        form.set_data(result)
-        cur_school, cur_institution = result['school'], result['institution']
-    # 获取所有的学校
-    generator = mongo_operator.get_collection('school').find({}, {'_id': 0, 'name': 1})
-    cur_school = form.set_schools(generator, cur_school)
-    # 获取当前学校的所有院系
-    school = mongo_operator.get_collection('school'). \
-        find_one({'name': cur_school}, {'_id': 0, 'institutions': 1})
-    form.set_institutions(school['institutions'], cur_institution)
+    form = ScholarForm(teacher_id)
 
     if request.method == 'POST':
         # 出现错误，则交给flash

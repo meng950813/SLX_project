@@ -1,7 +1,10 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, \
-    SelectField, SelectMultipleField, IntegerField, DateTimeField
+    SelectField, SelectMultipleField, DateTimeField
 from wtforms.validators import DataRequired, Length, Email, Optional, EqualTo
+
+from web.utils.mongo_operator import MongoOperator
+from web.config import MongoDB_CONFIG
 
 
 class LoginForm(FlaskForm):
@@ -27,6 +30,24 @@ class ScholarForm(FlaskForm):
     email = StringField('邮箱：', validators=[Email(), Optional()])
     edu_exp = TextAreaField('教育经历：')
     submit = SubmitField('提交')
+
+    def __init__(self, teacher_id, *args, **kwargs):
+        super(ScholarForm, self).__init__(*args, **kwargs)
+        mongo_operator = MongoOperator(**MongoDB_CONFIG)
+        cur_school = None
+        cur_institution = None
+        # 设置数据
+        if teacher_id:
+            result = mongo_operator.get_collection('basic_info').find_one({'id': teacher_id}, {'_id': 0})
+            self.set_data(result)
+            cur_school, cur_institution = result['school'], result['institution']
+        # 获取所有的学校
+        generator = mongo_operator.get_collection('school').find({}, {'_id': 0, 'name': 1})
+        cur_school = self.set_schools(generator, cur_school)
+        # 获取当前学校的所有院系
+        school = mongo_operator.get_collection('school'). \
+            find_one({'name': cur_school}, {'_id': 0, 'institutions': 1})
+        self.set_institutions(school['institutions'], cur_institution)
 
     def set_data(self, datum):
         self.name.data = datum['name']
