@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, \
-    SelectField, SelectMultipleField, DateTimeField
+    SelectField, SelectMultipleField, DateTimeField, HiddenField
 from wtforms.validators import DataRequired, Length, Email, Optional, EqualTo
 
 from web.utils.mongo_operator import MongoOperator
@@ -16,8 +16,9 @@ class LoginForm(FlaskForm):
 
 class ScholarForm(FlaskForm):
     name = StringField('姓名：', validators=[DataRequired()])
-    gender = SelectField('性别：', choices=[('男', '男'), ('女', '女')], coerce=str)
+    gender = SelectField('性别：', choices=[('', '未知'), ('男', '男'), ('女', '女')], coerce=str)
     birth_year = StringField('出生年份', validators=[Optional()])
+    domain = HiddenField()
 
     school = SelectField('学校：', validators=[DataRequired()], coerce=str)
     institution = SelectField('学院：', validators=[DataRequired()], coerce=str)
@@ -59,9 +60,11 @@ class ScholarForm(FlaskForm):
         if 'department' in datum:
             self.department.data = datum['department']
 
-        self.title.data = datum['title']
+        self.title.data = datum['title'].strip()
         if 'honor' in datum:
             self.honor.data = datum['honor']
+        if 'domain' in datum:
+            self.domain.data = ';'.join(datum['domain'])
 
         self.email.data = datum['email'].strip()
         self.phone_number.data = datum['phone_number'].strip()
@@ -83,6 +86,11 @@ class ScholarForm(FlaskForm):
             'office_number': self.office_number.data,
             'edu_exp': self.edu_exp.data,
         }
+        if len(self.domain.data.strip()) == 0:
+            datum['domain'] = []
+        else:
+            datum['domain'] = self.domain.data.split(';')
+
         return datum
 
     def set_schools(self, schools, cur_school):

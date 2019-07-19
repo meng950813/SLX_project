@@ -65,7 +65,7 @@ def feedback():
         else:
             datum = form.get_data()
             datum.update({
-                'type': cur_type, 'status': 0, 'username': current_user.name,
+                'type': cur_type, 'status': 1, 'username': current_user.name,
                 'timestamp': datetime.datetime.utcnow(), 'teacher_id': teacher_id
             })
             # 写入数据库

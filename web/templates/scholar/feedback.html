@@ -8,7 +8,15 @@
 {% block styles %}
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.9/dist/css/bootstrap-select.min.css">
+
     <link rel="stylesheet" href="../../static/css/autocomplete.css">
+    <style>
+    .domain{
+        padding:1px 10px;
+        background: #e9e9e9;
+        display: inline-block;
+    }
+    </style>
 {% endblock %}
 
 {% block main %}
@@ -21,7 +29,7 @@
                     <h2 class="text-center">修改老师信息</h2>
                 {% endif %}
 
-                <form method="post" class="card-body bg-light">
+                <form method="post" class="card-body bg-light" id="teacher-info">
                     {{ form.hidden_tag() }}
                     <div class="form-row">
                         <div class="form-group col">
@@ -32,6 +40,12 @@
                         </div>
                         <div class="form-group col">
                             {{ render_field(form.birth_year, class="form-control", placeholder="出生年份") }}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-2">研究领域：</div>
+                        <div class="form-group col">
+                            <a href="#" onclick="addDomain($(this));" id="add-domain"><i class="mdui-icon material-icons">&#xe146;</i>添加</a>
                         </div>
                     </div>
                     <div class="form-row">
@@ -69,7 +83,7 @@
                             {{ render_field(form.edu_exp, class="form-control", placeholder="教育经历", rows="5") }}
                         </div>
                     </div>
-                    {{ form.submit(class="btn btn-primary") }}
+                    <input class="btn btn-primary" onclick="submitData();" type="button" value="提交">
                 </form>
             </div>
         </div>
