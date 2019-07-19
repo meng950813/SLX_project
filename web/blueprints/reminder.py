@@ -29,14 +29,14 @@ def info_reminder():
 
     # 把信息分为已读和未读
     for message in messages:
-        if message['state'] == 1:
+        if message['state'] == 0:
             checked_message.append(message)
         else:
             unchecked_message.append(message)
 
     # 标记未读的为已读
     collection = mongo_operator.get_collection("message")
-    collection.update_many({"to_id": uid}, {"$set": {"state": 1}})
+    collection.update_many({"to_id": uid}, {"$set": {"state": 0}})
 
     return render_template("info_reminder.html",
                            checked_message=checked_message, unchecked_message=unchecked_message)
