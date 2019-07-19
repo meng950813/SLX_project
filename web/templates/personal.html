@@ -18,7 +18,7 @@
             </select>
             <select id="select-institution" class="ml-3">
                 {% for institution in institutions %}
-                    <option data-times="{{ institution.visited }}">{{ institution.name }}</option>
+                    <option>{{ institution }}</option>
                 {% endfor %}
             </select>
             <button class="btn btn-default float-right" onclick="showTree()">行政关系</button>
@@ -35,7 +35,7 @@
     <script>
         {% if schools | length > 0 %}
             SCHOOL_NAME= "{{ schools[0] }}";
-            INSTITUTION_NAME = "{{ institutions[0].name }}";
+            INSTITUTION_NAME = "{{ institutions[0] }}";
             getInstitutionGraphData(SCHOOL_NAME, INSTITUTION_NAME)
         {% endif %}
 

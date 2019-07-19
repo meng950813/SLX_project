@@ -46,7 +46,7 @@ def index():
 
     if schools:
         # 仅仅获取第一个学校的学院数组
-        institutions = get_institutions_dict(schools[0])
+        institutions = get_institutions_list(schools[0])
 
         return render_template('personal.html', schools=schools, institutions=institutions)
     else:
@@ -57,33 +57,34 @@ def index():
 @login_required
 def change_school():
     school = request.args.get("school")
-    institutions = get_institutions_dict(school)
+    institutions = get_institutions_list(school)
     if institutions:
         return json.dumps(institutions)
     return json.dumps({"success": False, "message": "学校名有误"})
 
 
-@school_agent_bp.route('/change_institution', methods=["GET"])
+@school_agent_bp.route('/change_institution', methods=["GET", "PUT"])
 @login_required
 def change_institution():
     school = request.args.get("school")
     institution = request.args.get("institution")
-    visited = request.args.get("visited", type=int)
+    get_relation = request.args.get("relation")
+    
+    # 个人中心需要获取关系数据
+    if get_relation:
+        json_data = get_relations(school, institution, current_user.get("related_teacher"))
 
-    json_data = get_relations(school, institution, current_user.get("related_teacher"))
+        if json_data:
+            # 放在此处执行 + 1 操作是为了让无关系文件的学院靠后
+            # TODO 多线程执行访问数 +1
+            add_institution_click_time(school, institution)
+            
+            return json_data
+        else:
+            return json.dumps({"success": False, "message": "暂无当前学院的社交网络数据"})
 
-    try:
-        if visited:
-            # 该学院增加一次点击
-            MongoOperator(**MongoDB_CONFIG).get_collection("school").update_one({"name": school, "institutions.name": institution}, {"$set": {"institutions.$.visited": visited + 1}})
-    except Exception as e:
-        print("点击次数加一失败， visited=%s" % visited)
-        print(e)
-
-    if json_data:
-        return json_data
-    else:
-        return json.dumps({"success": False, "message": "暂无当前学院的社交网络数据"})
+    add_institution_click_time(school, institution)
+    return json.dumps({"success": True})
 
 
 def get_institutions_dict(school):
@@ -110,7 +111,6 @@ def get_institutions_list(school):
     :return: [xxx,xxx,xxx...] or False
     """
     institutions = get_institutions_dict(school)
-    print("00000000000000  ", institutions)
     # 取出学院名，转为list
     return [item["name"] for item in institutions]
 
@@ -321,6 +321,27 @@ def create_agent_relation_with_core_node(core_node):
         })
 
     return back
+
+
+def add_institution_click_time(school, institution):
+    """
+    更新指定学院的点击次数 +1
+    :param school: 学校名
+    :param institution: 学院名
+    :return:
+    """
+    try:
+        school_collection = MongoOperator(**MongoDB_CONFIG).get_collection("school")
+
+        # {'_id': ObjectId('xxx'), 'institutions': [{'visited': 2, 'name': '公共卫生学院'}]}
+        back = school_collection.find_one({"name": school, "institutions.name": institution}, {"institutions.$.visited":1})
+        visited = int(back['institutions'][0]["visited"]) + 1
+        # 该学院增加一次点击
+        school_collection.update_one(
+            {"name": school, "institutions.name": institution}, {"$set": {"institutions.$.visited": visited }})
+    except Exception as e:
+        print("点击次数加一失败， visited=%s")
+        print(e)
 
 
 if __name__ == '__main__':
