@@ -8,7 +8,6 @@ from web.blueprints.auth import login_required
 from web.utils.mongo_operator import MongoOperator
 from web.config import MongoDB_CONFIG
 from web.forms import ScholarForm
-from web.blueprints.school_agent import get_institutions_list
 from web.utils import redirect_back
 
 scholar_bp = Blueprint('scholar', __name__)
@@ -36,7 +35,8 @@ def scholar_info(teacher_id):
 
     # 计算教师年龄
     birth_year = teacher_basic_info["birth_year"]
-    if birth_year == " ":
+    # 如果存在birth_year字段且为空，则不计算age
+    if not birth_year or len(birth_year.strip()) == 0:
         age = " "
     else:
         year = datetime.datetime.now().year
@@ -48,21 +48,14 @@ def scholar_info(teacher_id):
 @scholar_bp.route('/feedback', methods=['GET', 'POST'])
 @login_required
 def feedback():
-    form = ScholarForm()
 
     teacher_id = request.args.get('tid', type=int, default=None)
-    # 当前类型 add modify
+    # 当前类型 添加or修改 add modify
     cur_type = 'modify' if teacher_id else 'add'
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    form = ScholarForm(teacher_id)
 
-    # if form.validate_on_submit():
-    if request.method == 'GET' and teacher_id:
-        # 传入数据库
-        mongo_operator = MongoOperator(**MongoDB_CONFIG)
-        result = mongo_operator.db['basic_info'].find_one({'id': teacher_id}, {'_id': 0})
-        # 设置数据
-        form.set_data(result)
-
-    elif request.method == 'POST':
+    if request.method == 'POST':
         # 出现错误，则交给flash
         if not form.validate():
             warning = []
@@ -71,13 +64,11 @@ def feedback():
             flash(','.join(warning), 'warning')
         else:
             datum = form.get_data()
-            datum['type'] = cur_type
-            datum['status'] = 0
-            datum['username'] = current_user.name
-            datum['timestamp'] = datetime.datetime.utcnow()
-            datum['teacher_id'] = teacher_id
+            datum.update({
+                'type': cur_type, 'status': 1, 'username': current_user.name,
+                'timestamp': datetime.datetime.utcnow(), 'teacher_id': teacher_id
+            })
             # 写入数据库
-            mongo_operator = MongoOperator(**MongoDB_CONFIG)
             result = mongo_operator.db['agent_feedback'].insert_one(datum)
             flash('操作成功，感谢您的反馈', 'success')
 
@@ -112,6 +103,7 @@ def search():
 @login_required
 def get_schools():
     """
+    TODO: 待删除 若zhang未使用，则删除此函数
     获取所有的学校的名称
     :return:
     """
@@ -134,9 +126,11 @@ def get_institutions(school):
     :param school:
     :return:
     """
-    results = get_institutions_list(school)
-    if results is False:
-        results = []
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # 获取当前学校的所有院系
+    condition = {'name': school}
+    school = mongo_operator.get_collection('school').find_one(condition, {'_id': 0, 'institutions': 1})
 
-    return json.dumps(results)
+    return json.dumps(school['institutions'])
+
 

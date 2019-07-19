@@ -33,7 +33,7 @@
 {#                        <span>某重点实验室主任</span>#}
 
                             {% for honor in teacher_basic_info["honor"] %}
-                                <span>
+                                <span title="{{ honor['year'] }}获得">
                                     {{ honor["type"] }}
                                 </span>
                             {% endfor %}
