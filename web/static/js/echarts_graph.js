@@ -257,7 +257,7 @@ function getInstitutions(school){
         data: {"school" : school},
         dataType: "json",
         success: function (response) {
-            console.log(response);
+            // console.log(response);
             if(response.success == false){
                 toggle_alert(false, "", response.message);
                 return;
@@ -286,12 +286,10 @@ function setInstitution(institution_list, school){
     }
     let options = "";
     for (let i = 0; i < institution_list.length; i++) {
-        // options += `<option>${institution_list[i]}</option>`;
-        options += `<option data-times="${institution_list[i].visited}">${institution_list[i].name}</option>`;
+        options += `<option>${institution_list[i]}</option>`;
     }
     $("#select-institution").html(options);
-    // getInstitutionGraphData(school, institution_list[0]);
-    getInstitutionGraphData(school, institution_list[0].name, institution_list[1].visited);
+    getInstitutionGraphData(school, institution_list[0]);
 }
 
 
@@ -299,16 +297,15 @@ function setInstitution(institution_list, school){
  * 根据学校名及学院名，获取学院内的关系数据
  * @param {String} school 
  * @param {String} institution 
- * @param {int} visited 被访问次数
  */
-function getInstitutionGraphData(school, institution, visited){
+function getInstitutionGraphData(school, institution){
     $.ajax({
         type: "get",
         url: "/change_institution",
-        data: {"school": school, "institution": institution, "visited": visited},
+        data: {"school": school, "institution": institution, "relation": true},
         dataType: "json",
         success: function (response) {
-            console.log(response);
+            // console.log(response);
             if(response.success == false){
                 toggle_alert(false, "", response.message);
                 return;

@@ -42,23 +42,24 @@ def new_visit_record():
         "user_id": uid,
         "status": 1,
     }
-    teacher_id = request.form.get("teacher_id")
-    # print(id)
-    if teacher_id is None:
-        print("-------------未插入")
-        return json.dumps({'success': False, 'record_id': str("")})
-
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
-    # 获取拜访记录集合
-    collection = mongo_operator.get_collection("visit_record")
-    print("-----------------已插入")
-    result = collection.insert_one(record)
-    record_id = result.inserted_id
+    try:
+        # back => dict or None
+        teacher_info = mongo_operator.get_collection("basic_info").find_one(
+                {"name": record['teacher'], "school": record['school'], "institution": record['institution']},
+                {"_id": 1, "id": 1}
+            )
+        if teacher_info is None:
+            return json.dumps({'success': False, "message": "教师不存在,请检查输入的信息"})
 
-    print("new visit record---------------------------")
-    print(teacher_id)
+        # 插入拜访记录
+        result = mongo_operator.get_collection("visit_record").insert_one(record)
 
-    return json.dumps({'success': True, 'record_id': str(record_id)})
+        return json.dumps({'success': True, 'record_id': str(result.inserted_id)})
+
+    except Exception as e:
+        print("插入新拜访记录出错，原因：%s" % e)
+        return json.dumps({'success': False, "message": "插入失败, 请确认数据是否正确"})
 
 
 @visit_record_bp.route('/visit_record/edit', methods=['POST'])
@@ -68,31 +69,26 @@ def edit_visit_record():
     修改拜访记录
     :return:
     """
-    print("---------------修改拜访记录-----------------")
     # 获取当前的id
     record_id = request.form.get('id')
     datum = {
-        'institution': request.form.get('institution'),
-        'school': request.form.get('school'),
         'content': request.form.get('content'),
         'date': request.form.get('date'),
-        'teacher': request.form.get('teacher'),
         'title': request.form.get('title'),
     }
+    try:
+        mongo_operator = MongoOperator(**MongoDB_CONFIG)
+        # 更新
+        condition = {"_id": ObjectId(record_id)}
+        result = mongo_operator.db['visit_record'].update_one(condition, {"$set":  datum})
 
-    teacher_id = request.form.get("teacher_id")
-    # print(id)
-    print("teacher_id", teacher_id)
-    print(type(teacher_id))
-    if teacher_id is None or teacher_id is '':
-        print("-------------未修改")
-        return json.dumps({'success': False})
-    mongo_operator = MongoOperator(**MongoDB_CONFIG)
-    # 更新
-    condition = {"_id": ObjectId(record_id)}
-    result = mongo_operator.db['visit_record'].update_one(condition, {"$set":  datum})
-    print("--------已修改")
-    return json.dumps({'success': True})
+        if result.matched_count > 0:
+            return json.dumps({'success': True})
+        else:
+            return json.dumps({"success": False, "message": "修改失败，请稍后再试"})
+    except Exception as e:
+        print("修改拜访记录出错，原因：%s" % e)
+        return json.dumps({'success': False, "message": "修改失败"})
 
 
 @visit_record_bp.route('/visit_record/delete', methods=['POST'])
@@ -103,15 +99,22 @@ def delete_visit_record():
     :return:
     """
     # 获取当前的id
-    print("----------------------------准备删除拜访记录-------------------------")
     record_id = request.form.get('id')
-    csrf_token = request.form.get('csrf_token')
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
     # 设置条件
-    condition = {"_id": ObjectId(record_id)}
-    mongo_operator.db['visit_record'].update_one(condition, {"$set":  {"status": 0}})
+    try:
+        condition = {"_id": ObjectId(record_id)}
+        result = mongo_operator.db['visit_record'].update_one(condition, {"$set":  {"status": 0}})
+        if result.matched_count > 0:
+            return json.dumps({'success': True})
+        else:
+            return json.dumps({'success': False, "message": "删除失败"})
 
-    return json.dumps({"success": True})
+    except Exception as e:
+        print("删除拜访记录失败，原因：%s" % e)
+        return json.dumps({'success': False, "message": "删除失败"})
+
+
 
 
 

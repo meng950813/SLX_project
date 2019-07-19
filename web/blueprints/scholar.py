@@ -150,7 +150,7 @@ def get_teacher_id():
     :return:
     """
     print("----------获取教师id------------------")
-    uid = session['uid']
+    uid = current_user.id
     school = request.form.get("school")
     institution = request.form.get("institution")
     teacher = request.form.get("teacher")
