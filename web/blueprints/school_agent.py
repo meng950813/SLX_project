@@ -110,6 +110,7 @@ def get_institutions_list(school):
     :return: [xxx,xxx,xxx...] or False
     """
     institutions = get_institutions_dict(school)
+    print("00000000000000  ", institutions)
     # 取出学院名，转为list
     return [item["name"] for item in institutions]
 

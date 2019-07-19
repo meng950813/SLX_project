@@ -70,6 +70,7 @@ def register_template_context(app):
     def make_template_context():
         # 如果登录，则尝试拉取未读信息
         unread_msg = 0
+
         if current_user.is_authenticated:
             uid = current_user.id
             mongo_operator = MongoOperator(**MongoDB_CONFIG)
