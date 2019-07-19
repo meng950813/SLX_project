@@ -10,7 +10,7 @@
         <title>{% block title %}Base-Template{% endblock %}</title>
         <link href="https://cdn.bootcss.com/mdui/0.4.2/css/mdui.min.css" rel="stylesheet">
         <!-- Bootstrap -->
-        <link rel="stylesheet" href="../static/css/bootstrap_v4.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap_v4.min.css') }}">
 
         <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
         {% block styles %}{% endblock %}
@@ -41,7 +41,8 @@
             background: white;
         }
         </style>
-        <link rel="icon" type="image/x-icon" href="../static/images/favicon.ico">
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+        
     {% endblock %}
 </head>
 <body>
@@ -169,7 +170,7 @@ function toggle_alert(isSuccess, modal, message = ""){
 }
 </script>
 {% block scripts %}
-    <script src="../static/js/bootstrap_v4.min.js"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap_v4.min.js') }}"></script>
 {% endblock %}
 </body>
 </html>

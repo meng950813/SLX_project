@@ -26,7 +26,7 @@ def schedule():
     # 选定集合
     schedule_col = mongo_operator.get_collection("schedule")
     # 找到对应的user ,根据提醒日期对日程进行降序排序
-    schedule_list = schedule_col.find({"user_id": user_id, "status": 0}).sort([("remind_date", 1)])
+    schedule_list = schedule_col.find({"user_id": user_id, "status": 1}).sort([("remind_date", 1)])
 
     # print(schedule_list)
 
@@ -50,7 +50,7 @@ def edit_schedule():
         # 详细内容
         "content": request.form.get("content"),
         "remind_date": request.form.get('date'),
-        # 标识当前日程的状态: 0 => 未处理; 1 => 已完成; -1 => 已舍弃
+        # 标识当前日程的状态: 0 => 已完成; 1 => 未处理; -1 => 已舍弃
         "status": 0
     }
 
@@ -110,13 +110,13 @@ def set_whether_completed_or_canceled(schedule_id, status):
     """
     设置该用户下的该计划是否完成或取消
     :param schedule_id:
-    :param status: ==0 表示未完成， ==1 表示已完成 ==-1表示该计划已经取消
+    :param status: ==0 表示已完成， ==1 表示未完成 ==-1表示该计划已经取消
     :return: 返回true表示修改成功，否则失败
     """
 
     schedule_col = MongoOperator(**MongoDB_CONFIG).get_collection("schedule")
 
-    status = 1 if status == 1 else -1
+    status = 0 if status == 0 else -1
 
     try:
         # 更新schedule_list
