@@ -47,13 +47,16 @@ def new_visit_record():
         # back => dict or None
         teacher_info = mongo_operator.get_collection("basic_info").find_one(
                 {"name": record['teacher'], "school": record['school'], "institution": record['institution']},
-                {"_id": 1, "id": 1}
+                {"_id": 1, "id": 1, "name": 1}
             )
         if teacher_info is None:
             return json.dumps({'success': False, "message": "教师不存在,请检查输入的信息"})
 
         # 插入拜访记录
         result = mongo_operator.get_collection("visit_record").insert_one(record)
+        
+        # TODO 插入用户与教师的关系
+        upsert_relation_of_visited(uid, teacher_info['id'], teacher_info['name'])
 
         return json.dumps({'success': True, 'record_id': str(result.inserted_id)})
 
@@ -115,8 +118,36 @@ def delete_visit_record():
         return json.dumps({'success': False, "message": "删除失败"})
 
 
+def upsert_relation_of_visited(user_id, teacher_id, teacher_name):
+    """
+    添加拜访信息到 user 表中
+    :param user_id:
+    :param teacher_id:
+    :param teacher_name:
+    :return:
+    """
+    collection_user = MongoOperator(**MongoDB_CONFIG).get_collection("user")
+    try:
+        # back => None or dict{"_id":ObjectId("xxx"), "related_teacher":[{id:xx, name, visited_count:12, acitve_count: 123}]}
+        visited_record = collection_user.find_one({"id": user_id, "related_teacher.id": teacher_id}, {"related_teacher.$": 1})
+
+        if visited_record:
+            info = visited_record['related_teacher'][0]
+            count = int(info['visited_count'] + 1)
+            collection_user.update_one({"_id": visited_record["_id"], "related_teacher.id": teacher_id},
+                                       {"$set": {"related_teacher.$.visited_count": count}})
+        else:
+            insert_data = {
+                "id": teacher_id,
+                "name": teacher_name,
+                "visited_count": int(1),
+                "acitve_count": int(0)
+            }
+            collection_user.update_one({"id": user_id}, {"$set": {"related_teacher": [insert_data]}})
+
+    except Exception as e:
+        print("更新关系失败, 原因：%s" % e)
 
 
-
-
-
+if __name__ == '__main__':
+    upsert_relation_of_visited(100003, 135495, "张三")

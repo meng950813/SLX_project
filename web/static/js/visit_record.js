@@ -219,7 +219,7 @@ function saveVisitedRecord(e){
     if(!content) return toggle_alert(false, "", "拜访内容不能为空");
     
     let csrf_token = $('#csrf_token').val();
-    data = {
+    send_data = {
         date: date,
         content: content,
         title: title,
@@ -229,7 +229,7 @@ function saveVisitedRecord(e){
     let url = '';
     //回写
     if (isModifying){
-        data["id"] = identifier;
+        send_data["id"] = identifier;
         url = '/visit_record/edit';
     }else{
         let teacher = $('#teacher').val().trim();
@@ -238,31 +238,32 @@ function saveVisitedRecord(e){
         url = '/visit_record/new';
         cur_school = $('#select-college').children("option:selected").text();
         cur_institution = $('#select-institution').children("option:selected").text();
-        data["school"] = cur_school;
-        data["institution"] = cur_institution;
-        data['teacher'] = teacher;
+        send_data["school"] = cur_school;
+        send_data["institution"] = cur_institution;
+        send_data['teacher'] = teacher;
     }
 
     //发送事件
     $.ajax({
         url: url,
         type: 'POST',
-        data: data,
+        data: send_data,
         dataType: 'json'
-    }).done(function (data) {
+    }).done(function (response) {
         //新的拜访记录添加成功
-        if (!data.success){
-            return toggle_alert(false, "exampleModal", data.message);
+        if (!response.success){
+            return toggle_alert(false, "exampleModal", response.message);
         }
         //显示新修改的记录
         if (!isModifying){
             let total = parseInt($('#total').text()) + 1;
             let insert_html =
-                `<tr><td>${total}</td><td>${date}</td><td><a>${title}</a></td><td>${school}</td> <td>${institution}</td> <td>${teacher}</td> 
-                <td class="operation" data-id="${data.record_id}">
+                `<tr><td>${total}</td><td>${send_data.date}</td><td><a>${send_data.title}</a></td><td>${send_data.school}</td>
+                <td>${send_data.institution}</td> <td>${send_data.teacher}</td> 
+                <td class="operation" data-id="${send_data.record_id}">
                     <button class="btn btn-info btn-modify">修改</button>
                     <button class="btn btn-danger btn-delete">删除</button>
-                    <input type="hidden" id="detail" value="${content}">
+                    <input type="hidden" id="detail" value="${send_data.content}">
                 </td></tr>`;
             let $tr=$("#tab tr").eq(-2);
             $tr.after(insert_html);
@@ -274,11 +275,11 @@ function saveVisitedRecord(e){
         else{
             if(isModifying){
                 if(tds != null){
-                    tds[1].innerHTML = $("#date").val();
-                    tds[2].innerHTML = $("#title").val();
+                    tds[1].innerHTML = send_data.date;
+                    tds[2].innerHTML = send_data.title;
                 }
                 
-                $("#detail").val(content);
+                $("#detail").val(send_data.content);
             }
             toggle_alert(true, "exampleModal", "修改成功");
         }
