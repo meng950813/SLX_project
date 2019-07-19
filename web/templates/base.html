@@ -30,6 +30,15 @@
         body{
             background: #f6f6f6;
         }
+        #inputGroup-sizing-sm{
+            padding: 0;
+            border: none;
+            cursor: pointer;
+        }
+        #inputGroup-sizing-sm .input-group-text{
+            border-right: none;
+            background: white;
+        }
         </style>
         <link rel="icon" type="image/x-icon" href="../static/images/favicon.ico">
     {% endblock %}
@@ -54,12 +63,15 @@
                 <form class="form-inline" method="get" action="{{ url_for('scholar.search') }}">
                     <div class="input-group input-group-sm">
                         <input type="text" class="form-control" name="teacher-name" placeholder="Search for experts..."
-                               aria-label="Small" aria-describedby="inputGroup-sizing-sm">
-                        <span class="input-group-btn">
-                            <button class="btn btn-default" type="submit">
+                               aria-label="Small" aria-describedby="inputGroup-sizing-sm" style="border-right: none">
+                               
+                        <!-- <span class="input-group-btn"> -->
+                        <button class="input-group-append" type="submit" id="inputGroup-sizing-sm">
+                            <span class="input-group-text">
                                 <i class="mdui-icon material-icons">&#xe8b6;</i>
-                            </button>
-                        </span>
+                            </span> 
+                        </button>
+                        <!-- </span> -->
                     </div><!-- /input-group -->
                 </form>
                 <li>
