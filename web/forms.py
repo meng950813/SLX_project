@@ -12,8 +12,8 @@ class LoginForm(FlaskForm):
 
 
 class ScholarForm(FlaskForm):
-    school = StringField('学校：', validators=[DataRequired()])
-    institution = StringField('学院：', validators=[DataRequired()])
+    school = SelectField('学校：', validators=[DataRequired()], coerce=str)
+    institution = SelectField('学院：', validators=[DataRequired()], coerce=str)
     name = StringField('姓名：', validators=[DataRequired()])
     birth_year = IntegerField('出生年份', validators=[Optional()])
     title = SelectField('头衔：', choices=[('', '未知'), ('教授', '教授'), ('副教授', '副教授'), ('讲师', '讲师'), ('助教', '助教')], default='', coerce=str)
@@ -28,7 +28,8 @@ class ScholarForm(FlaskForm):
         self.name.data = datum['name']
         self.school.data = datum['school']
         self.institution.data = datum['institution']
-        self.birth_year.data = datum['birth_year'].strip()
+        if 'birth_year' in datum and datum['birth_year']:
+            self.birth_year.data = datum['birth_year'].strip()
         self.title.data = datum['title']
         if 'honor' in datum:
             self.honor.data = datum['honor']
@@ -52,6 +53,16 @@ class ScholarForm(FlaskForm):
             'edu_exp': self.edu_exp.data,
         }
         return datum
+
+    def set_schools(self, schools, cur_school):
+        self.school.choices = [(school['name'], school['name']) for school in schools]
+        if cur_school:
+            self.school.default = cur_school
+
+    def set_institutions(self, institutions, cur_institution):
+        self.institution.choices = [(institution['name'], institution['name']) for institution in institutions]
+        if cur_institution:
+            self.institution.default = cur_institution
 
 
 class ForgetPasswordForm(FlaskForm):

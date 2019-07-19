@@ -36,7 +36,8 @@ def scholar_info(teacher_id):
 
     # 计算教师年龄
     birth_year = teacher_basic_info["birth_year"]
-    if birth_year == " ":
+    # 如果存在birth_year字段且为空，则不计算age
+    if not birth_year or len(birth_year.strip()) == 0:
         age = " "
     else:
         year = datetime.datetime.now().year
@@ -51,16 +52,26 @@ def feedback():
     form = ScholarForm()
 
     teacher_id = request.args.get('tid', type=int, default=None)
-    # 当前类型 add modify
+    # 当前类型 添加or修改 add modify
     cur_type = 'modify' if teacher_id else 'add'
 
-    # if form.validate_on_submit():
-    if request.method == 'GET' and teacher_id:
+    if request.method == 'GET':
         # 传入数据库
         mongo_operator = MongoOperator(**MongoDB_CONFIG)
-        result = mongo_operator.db['basic_info'].find_one({'id': teacher_id}, {'_id': 0})
-        # 设置数据
-        form.set_data(result)
+        cur_school = None
+        cur_institution = None
+        if teacher_id:
+            result = mongo_operator.get_collection('basic_info').find_one({'id': teacher_id}, {'_id': 0})
+            # 设置数据
+            form.set_data(result)
+            cur_school, cur_institution = result['school'], result['institution']
+            # 获取所有的学校
+            generator = mongo_operator.get_collection('school').find({}, {'_id': 0, 'name': 1})
+            form.set_schools(generator, cur_school)
+        # 获取当前学校的所有院系
+        school = mongo_operator.get_collection('school').\
+            find_one({'name': cur_school}, {'_id': 0, 'institutions': 1})
+        form.set_institutions(school['institutions'], cur_institution)
 
     elif request.method == 'POST':
         # 出现错误，则交给flash
@@ -71,11 +82,10 @@ def feedback():
             flash(','.join(warning), 'warning')
         else:
             datum = form.get_data()
-            datum['type'] = cur_type
-            datum['status'] = 0
-            datum['username'] = current_user.name
-            datum['timestamp'] = datetime.datetime.utcnow()
-            datum['teacher_id'] = teacher_id
+            datum.update({
+                'type': cur_type, 'status': 0, 'username': current_user.name,
+                'timestamp': datetime.datetime.utcnow(), 'teacher_id': teacher_id
+            })
             # 写入数据库
             mongo_operator = MongoOperator(**MongoDB_CONFIG)
             result = mongo_operator.db['agent_feedback'].insert_one(datum)
@@ -112,6 +122,7 @@ def search():
 @login_required
 def get_schools():
     """
+    TODO: 待删除 若zhang未使用，则删除此函数
     获取所有的学校的名称
     :return:
     """
@@ -134,84 +145,11 @@ def get_institutions(school):
     :param school:
     :return:
     """
-    results = get_institutions_list(school)
-    if results is False:
-        results = []
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    # 获取当前学校的所有院系
+    condition = {'name': school}
+    school = mongo_operator.get_collection('school').find_one(condition, {'_id': 0, 'institutions': 1})
 
-    return json.dumps(results)
+    return json.dumps(school['institutions'])
 
-
-@scholar_bp.route('/get_teacher_id', methods=['POST'])
-@login_required
-def get_teacher_id():
-    """
-    根据教师的学校，学院，名字获取其id
-    :param teacher_id:
-    :return:
-    """
-    print("----------获取教师id------------------")
-    uid = session['uid']
-    school = request.form.get("school")
-    institution = request.form.get("institution")
-    teacher = request.form.get("teacher")
-
-    print("teacher   ", teacher)
-
-    mongo = MongoOperator(**MongoDB_CONFIG)
-    basic_info_col = mongo.get_collection("basic_info")
-    outcome = basic_info_col.find_one({"name": teacher, "school": school, "institution": institution})
-
-    if outcome == None:
-        print("---------未找到此人")
-        return json.dumps({"success": False, "teacher_id": None})
-    else:
-        print(outcome)
-        teacher_id = outcome["id"]
-
-        print('--'*50, uid)
-        print('--'*50, school, institution, teacher)
-        print(teacher_id)
-        # 将用户和教师新增的关系入库
-        add_relation(teacher_id, uid)
-
-    return json.dumps({"success": True, "teacher_id": teacher_id})
-
-
-def add_relation(teacher_id, uid):
-    """
-    将新建的拜访记录的用户与教师的关系存入数据库
-    :param teacher_id:
-    :param uid:
-    :return:
-    """
-    print("-----------------------add_relation-------------------------------")
-    print(teacher_id)
-    mongo = MongoOperator(**MongoDB_CONFIG)
-    # 获取教师基本信息集合
-    basic_info_col = mongo.get_collection("basic_info")
-    # 获取用户的集合
-    user_col = mongo.get_collection("user")
-    # 获取对应用户的文档
-    user_doc = user_col.find_one({"id": uid, "related_teacher": {"$elemMatch": {"id": teacher_id}}}, {"related_teacher": 1, "_id": 0})
-    if user_doc is None:
-        # print("---")
-        user_doc = user_col.find_one({"id": uid}, {"related_teacher": 1, "_id": 0})
-        name = basic_info_col.find_one({"id": teacher_id}, {"name": 1, "_id": 0})["name"]
-        teacher_list = user_doc["related_teacher"]
-        teacher_list.append({
-            "id": teacher_id,
-            "name": name,
-            "weight": 1
-        })
-        user_col.update({"id": uid}, {"$set": {"related_teacher": teacher_list}})
-
-    else:
-        for d in user_doc["related_teacher"]:
-            if d["id"] == teacher_id:
-                w = d["weight"]
-                d["weight"] = w+1
-                break
-        user_col.update({"id": uid}, {"$set": {"related_teacher": user_doc["related_teacher"]}})
-
-    # print(user_col.find_one({"id": uid, "related_teacher": {"$elemMatch": {"id": teacher_id}}}, {"related_teacher": 1, "_id": 0}))
 
