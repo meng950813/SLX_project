@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% from 'bootstrap/form.html' import render_field %}
 
 {% block title %}
     专家信息
@@ -13,58 +14,59 @@
 {% block main %}
     <div class="container">
         <div class="row" style="padding-top: 30px;">
-            <div class="col-md-6 offset-3">
+            <div class="col-md-8 offset-2">
                 {% if cur_type == 'add' %}
                     <h2 class="text-center">添加老师</h2>
                 {% else %}
                     <h2 class="text-center">修改老师信息</h2>
                 {% endif %}
 
-                <form method="post">
+                <form method="post" class="card-body bg-light">
                     {{ form.hidden_tag() }}
-                    <p class="h5">基本信息<span style="color:red;">*</span>:</p>
                     <div class="form-row">
-                        <div class="col">
-                            {{ form.name(class="form-control", placeholder="姓名") }}
+                        <div class="form-group col">
+                            {{ render_field(form.name, class="form-control", placeholder="姓名") }}
                         </div>
-                        <div class="col">
-                            {{ form.school(class="form-control", placeholder="学校") }}
+                        <div class="form-group col">
+                            {{ render_field(form.gender, class="form-control") }}
                         </div>
-                        <div class="col">
-                            {{ form.institution(class="form-control", placeholder="院系") }}
+                        <div class="form-group col">
+                            {{ render_field(form.birth_year, class="form-control", placeholder="出生年份") }}
                         </div>
                     </div>
-                    <p class="h5">出生年份：</p>
                     <div class="form-row">
-                        <div class="col">
-                            {{ form.birth_year(class="form-control", placeholder="出生年份") }}
+                        <div class="form-group col">
+                            {{ render_field(form.school, class="form-control") }}
+                        </div>
+                        <div class="form-group col">
+                            {{ render_field(form.institution, class="form-control") }}
+                        </div>
+                        <div class="form-group col">
+                            {{ render_field(form.department, class="form-control", placeholder="系") }}
                         </div>
                     </div>
-                    <p class="h5">职称 & 荣誉：</p>
                     <div class="form-row">
-                        <div class="col">
-                            {{ form.title(class="selectpicker form-control") }}
+                        <div class="form-group col">
+                            {{ render_field(form.title, class="selectpicker form-control") }}
                         </div>
-                        <div class="col">
-                            {{ form.honor(class="selectpicker form-control") }}
+                        <div class="form-group col">
+                            {{ render_field(form.honor, class="selectpicker form-control") }}
                         </div>
                     </div>
-                    <p class="h5">联系方式：</p>
                     <div class="form-row">
-                        <div class="col">
-                            {{ form.email(class="form-control", placeholder="邮箱") }}
+                        <div class="form-group col">
+                            {{ render_field(form.email, class="form-control", placeholder="邮箱") }}
                         </div>
-                        <div class="col">
-                            {{ form.phone_number(class="form-control", placeholder="手机号") }}
+                        <div class="form-group col">
+                            {{ render_field(form.phone_number, class="form-control", placeholder="手机号") }}
                         </div>
-                        <div class="col">
-                            {{ form.office_number(class="form-control", placeholder="办公电话") }}
+                        <div class="form-group col">
+                            {{ render_field(form.office_number, class="form-control", placeholder="办公电话") }}
                         </div>
                     </div>
-                    <p class="h5">教育经历：</p>
                     <div class="form-row">
-                        <div class="col">
-                            {{ form.edu_exp(class="form-control", placeholder="教育经历", rows="5") }}
+                        <div class="form-group col">
+                            {{ render_field(form.edu_exp, class="form-control", placeholder="教育经历", rows="5") }}
                         </div>
                     </div>
                     {{ form.submit(class="btn btn-primary") }}

@@ -54,26 +54,25 @@ def feedback():
     teacher_id = request.args.get('tid', type=int, default=None)
     # 当前类型 添加or修改 add modify
     cur_type = 'modify' if teacher_id else 'add'
+    # 传入数据库
+    mongo_operator = MongoOperator(**MongoDB_CONFIG)
+    cur_school = None
+    cur_institution = None
 
-    if request.method == 'GET':
-        # 传入数据库
-        mongo_operator = MongoOperator(**MongoDB_CONFIG)
-        cur_school = None
-        cur_institution = None
-        if teacher_id:
-            result = mongo_operator.get_collection('basic_info').find_one({'id': teacher_id}, {'_id': 0})
-            # 设置数据
-            form.set_data(result)
-            cur_school, cur_institution = result['school'], result['institution']
-            # 获取所有的学校
-            generator = mongo_operator.get_collection('school').find({}, {'_id': 0, 'name': 1})
-            form.set_schools(generator, cur_school)
-        # 获取当前学校的所有院系
-        school = mongo_operator.get_collection('school').\
-            find_one({'name': cur_school}, {'_id': 0, 'institutions': 1})
-        form.set_institutions(school['institutions'], cur_institution)
+    # 设置数据
+    if teacher_id:
+        result = mongo_operator.get_collection('basic_info').find_one({'id': teacher_id}, {'_id': 0})
+        form.set_data(result)
+        cur_school, cur_institution = result['school'], result['institution']
+    # 获取所有的学校
+    generator = mongo_operator.get_collection('school').find({}, {'_id': 0, 'name': 1})
+    cur_school = form.set_schools(generator, cur_school)
+    # 获取当前学校的所有院系
+    school = mongo_operator.get_collection('school'). \
+        find_one({'name': cur_school}, {'_id': 0, 'institutions': 1})
+    form.set_institutions(school['institutions'], cur_institution)
 
-    elif request.method == 'POST':
+    if request.method == 'POST':
         # 出现错误，则交给flash
         if not form.validate():
             warning = []
@@ -87,7 +86,6 @@ def feedback():
                 'timestamp': datetime.datetime.utcnow(), 'teacher_id': teacher_id
             })
             # 写入数据库
-            mongo_operator = MongoOperator(**MongoDB_CONFIG)
             result = mongo_operator.db['agent_feedback'].insert_one(datum)
             flash('操作成功，感谢您的反馈', 'success')
 
