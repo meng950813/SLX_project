@@ -1,3 +1,8 @@
+"""
+author: xiaoniu
+date: 2019-07-22
+desc: 用作flask-wtf的表单类型
+"""
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, \
     SelectField, SelectMultipleField, DateTimeField, HiddenField
@@ -8,6 +13,9 @@ from web.config import MongoDB_CONFIG
 
 
 class LoginForm(FlaskForm):
+    """
+    登录表单
+    """
     username = StringField('用户名', validators=[DataRequired(), Length(1, 20)])
     password = PasswordField('密码', validators=[DataRequired(), Length(1, 128, message='密码最少为8位')])
     remember = BooleanField('七天免登陆')
@@ -15,6 +23,9 @@ class LoginForm(FlaskForm):
 
 
 class ScholarForm(FlaskForm):
+    """
+    老师个人信息表单
+    """
     name = StringField('姓名：', validators=[DataRequired()])
     gender = SelectField('性别：', choices=[('', '未知'), ('男', '男'), ('女', '女')], coerce=str)
     birth_year = StringField('出生年份', validators=[Optional()])
@@ -110,11 +121,17 @@ class ScholarForm(FlaskForm):
 
 
 class ForgetPasswordForm(FlaskForm):
+    """
+    忘记密码表单
+    """
     email = StringField('', validators=[DataRequired(), Length(1, 254), Email()])
     submit = SubmitField('下一步')
 
 
 class ResetPasswordForm(FlaskForm):
+    """
+    重置密码表单
+    """
     email = StringField('邮箱', validators=[DataRequired(), Length(1, 254), Email()])
     password = PasswordField('密码', validators=[
         DataRequired(), Length(8, 128), EqualTo('password2')])
@@ -123,7 +140,46 @@ class ResetPasswordForm(FlaskForm):
 
 
 class ActivityForm(FlaskForm):
+    """
+    活动表单
+    """
     title = StringField('活动名：', validators=[DataRequired()])
     location = StringField('活动地点：', validators=[DataRequired()])
     date = DateTimeField('日期：')
     content = TextAreaField('内容：')
+
+
+class ProjectForm(FlaskForm):
+    """
+    项目表单
+    """
+    number = StringField('项目编号', validators=[DataRequired()])
+    name = StringField('项目名称', validators=[DataRequired()])
+    project_type = SelectField('项目类型', choices=[('省（部）级鉴定', '省（部）级鉴定'),
+                                                ('授权发明专利', '授权发明专利'), ('国外技术', '国外技术'),
+                                                ('其他', '其他')], default='省（部）级鉴定', coerce=str)
+    fund = StringField('项目资金', validators=[DataRequired()])
+    start_time = DateTimeField('起止时间')
+    end_time = DateTimeField('截至时间')
+    members = HiddenField()
+
+    school = SelectField('', validators=[DataRequired()], coerce=str)
+    institution = SelectField('', validators=[DataRequired()], coerce=str)
+    person = StringField('负责人', validators=[DataRequired()])
+
+    company = StringField('支撑单位')
+    content = TextAreaField('项目简介')
+    submit = SubmitField('提交')
+
+    def __init__(self, *args, **kwargs):
+        super(ProjectForm, self).__init__(*args, **kwargs)
+        mongo_operator = MongoOperator(**MongoDB_CONFIG)
+        # 获取所有的学校
+        generator = mongo_operator.get_collection('school').find({}, {'_id': 0, 'name': 1})
+        self.school.choices = [(school['name'], school['name']) for school in generator]
+        cur_school = self.school.choices[0][0]
+        # 获取当前学校的所有院系
+        school = mongo_operator.get_collection('school'). \
+            find_one({'name': cur_school}, {'_id': 0, 'institutions': 1})
+        self.institution.choices = [(result['name'], result['name']) for result in school['institutions']]
+

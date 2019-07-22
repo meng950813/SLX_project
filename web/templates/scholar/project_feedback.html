@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/form.html' import render_field %}
+
+{% block title %}
+    项目
+{% endblock %}
+
+{% block styles %}
+    <style>
+    .member{
+        padding:1px 10px;
+        background: #e9e9e9;
+        display: inline-block;
+    }
+    </style>
+{% endblock %}
+
+{% block main %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1 class="text-center">项目简介</h1>
+        </div>
+    </div>
+    <form>
+        {{ form.hidden_tag() }}
+        <div class="form-group row">
+            {{ form.number.label(class="col-sm-1 offset-2 col-form-label") }}
+            <div class="col-sm-7">
+                {{ form.number(class="form-control") }}
+            </div>
+        </div>
+        <div class="form-group row">
+            {{ form.name.label(class="col-sm-1 offset-2 col-form-label") }}
+            <div class="col-sm-7">
+                {{ form.name(class="form-control") }}
+            </div>
+        </div>
+        <div class="form-group row">
+            {{ form.project_type.label(class="col-sm-1 offset-2 col-form-label") }}
+            <div class="col-sm-7">
+                {{ form.project_type(class="form-control") }}
+            </div>
+        </div>
+        <div class="form-group row">
+            {{ form.fund.label(class="col-sm-1 offset-2 col-form-label") }}
+            <div class="col-sm-7">
+                {{ form.fund(class="form-control", placeholder="万元") }}
+            </div>
+        </div>
+        <div class="form-group row">
+            {{ form.start_time.label(class="col-sm-1 offset-2 col-form-label") }}
+            <div class="col-sm-3">
+                {{ form.start_time(class="form-control", type="date") }}
+            </div>
+            <div class="col-sm-1 text-center">到</div>
+            <div class="col-sm-3">
+                {{ form.end_time(class="form-control", type="date") }}
+            </div>
+        </div>
+        <div class="form-group row">
+            {{ form.person.label(class="col-sm-1 offset-2 col-form-label") }}
+            <div class="col" id="leader">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-1 offset-2 col-form-label">其他成员</label>
+            <div class="col" id="people">
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-2 offset-3">
+                {{ form.school(class="form-control") }}
+            </div>
+            <div class="col-sm-2">
+                {{ form.institution(class="form-control") }}
+            </div>
+            <div class="col-sm-2">
+                {{ form.person(class="form-control", placeholder="请输入名字") }}
+            </div>
+            <div class="col-sm-1">
+                <a href="#" id="add-domain" onclick="addDomain();"><i class="mdui-icon material-icons">&#xe146;</i>添加</a>
+            </div>
+        </div>
+        <div class="form-group row">
+            {{ form.company.label(class="col-sm-1 offset-2 col-form-label") }}
+            <div class="col-sm-7">
+                {{ form.company(class="form-control") }}
+            </div>
+        </div>
+        <div class="form-group row">
+            {{ form.content.label(class="col-sm-1 offset-2 col-form-label") }}
+            <div class="col-sm-7">
+                {{ form.content(class="form-control", rows="5") }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-2 offset-5">
+                {{ form.submit(class="btn btn-primary btn-block") }}
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/project_feedback.js') }}"></script>
+{% endblock %}

@@ -7,7 +7,7 @@ import json
 from web.blueprints.auth import login_required
 from web.utils.mongo_operator import MongoOperator
 from web.config import MongoDB_CONFIG
-from web.forms import ScholarForm
+from web.forms import ScholarForm, ProjectForm
 from web.utils import redirect_back
 
 scholar_bp = Blueprint('scholar', __name__)
@@ -26,12 +26,11 @@ def scholar_info(teacher_id):
     # 当老师id不存在时，直接报404
     if teacher_basic_info is None:
         return abort(404)
-    length = [0, 0]
 
+    length = [0, 0]
     # 计算该教师所拥有的基金的数目，并将其加到列表中，用以传送给前端
     if "funds" in teacher_basic_info:
         length[0] = len(teacher_basic_info["funds"])
-
     # 计算该教师所拥有的专利
     if "patent" in teacher_basic_info:
         length[1] = len(teacher_basic_info["patent"])
@@ -107,25 +106,6 @@ def search():
     return render_template('scholar/search.html', teachers=teachers, teacher_name=teacher_name)
 
 
-@scholar_bp.route('/get_schools', methods=['GET'])
-@login_required
-def get_schools():
-    """
-    TODO: 待删除 若zhang未使用，则删除此函数
-    获取所有的学校的名称
-    :return:
-    """
-    mongo_operator = MongoOperator(**MongoDB_CONFIG)
-    scope = {'_id': 0, 'name': 1}
-    generator = mongo_operator.get_collection('school').find({}, scope)
-
-    schools = []
-    for school in generator:
-        schools.append(school['name'])
-
-    return json.dumps(schools)
-
-
 @scholar_bp.route('/get_institutions/<school>', methods=['GET'])
 @login_required
 def get_institutions(school):
@@ -142,3 +122,9 @@ def get_institutions(school):
     return json.dumps(school['institutions'])
 
 
+@scholar_bp.route('/project')
+@login_required
+def project_feedback():
+    form = ProjectForm()
+
+    return render_template('scholar/project_feedback.html', form=form)
