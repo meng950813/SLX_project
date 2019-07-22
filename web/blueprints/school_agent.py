@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request
 import json
 import os
+import threading
 from flask_login import current_user
 
 from web.blueprints.auth import login_required
@@ -76,14 +77,17 @@ def change_institution():
 
         if json_data:
             # 放在此处执行 + 1 操作是为了让无关系文件的学院靠后
-            # TODO 多线程执行访问数 +1
-            add_institution_click_time(school, institution)
-            
+            # 多线程执行访问数 +1
+            add_thead = threading.Thread(target=add_institution_click_time, args=(school, institution))
+            add_thead.start()
             return json_data
         else:
             return json.dumps({"success": False, "message": "暂无当前学院的社交网络数据"})
 
-    add_institution_click_time(school, institution)
+    # 多线程执行访问数 +1
+    add_thead = threading.Thread(target=add_institution_click_time, args=(school, institution))
+    add_thead.start()
+    
     return json.dumps({"success": True})
 
 
