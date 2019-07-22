@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}404 Error{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="card w-50 bg-light">
+                <img class="card-img-top img-fluid" src="{{ url_for('static', filename='images/error.jpg') }}">
+                <div class="card-body">
+                    <h5 class="card-title">404 Error</h5>
+                    <p class="card-text">该页面未找到</p>
+                </div>
+                <div class="card-footer">
+                    <div class="float-right">
+                        <a class="btn btn-primary" href="{{ url_for('school_agent.index') }}">Return Home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
