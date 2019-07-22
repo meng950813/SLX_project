@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, request, flash
+from flask import Blueprint, render_template, request, flash, abort
 from flask_login import current_user
-from web.service.basic_info_service import search_teacher_basic_info
+import web.service.basic_info_service as basic_info_service
 import datetime
 import json
 
@@ -17,12 +17,15 @@ scholar_bp = Blueprint('scholar', __name__)
 @login_required
 def scholar_info(teacher_id):
     """
-    专家个人信息
+    获取专家个人信息
     :param teacher_id:
     :return:
     """
-    # 返回json 序列化后的文件
-    teacher_basic_info = search_teacher_basic_info(teacher_id)
+    # 返回json 序列化后的数据
+    teacher_basic_info = basic_info_service.get_info(teacher_id)
+    # 当老师id不存在时，直接报404
+    if teacher_basic_info is None:
+        return abort(404)
     length = [0, 0]
 
     # 计算该教师所拥有的基金的数目，并将其加到列表中，用以传送给前端
@@ -48,7 +51,12 @@ def scholar_info(teacher_id):
 @scholar_bp.route('/feedback', methods=['GET', 'POST'])
 @login_required
 def feedback():
-
+    """
+    老师信息反馈页面
+    GET 返回当前页面
+    POST 进行数据库操作
+    :return:
+    """
     teacher_id = request.args.get('tid', type=int, default=None)
     # 当前类型 添加or修改 add modify
     cur_type = 'modify' if teacher_id else 'add'
