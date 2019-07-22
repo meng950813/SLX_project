@@ -2,6 +2,10 @@ from flask_login import UserMixin
 
 
 class User(dict, UserMixin):
+    """
+    登录用户类，赋值会在登录或者从cookie中赋值
+    得到的数据目前为用户集合中的所有数据,在修改该用户的相关数据注意级联
+    """
     def __getattr__(self, key):
         try:
             return self[key]

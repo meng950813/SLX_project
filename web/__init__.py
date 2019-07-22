@@ -63,6 +63,10 @@ def register_errors(app):
     def bad_request(e):
         return render_template('errors/400.html', description="会话过期或失效，请返回上一页重试"), 400
 
+    @app.errorhandler(404)
+    def bad_request(e):
+        return render_template('errors/404.html'), 404
+
 
 def register_template_context(app):
     """注册模板上下文，使得变量可以在模板中使用"""
