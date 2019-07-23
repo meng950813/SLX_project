@@ -25,12 +25,6 @@
     <form>
         {{ form.hidden_tag() }}
         <div class="form-group row">
-            {{ form.number.label(class="col-sm-1 offset-2 col-form-label") }}
-            <div class="col-sm-7">
-                {{ form.number(class="form-control") }}
-            </div>
-        </div>
-        <div class="form-group row">
             {{ form.name.label(class="col-sm-1 offset-2 col-form-label") }}
             <div class="col-sm-7">
                 {{ form.name(class="form-control") }}
@@ -59,13 +53,13 @@
             </div>
         </div>
         <div class="form-group row">
-            {{ form.person.label(class="col-sm-1 offset-2 col-form-label") }}
+            <label class="col-sm-1 offset-2 col-form-label">负责人</label>
             <div class="col" id="leader">
             </div>
         </div>
         <div class="form-group row">
             <label class="col-sm-1 offset-2 col-form-label">其他成员</label>
-            <div class="col" id="people">
+            <div class="col" id="other">
             </div>
         </div>
         <div class="form-group row">
@@ -76,7 +70,7 @@
                 {{ form.institution(class="form-control") }}
             </div>
             <div class="col-sm-2">
-                {{ form.person(class="form-control", placeholder="请输入名字") }}
+                <input class="form-control" id="person-name" placeholder="请输入名字" required="" type="text" value="">
             </div>
             <div class="col-sm-1">
                 <a href="#" id="add-domain" onclick="addDomain();"><i class="mdui-icon material-icons">&#xe146;</i>添加</a>

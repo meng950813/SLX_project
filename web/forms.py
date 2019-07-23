@@ -153,7 +153,6 @@ class ProjectForm(FlaskForm):
     """
     项目表单
     """
-    number = StringField('项目编号', validators=[DataRequired()])
     name = StringField('项目名称', validators=[DataRequired()])
     project_type = SelectField('项目类型', choices=[('省（部）级鉴定', '省（部）级鉴定'),
                                                 ('授权发明专利', '授权发明专利'), ('国外技术', '国外技术'),
@@ -165,7 +164,6 @@ class ProjectForm(FlaskForm):
 
     school = SelectField('', validators=[DataRequired()], coerce=str)
     institution = SelectField('', validators=[DataRequired()], coerce=str)
-    person = StringField('负责人', validators=[DataRequired()])
 
     company = StringField('支撑单位')
     content = TextAreaField('项目简介')

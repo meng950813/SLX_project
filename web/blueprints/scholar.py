@@ -122,7 +122,7 @@ def get_institutions(school):
     return json.dumps(school['institutions'])
 
 
-@scholar_bp.route('/project')
+@scholar_bp.route('/project', methods=['GET', 'POST'])
 @login_required
 def project_feedback():
     form = ProjectForm()

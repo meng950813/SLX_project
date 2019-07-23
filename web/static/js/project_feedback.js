@@ -27,9 +27,9 @@ function addDomain(value="") {
     //获取学校学院和人名
     let school = $('#school').val();
     let institution = $('#institution').val();
-    let person = $('#person').val();
+    let personName = $('#person-name').val();
 
-    if (person.length == 0){
+    if (personName.length == 0){
         toggle_alert(false, "", "请输入名字");
         return;
     }
@@ -37,22 +37,23 @@ function addDomain(value="") {
     else{
 
     }
+    //优先输入领导者
     let $target = null;
     if ($('#leader').children().length == 0){
         $target = $('#leader');
     }else
     {
-        $target = $('#people');
+        $target = $('#other');
     }
 
     $target.append(`
         <span>
-            <span class="member">${person}</span>
+            <span class="member" data-school="${school}" data-institution="${institution}">${personName}</span>
             <i class="mdui-icon material-icons" style="cursor: pointer" onclick="removeTheDomain($(this));">&#xe14c;</i>
         </span>`);
     //让最新产生的输入获得焦点
 }
-//移除指定的领域
+//移除指定的span
 function removeTheDomain($target) {
     $target.parent().remove();
 }
