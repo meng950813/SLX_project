@@ -3,9 +3,11 @@ author: xiaoniu
 date: 2019-07-22
 desc: 用作flask-wtf的表单类型
 """
+import json
+import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, \
-    SelectField, SelectMultipleField, DateTimeField, HiddenField
+    SelectField, SelectMultipleField, DateTimeField, HiddenField, FloatField, DateField
 from wtforms.validators import DataRequired, Length, Email, Optional, EqualTo
 
 from web.utils.mongo_operator import MongoOperator
@@ -154,30 +156,34 @@ class ProjectForm(FlaskForm):
     项目表单
     """
     name = StringField('项目名称', validators=[DataRequired()])
-    project_type = SelectField('项目类型', choices=[('省（部）级鉴定', '省（部）级鉴定'),
-                                                ('授权发明专利', '授权发明专利'), ('国外技术', '国外技术'),
-                                                ('其他', '其他')], default='省（部）级鉴定', coerce=str)
-    fund = StringField('项目资金', validators=[DataRequired()])
-    start_time = DateTimeField('起止时间')
-    end_time = DateTimeField('截至时间')
+    project_type = SelectField('项目类型',
+                               choices=[('省（部）级鉴定', '省（部）级鉴定'),
+                                        ('授权发明专利', '授权发明专利'), ('国外技术', '国外技术'),
+                                        ('其他', '其他')], default='省（部）级鉴定', coerce=str)
+    fund = FloatField('项目资金', validators=[DataRequired()])
+    start_time = DateField('起止时间', validators=[DataRequired()])
+    end_time = DateField('截至时间', validators=[DataRequired()])
     members = HiddenField()
 
-    school = SelectField('', validators=[DataRequired()], coerce=str)
-    institution = SelectField('', validators=[DataRequired()], coerce=str)
-
-    company = StringField('支撑单位')
-    content = TextAreaField('项目简介')
-    submit = SubmitField('提交')
+    company = StringField('支撑单位', validators=[DataRequired()])
+    content = TextAreaField('项目简介', validators=[DataRequired()])
 
     def __init__(self, *args, **kwargs):
         super(ProjectForm, self).__init__(*args, **kwargs)
-        mongo_operator = MongoOperator(**MongoDB_CONFIG)
-        # 获取所有的学校
-        generator = mongo_operator.get_collection('school').find({}, {'_id': 0, 'name': 1})
-        self.school.choices = [(school['name'], school['name']) for school in generator]
-        cur_school = self.school.choices[0][0]
-        # 获取当前学校的所有院系
-        school = mongo_operator.get_collection('school'). \
-            find_one({'name': cur_school}, {'_id': 0, 'institutions': 1})
-        self.institution.choices = [(result['name'], result['name']) for result in school['institutions']]
 
+    def get_data(self):
+        datum = {
+            'name': self.name.data,
+            'project_type': self.project_type.data,
+            'fund': self.fund.data,
+            'start_time': ProjectForm.date2datetime(self.start_time.data),
+            'end_time': ProjectForm.date2datetime(self.end_time.data),
+            'members': json.loads(self.members.data),
+            'company': self.company.data,
+            'content': self.content.data,
+        }
+        return datum
+
+    @staticmethod
+    def date2datetime(date):
+        return datetime.datetime(date.year, date.month, date.day)

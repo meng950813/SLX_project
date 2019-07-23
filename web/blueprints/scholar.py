@@ -81,7 +81,7 @@ def feedback():
 
             return redirect_back()
 
-    return render_template('scholar/feedback.html', form=form, cur_type=cur_type)
+    return render_template('scholar/teacher_feedback.html', form=form, cur_type=cur_type)
 
 
 @scholar_bp.route('/search', methods=['GET'])
@@ -96,14 +96,36 @@ def search():
 
     if 'teacher-name' in request.args:
         teacher_name = request.args.get('teacher-name')
+        # 获取老师列表
+        teachers = get_teachers(teacher_name)
+
+    return render_template('scholar/search.html', teachers=teachers, teacher_name=teacher_name)
+
+
+@scholar_bp.route('/get_teachers/<teacher_name>')
+@login_required
+def get_teachers(teacher_name):
+    """
+    根据老师的名字进行数据库的搜索
+    :param teacher_name: 老师名字
+    :return: 如果request.args存在is_json且为True,则返回json格式的字符串，否则直接返回python数组
+    """
+    # 是否把结果转换成json格式的字符串,默认为False
+    result = None
+    is_json = request.args.get('is_json', type=bool) if 'is_json' in request.args else False
+
+    try:
         # 查询数据库
         mongo_operator = MongoOperator(**MongoDB_CONFIG)
         condition = {'name': teacher_name}
         scope = {'title': 1, 'school': 1, 'institution': 1, 'name': 1, '_id': 0, 'id': 1}
         generator = mongo_operator.get_collection('basic_info').find(condition, scope)
         teachers = list(generator)
+        result = json.dumps(teachers) if is_json else teachers
+    except Exception as e:
+        print('error raised when get teacher: %s' % e)
 
-    return render_template('scholar/search.html', teachers=teachers, teacher_name=teacher_name)
+    return result
 
 
 @scholar_bp.route('/get_institutions/<school>', methods=['GET'])
@@ -126,5 +148,28 @@ def get_institutions(school):
 @login_required
 def project_feedback():
     form = ProjectForm()
+    mongo = MongoOperator(**MongoDB_CONFIG)
+    # 获取所有的学校
+    generator = mongo.get_collection('school').find({}, {'_id': 0, 'name': 1})
+    schools = [school['name'] for school in generator]
+    cur_school = schools[0]
+    # 获取当前学校的所有院系
+    school = mongo.get_collection('school').find_one({'name': cur_school}, {'_id': 0, 'institutions': 1})
+    institutions = [result['name'] for result in school['institutions']]
 
-    return render_template('scholar/project_feedback.html', form=form)
+    if request.method == 'POST':
+        # 出现错误，则交给flash
+        if not form.validate():
+            warning = []
+            for _, errors in form.errors.items():
+                warning.extend(errors)
+            flash(','.join(warning), 'warning')
+        else:
+            datum = form.get_data()
+            # 写入数据库
+            result = mongo.db['project_feedback'].insert_one(datum)
+            flash('操作成功，感谢您的反馈', 'success')
+
+            return redirect_back()
+
+    return render_template('scholar/project_feedback.html', form=form, schools=schools, institutions=institutions)
