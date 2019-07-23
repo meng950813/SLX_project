@@ -14,7 +14,7 @@ class Operations:
 
 AGNET_TYPE = {
     "SCHOOL_AGENT": "0",
-    "BUSINESS_AGENT" : "1"
+    "BUSINESS_AGENT": "1"
 }
 
 

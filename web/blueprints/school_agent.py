@@ -8,6 +8,8 @@ from web.blueprints.auth import login_required
 from web.utils.mongo_operator import MongoOperator
 from web.config import MongoDB_CONFIG
 from web.settings import basedir
+from web.service.user_service import check_user
+from web.utils.encrypt import encryption
 
 school_agent_bp = Blueprint('school_agent', __name__)
 
@@ -80,6 +82,7 @@ def change_institution():
             # 多线程执行访问数 +1
             add_thead = threading.Thread(target=add_institution_click_time, args=(school, institution))
             add_thead.start()
+            
             return json_data
         else:
             return json.dumps({"success": False, "message": "暂无当前学院的社交网络数据"})
@@ -346,6 +349,143 @@ def add_institution_click_time(school, institution):
     except Exception as e:
         print("点击次数加一失败， visited=%s")
         print(e)
+
+
+@school_agent_bp.route('/setting')
+@login_required
+def setting():
+    """
+    by zhang
+    商务修改个人信息
+    :return:修改基本信息的页面
+    """
+
+    return render_template('change_basic_info.html')
+
+
+@school_agent_bp.route('/get_user_info')
+@login_required
+def get_user_info():
+    """
+    获取具体的个人信息
+    :return:json格式的用户字典
+    """
+
+    type = current_user.type
+    user_type = ""
+    if type == "0":
+        user_type = "学校商务"
+    elif type == "1":
+        user_type = "企业商务"
+    else:
+        user_type = "其他用户"
+
+    user_dict = {
+        "user_id": current_user.id,
+        "user_name": current_user.name,
+        "user_tel": current_user.tel_number,
+        "user_email": current_user.email,
+        "user_pwd": current_user.password,
+        "user_type": user_type,
+        "charge_school": current_user.charge_school,
+        "related_teacher": current_user.related_teacher
+    }
+
+    return json.dumps(user_dict)
+
+
+@school_agent_bp.route('/save_basic_info', methods=["POST"])
+@login_required
+def save_basic_info():
+    """
+    保存用户修改的基本信息
+    :return:修改成功： {"success": True}， 修改失败： {"success": False}
+    """
+
+    user_id = request.form.get("user_id")
+    user_id = int(user_id)
+
+    user_name = request.form.get("user_name")
+    user_email = request.form.get("user_email")
+    user_tel = request.form.get("user_tel")
+
+    mongo = MongoOperator(**MongoDB_CONFIG)
+
+    user_col = mongo.get_collection("user")
+
+    try:
+        update_res = user_col.update({'id': user_id}, {"$set": {
+            "name": user_name,
+            "email": user_email,
+            "tel_number": user_tel,
+        }})
+
+        if update_res['nModified'] != 0:
+            current_user.name = user_name
+            current_user.email = user_email
+            current_user.tel_number = user_tel
+
+        return json.dumps({"success": True})
+    except:
+        return json.dumps({"success": False})
+
+
+@school_agent_bp.route('/school_agent/basic_info')
+@login_required
+def basic_info():
+    """
+
+    :return:
+    """
+    return render_template('change_basic_info.html')
+
+
+@school_agent_bp.route('/school_agent/change_pwd')
+@login_required
+def change_pwd():
+    """
+    点击修改密码按钮时跳转页面
+    :return:修改密码的页面
+    """
+    return render_template('change_pwd.html')
+
+
+@school_agent_bp.route('/vertify_pwd/<old_pwd>')
+@login_required
+def vertify_pwd(old_pwd):
+    """
+    修改密码时验证 输入的原密码
+    :param old_pwd:输入的原密码
+    :return:原密码验证失败： {"success": False}， 验证成功： {"success": True}
+    """
+    user_name = current_user.name
+
+    res = encryption(old_pwd)
+
+    if res != current_user.password:
+        return json.dumps({"success": False})
+    else:
+        return json.dumps({"success": True})
+
+
+@school_agent_bp.route('/change_pwd_in_db/<new_pwd>')
+@login_required
+def change_pwd_in_db(new_pwd):
+    """
+    根据输入的新密码对用户数据库中的密码进行修改
+    :param new_pwd:新密码
+    :return:密码修改失败： {"success": False}， 修改成功： {"success": True}
+    """
+
+    user_id = current_user.id
+    pwd_md5 = encryption(new_pwd)
+    try:
+        mongo = MongoOperator(**MongoDB_CONFIG)
+        user_col = mongo.get_collection("user")
+        user_col.update({"id": user_id}, {"$set": {"password": pwd_md5}})
+        return json.dumps({"success": True})
+    except:
+        return json.dumps({"success": False})
 
 
 if __name__ == '__main__':
