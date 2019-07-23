@@ -106,5 +106,6 @@
 {% endblock %}
 
 {% block scripts %}
+    {{ super() }}
     <script type="text/javascript" src="{{ url_for('static', filename='js/project_feedback.js') }}"></script>
 {% endblock %}
