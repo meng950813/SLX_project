@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    用户设置
+{% endblock %}
+
+{% block styles %}
+    <style type="text/css">
+
+    </style>
+{% endblock %}
+
+
+{% block main %}
+<div class="container">
+    <div class="row">
+        <div class="list-group col-sm-2">
+            <a href="{{ url_for('school_agent.setting') }}" class="list-group-item list-group-item-action">基本信息</a>
+            <a href="{{ url_for('school_agent.change_pwd') }}" class="list-group-item list-group-item-action">修改密码</a>
+        </div>
+
+        <div class="col-sm-10">
+            {% block supply %}
+
+            {% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}
