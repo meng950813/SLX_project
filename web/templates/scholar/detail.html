@@ -57,14 +57,32 @@
 
         <fieldset id="edu-exp" class="row card-mine">
             <legend>教育经历</legend>
+<<<<<<< HEAD
             <p>{{ teacher["edu_exp"] }}</p>
+=======
+            {% if teacher_basic_info["edu_exp"] %}
+                <p>{{ teacher_basic_info["edu_exp"] }}</p>
+            {% endif %}
+>>>>>>> origin/chen
 
         </fieldset>
 
-        <fieldset id="team-info" class="row card-mine">
+        <fieldset id="visited-info" class="row card-mine">
+            <legend>拜访记录</legend>
+            <table class="table table-hover">
+                <tbody>
+                    <tr>
+                        <td style="width: 120px">2019-07-18</td>
+                        <td>拜访标题</td>
+                        <td>详细信息</td>
+                    </tr>
+                </tbody>
+            </table>
+        </fieldset>
+         <!-- <fieldset id="team-info" class="row card-mine">
             <legend>团队信息</legend>
 
-        </fieldset>
+        </fieldset> -->
 
         <fieldset id="achieve-info" class="row card-mine">
             <legend>学术成果</legend>
@@ -97,9 +115,9 @@
                                 <div class="d-inline">
                                     <span>{{ fund["belong"] }}</span>
                                     <span>资金：{{ fund["money"] }}万元</span>
+                                    <span>起始年份：{{ fund["year"] }}年</span>
                                     <span>项目周期：4年</span>
-                                    <span>{{ fund["year"] }}</span>
-                                    <span>负责人：{{ fund["name"] }}</span><br>
+                                    <span>负责人：{{ fund["name"] }}</span>
                                 </div>
                             </li>
                             {% endfor %}
