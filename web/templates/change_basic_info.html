@@ -1,0 +1,88 @@
+{% extends 'user_info_base.html' %}
+
+{% block title %}
+    用户设置
+{% endblock %}
+
+
+{% block styles %}
+    <script src="https://cdn.bootcss.com/twitter-bootstrap/4.0.0-beta.3/js/bootstrap.min.js"></script>
+    <style type="text/css">
+        .modal-body{
+            left: 20%;
+            width: 60%;
+            text-align: center;
+
+        }
+        .form-group input{
+            width: 30px;
+            height: 45px;
+            font-size: 23px;
+        }
+        .form-group textarea{
+            height: 200px;
+            width: 60px;
+            font-size: 23px;
+        }
+    </style>
+{% endblock %}
+
+
+{% block supply %}
+<div class="modal-body">
+    <form>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" id="csrf_token">
+        <div class="input-group flex-nowrap">
+            <div class="input-group-prepend">
+                <span class="input-group-text " id="addon-wrapping">用户名</span>
+            </div>
+            <input type="text" id="user_name" class="form-control mod" placeholder="" aria-describedby="addon-wrapping">
+        </div>
+        <br>
+        <div class="input-group flex-nowrap">
+            <div class="input-group-prepend">
+                <span class="input-group-text "  id="addon-wrapping">电话</span>
+            </div>
+            <input type="text" id="user_tel" class="form-control mod" placeholder="" aria-describedby="addon-wrapping">
+        </div>
+        <br>
+        <div class="input-group flex-nowrap">
+            <div class="input-group-prepend">
+                <span class="input-group-text"  id="addon-wrapping">邮箱</span>
+            </div>
+            <input type="text" id="user_email" class="form-control mod" placeholder="" aria-describedby="addon-wrapping">
+        </div>
+        <br>
+        <div class="input-group flex-nowrap">
+            <div class="input-group-prepend">
+                <span class="input-group-text " id="addon-wrapping">用户类型：</span>
+                <span class="input-group-text " id="user_type"></span>
+            </div>
+        </div>
+        <br>
+        <div class="input-group flex-nowrap">
+            <div class="input-group-prepend">
+                <span class="input-group-text " id="addon-wrapping">负责学校：</span>
+                <span class="input-group-text " id="charge_school"></span>
+            </div>
+        </div>
+        <br>
+        <div class="input-group flex-nowrap">
+            <div class="input-group-prepend">
+                <span class="input-group-text " id="addon-wrapping">相关老师：</span>
+                <span class="input-group-text " id="related_teacher"></span>
+            </div>
+        </div>
+        <br>
+
+    </form>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary preservation" onclick="save_basic_info($(this))">保存</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/setting.js') }}"></script>
+{% endblock %}

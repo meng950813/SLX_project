@@ -50,7 +50,7 @@ def register_extensions(app):
 
 def register_blueprints(app):
     app.register_blueprint(school_agent_bp)
-    app.register_blueprint(scholar_bp)
+    app.register_blueprint(scholar_bp, url_prefix='/scholar')
     app.register_blueprint(auth_bp)
     app.register_blueprint(visit_record_bp)
     app.register_blueprint(schedule_bp)

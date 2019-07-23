@@ -3,7 +3,7 @@ $('#school').on('change', function () {
     let school = $('#school').val();
     //请求获取学院
     $.ajax({
-        url: '/get_institutions/' + school,
+        url: '/scholar/get_institutions/' + school,
         type: 'GET',
         dataType: 'json'
     }).done(function (institutions) {
