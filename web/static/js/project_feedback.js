@@ -74,10 +74,57 @@ function removeTheSpan($target) {
 }
 
 /**
+ * 检测一些输入是否合法
+ * 比如起止时间，和必须有负责人
+ * @returns {boolean}
+ */
+function checkValid() {
+    //名称
+    if ($('#name').val().length == 0){
+        toggle_alert(false, "", "请输入项目名称");
+        return false;
+    }
+    if ($('#fund').val().length == 0){
+        toggle_alert(false, "", "请输入项目资金");
+        return false;
+    }
+    //获取起止时间
+    if ($('#start_time').val().length == 0){
+        toggle_alert(false, "", "请输入开始时间");
+        return false;
+    }
+    if ($('#end_time').val().length == 0){
+        toggle_alert(false, "", "请输入截至时间");
+        return false;
+    }
+    //保证开始时间小于截至日期
+    let start_time = new Date($('#start_time').val());
+    let end_time = new Date($('#end_time').val());
+
+    if (start_time > end_time){
+        toggle_alert(false, "", "起止时间输入有误，请确认后重新输入");
+        return false;
+    }
+    //保证有负责人
+    if ($('#leader').children().length == 0){
+        toggle_alert(false, "", "请输入负责人");
+        return false;
+    }
+    if ($('#company').val().length == 0){
+        toggle_alert(false, "", "请输入支撑单位");
+        return false;
+    }
+    return true;
+}
+/**
  * 提交form表单，在提交之前会组合所有的class="domain"的span的值，然后使用;拼接
  * 赋值给#domain中，之后发给后端
  */
 function submitData() {
+    //检测输入是否合法
+    if (!checkValid()){
+        return;
+    }
     //获取class="member"的所有成员
     let $members = $('.member');
     let data = [];

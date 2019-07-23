@@ -147,6 +147,10 @@ def get_institutions(school):
 @scholar_bp.route('/project', methods=['GET', 'POST'])
 @login_required
 def project_feedback():
+    """
+    项目反馈
+    :return:
+    """
     form = ProjectForm()
     mongo = MongoOperator(**MongoDB_CONFIG)
     # 获取所有的学校
@@ -160,12 +164,10 @@ def project_feedback():
     if request.method == 'POST':
         # 出现错误，则交给flash
         if not form.validate():
-            warning = []
-            for _, errors in form.errors.items():
-                warning.extend(errors)
-            flash(','.join(warning), 'warning')
+            flash('数据输入有误，请确认后输入', 'warning')
         else:
             datum = form.get_data()
+            datum.update({'timestamp': datetime.datetime.utcnow(), 'username': current_user.name, 'status': 1})
             # 写入数据库
             result = mongo.db['project_feedback'].insert_one(datum)
             flash('操作成功，感谢您的反馈', 'success')
