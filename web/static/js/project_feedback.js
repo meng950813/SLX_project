@@ -91,7 +91,6 @@ function submitData() {
         };
         data.push(datum);
     }
-    console.log(data);
     //把值添加到隐藏字段members中
     $('#members').val(JSON.stringify(data));
 
