@@ -21,14 +21,15 @@ $.ajax({
     console.log(user_info["user_tel"]);
     $("#user_email").val(user_info["user_email"]);
 
-    $("#user_type").html(user_info["user_type"]);
+    $("#user_type").val(user_info["user_type"]);
+
     var charge_school = "";
     for(var i = 0; i < user_info["charge_school"].length; i++){
         charge_school += user_info["charge_school"][i] + "  " ;
     }
     if(charge_school == "")
         charge_school = "无"
-    $("#charge_school").html(charge_school);
+    $("#charge_school").val(charge_school);
 
     var related_teachers = "";
     for(var i = 0; i < user_info["related_teacher"].length; i++){
@@ -36,7 +37,7 @@ $.ajax({
     }
     if(related_teachers == "")
         related_teachers = "无"
-    $("#related_teacher").html(related_teachers);
+    $("#related_teacher").val(related_teachers);
 })
 
 
