@@ -1,68 +1,45 @@
-{% extends 'user_info_base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}
     用户修改密码
 {% endblock %}
 
-{% block styles %}
-    <script src="https://cdn.bootcss.com/twitter-bootstrap/4.0.0-beta.3/js/bootstrap.min.js"></script>
-    <style type="text/css">
-        .card-body{
-            margin-top: 10%;
-        }
-        .input-group flex-nowrap{
-            width: 180%;
-        }
-    </style>
-{% endblock %}
-
-
-{% block supply %}
-
-    <div class="container">
-        <div class="row" style="padding-top: 30px;">
-            <div class="col-sm-8 card bg-light text-dark offset-2">
-                <div class="card-body">
-                    <div>
-                        <h1 style="text-align: center" class="text-primary">修改密码</h1>
-                    </div>
-                    <div class="modal-body">
-                        <form id="input_pwd">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" id="csrf_token">
-                            <div class="input-group flex-nowrap">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text " id="addon-wrapping">请输入原密码</span>
-                                </div>
-                                <input type="password" id="old_pwd" class="form-control mod" placeholder="" aria-describedby="addon-wrapping">
-                            </div>
-                            <br>
-                            <div class="input-group flex-nowrap">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text "  id="addon-wrapping">请输入新密码</span>
-                                </div>
-                                <input type="password" id="new_pwd" class="form-control mod" placeholder="" aria-describedby="addon-wrapping">
-                            </div>
-                            <br>
-                            <div class="input-group flex-nowrap">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"  id="addon-wrapping">请确认新密码</span>
-                                </div>
-                                <input type="password" id="second_new_pwd" class="form-control mod" placeholder="" aria-describedby="addon-wrapping">
-                            </div>
-                        </form>
-
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary preservation" onclick="save_change_pwd($(this))">保存</button>
+{% block main %}
+<div class="container">
+    <div class="row">
+        <div class="list-group col-sm-2 offset-2">
+            <a href="{{ url_for('school_agent.setting') }}" class="list-group-item list-group-item-action">基本信息</a>
+            <a href="{{ url_for('school_agent.change_pwd') }}" class="list-group-item list-group-item-action">修改密码</a>
+        </div>
+        <div class="col-sm-4 card bg-light text-dark">
+            <div class="card-body">
+                <h1 style="text-align: center" class="text-primary">修改密码</h1>
+                <form id="input_pwd">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" id="csrf_token">
+                    <div class="form-group row">
+                        <div class="col">
+                            <input type="password" id="old_pwd" class="form-control" placeholder="请输入原密码" aria-describedby="addon-wrapping">
                         </div>
                     </div>
-                    <hr>
-                </div>
+                    <div class="form-group row">
+                        <div class="col">
+                            <input type="password" id="new_pwd" class="form-control mod" placeholder="请输入新密码" aria-describedby="addon-wrapping">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col">
+                            <input type="password" id="second_new_pwd" class="form-control mod" placeholder="请再次输入新密码" aria-describedby="addon-wrapping">
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary preservation" onclick="save_change_pwd($(this))">保存</button>
+                </form>
             </div>
         </div>
     </div>
-
+</div>
 {% endblock %}
 
 {% block scripts %}
+    {{ super() }}
     <script src="{{ url_for('static', filename='js/setting.js') }}"></script>
 {% endblock %}
