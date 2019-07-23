@@ -13,7 +13,7 @@ from web.utils import redirect_back
 scholar_bp = Blueprint('scholar', __name__)
 
 
-@scholar_bp.route('/scholar/<int:teacher_id>')
+@scholar_bp.route('/detail/<int:teacher_id>')
 @login_required
 def scholar_info(teacher_id):
     """

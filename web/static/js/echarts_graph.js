@@ -175,7 +175,7 @@ myChart.on('click', function (params) {
     //仅限节点类型
     if (params.dataType == 'node' && params.data.name != "0"){
         //页面
-        window.open('/scholar/'+params.data.name, "_self");
+        window.open('/scholar/detail/'+params.data.name, "_self");
         return;
     }
     else if (params.dataType == 'main'){
