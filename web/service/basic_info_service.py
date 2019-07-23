@@ -2,7 +2,7 @@
 2019.7.3
 by zhang
 """
-
+import datetime
 from web.config import MongoDB_CONFIG
 from web.utils.mongo_operator import MongoOperator
 
@@ -32,6 +32,11 @@ def get_info(teacher_id):
             collection = mongo.get_collection("funds")
             funds_list = collection.find({"_id": {"$in": list(basic_info['funds_id'])}}, {"_id": 0})
             basic_info["funds"] = list(funds_list)
+        # 计算教师年龄
+        birth_year = basic_info["birth_year"]
+        # 如果存在birth_year字段且为空，则不计算age
+        if birth_year and len(birth_year.strip()) > 0:
+            basic_info['age'] = datetime.datetime.now().year - int(birth_year)
         """
         重点研发计划的部分未显示
         """

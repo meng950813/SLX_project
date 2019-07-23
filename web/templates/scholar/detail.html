@@ -12,41 +12,41 @@
     <div class="container">
         <fieldset class="card-mine">
             <legend>基本信息</legend>
-            <a href="{{ url_for('scholar.feedback', tid=teacher_basic_info['id'], next=request.full_path) }}" target="_self">
+            <a href="{{ url_for('scholar.feedback', tid=teacher['id'], next=request.full_path) }}" target="_self">
                 <i title="编辑" class="editor mdui-icon material-icons">&#xe3c9;</i>
             </a>
             <div id="basic-info" class="row">
                 <div class="img-container col-sm-3 col-md-2 align-middle">
-                    <div id="img-name" class="bg-primary align-middle">{{ teacher_basic_info["name"][0] }}</div>
+                    <div id="img-name" class="bg-primary align-middle">{{ teacher["name"][0] }}</div>
                 </div>
                 <div class="col-sm-9 col-md-10">
-                    <div class="scholar-name"> <strong> <a href="#" > {{ teacher_basic_info["name"] }} </a>  </strong> </div>
-                    <div class="scholar-depart">{{ teacher_basic_info["school"] }} - {{ teacher_basic_info["institution"] }}</div>
-                    <div class="scholar-depart half">邮箱： {{ teacher_basic_info["email"] }}</div>
-                    <div class="scholar-depart half">手机： {{ teacher_basic_info["phone_number"] }}</div>
-                    <div class="scholar-depart half">办公室电话： {{ teacher_basic_info["office_number"] }}</div>
+                    <div class="scholar-name"> <strong> <a href="#" > {{ teacher["name"] }} </a>  </strong> </div>
+                    <div class="scholar-depart">{{ teacher["school"] }} - {{ teacher["institution"] }}</div>
+                    <div class="scholar-depart half">邮箱： {{ teacher["email"] }}</div>
+                    <div class="scholar-depart half">手机： {{ teacher["phone_number"] }}</div>
+                    <div class="scholar-depart half">办公室电话： {{ teacher["office_number"] }}</div>
                     <div class="scholar-tags">
-                        {% if teacher_basic_info["other_title"] %}
-                        <span>{{ teacher_basic_info["other_title"] }}</span>
+                        {% if teacher["other_title"] %}
+                        <span>{{ teacher["other_title"] }}</span>
                         {% endif %}
 
-                        {% if age != " " %}
-                            <span>{{ age }}岁</span>
+                        {% if 'age' in teacher %}
+                            <span>{{ teacher['age'] }}岁</span>
                         {% endif %}
                         {#<span>某重点实验室主任</span>#}
 
-                            {% for honor in teacher_basic_info["honor"] %}
+                            {% for honor in teacher["honor"] %}
                                 <span title="{{ honor['year'] }}获得">
                                     {{ honor["type"] }}
                                 </span>
                             {% endfor %}
 
-                        <span>{{ teacher_basic_info["title"] }}</span>
+                        <span>{{ teacher["title"] }}</span>
                     </div>
-                    {% if teacher_basic_info["domain"] %}
+                    {% if teacher["domain"] %}
                         <div class="scholar-tags">
                             <strong>研究领域：</strong>
-                            {% for item in teacher_basic_info['domain'] %}
+                            {% for item in teacher['domain'] %}
                                 <span>{{ item }}</span>
                             {% endfor %}
                         </div>
@@ -57,7 +57,7 @@
 
         <fieldset id="edu-exp" class="row card-mine">
             <legend>教育经历</legend>
-            <p>{{ teacher_basic_info["edu_exp"] }}</p>
+            <p>{{ teacher["edu_exp"] }}</p>
 
         </fieldset>
 
@@ -71,13 +71,14 @@
             <ul class="nav nav-pills nav-fill">
                 <li class="nav-item">
                     <a href="#project-list" class="nav-link active" data-toggle="tab">
-                        <i class="glyphicon glyphicon-tasks"></i> 科研项目({{ length[0] }} )
+                        <i class="glyphicon glyphicon-tasks"></i> 科研项目
+                        ({% if 'funds' in teacher %}{{ teacher['funds'] | length }}{% else %}0{% endif %})
                     </a>
                 </li>
                 <li class="nav-item">
                     <a href="#patent-list" class="nav-link" data-toggle="tab">
-                        <i class="glyphicon glyphicon-hdd"></i> 发明专利({{ length[1] }} )
-
+                        <i class="glyphicon glyphicon-hdd"></i> 发明专利
+                        ({% if 'patent' in teacher %}{{ teacher['patent'] | length }}{% else %}0{% endif %})
                     </a>
                 </li>
                 <li class="nav-item" >
@@ -88,8 +89,8 @@
             </ul>
             <div class="tab-content">
                 <ul class="tab-pane fade in active show" id="project-list">
-                    {% if "funds" in teacher_basic_info %}
-                        {% for fund in teacher_basic_info["funds"] %}
+                    {% if "funds" in teacher %}
+                        {% for fund in teacher["funds"] %}
                             <li>
                                 <div class="d-inline">
                                     <i class="glyphicon glyphicon-tasks"></i> {{ fund["title"] }}</div>
@@ -105,8 +106,8 @@
                         {% endif %}
                 </ul>
                 <ul class="tab-pane fade in" id="patent-list">
-                    {% if "patent" in teacher_basic_info %}
-                        {% for patent in teacher_basic_info["patent"] %}
+                    {% if "patent" in teacher %}
+                        {% for patent in teacher["patent"] %}
                             <li>
                                 <div class="d-inline">
                                     <i class="glyphicon glyphicon-hdd"></i> {{ patent["title"] }}

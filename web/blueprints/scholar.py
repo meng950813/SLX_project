@@ -22,29 +22,12 @@ def scholar_info(teacher_id):
     :return:
     """
     # 返回json 序列化后的数据
-    teacher_basic_info = basic_info_service.get_info(teacher_id)
+    teacher = basic_info_service.get_info(teacher_id)
     # 当老师id不存在时，直接报404
-    if teacher_basic_info is None:
+    if teacher is None:
         return abort(404)
 
-    length = [0, 0]
-    # 计算该教师所拥有的基金的数目，并将其加到列表中，用以传送给前端
-    if "funds" in teacher_basic_info:
-        length[0] = len(teacher_basic_info["funds"])
-    # 计算该教师所拥有的专利
-    if "patent" in teacher_basic_info:
-        length[1] = len(teacher_basic_info["patent"])
-
-    # 计算教师年龄
-    birth_year = teacher_basic_info["birth_year"]
-    # 如果存在birth_year字段且为空，则不计算age
-    if not birth_year or len(birth_year.strip()) == 0:
-        age = " "
-    else:
-        year = datetime.datetime.now().year
-        age = year - int(birth_year)
-
-    return render_template('scholar/detail.html', teacher_basic_info=teacher_basic_info, length=length, age=age)
+    return render_template('scholar/detail.html', teacher=teacher)
 
 
 @scholar_bp.route('/feedback', methods=['GET', 'POST'])
