@@ -26,8 +26,10 @@
                     <div class="scholar-depart half">手机： {{ teacher_basic_info["phone_number"] }}</div>
                     <div class="scholar-depart half">办公室电话： {{ teacher_basic_info["office_number"] }}</div>
                     <div class="scholar-tags">
-
+                        {% if teacher_basic_info["other_title"] %}
                         <span>{{ teacher_basic_info["other_title"] }}</span>
+                        {% endif %}
+
                         {% if age != " " %}
                             <span>{{ age }}岁</span>
                         {% endif %}
@@ -43,6 +45,7 @@
                     </div>
                     {% if teacher_basic_info["domain"] %}
                         <div class="scholar-tags">
+                            <strong>研究领域：</strong>
                             {% for item in teacher_basic_info['domain'] %}
                                 <span>{{ item }}</span>
                             {% endfor %}
@@ -135,11 +138,4 @@
 
     </div>
 
-{% endblock %}
-
-{% block scripts %}
-    <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
-    <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
-    <script src="{{url_for('static',filename='js/bootstrap_v4.min.js')}}"></script>
 {% endblock %}

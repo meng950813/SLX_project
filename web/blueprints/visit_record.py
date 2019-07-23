@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request
 from bson.objectid import ObjectId
 import json
 from flask_login import current_user
+import threading
 
 from web.blueprints.auth import login_required
 from web.config import MongoDB_CONFIG
@@ -55,8 +56,9 @@ def new_visit_record():
         # 插入拜访记录
         result = mongo_operator.get_collection("visit_record").insert_one(record)
         
-        # TODO 多线程执行插入用户与教师的关系
-        upsert_relation_of_visited(uid, teacher_info['id'], teacher_info['name'])
+        # 多线程执行插入用户与教师的关系
+        threading.Thread(target=upsert_relation_of_visited, args=(uid, teacher_info['id'], teacher_info['name'])).start()
+        # upsert_relation_of_visited(uid, teacher_info['id'], teacher_info['name'])
 
         return json.dumps({'success': True, 'record_id': str(result.inserted_id)})
 
