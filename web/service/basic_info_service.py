@@ -35,7 +35,7 @@ def get_info(teacher_id):
         # 计算教师年龄
         birth_year = basic_info["birth_year"]
         # 如果存在birth_year字段且为空，则不计算age
-        if birth_year and len(birth_year.strip()) > 0:
+        if birth_year:
             basic_info['age'] = datetime.datetime.now().year - int(birth_year)
         """
         重点研发计划的部分未显示
