@@ -80,7 +80,7 @@ class NeoOperator(object):
         :param agent_id: int
         :param school: str
         :param institution: str
-        :return:[{agent_id: xxx, visited: xxx, activity: xxx, t_id:13213},...]
+        :return:[{visited: xxx, activity: xxx, id:13213},...]
         """
         try:
             # s_id ==> source_id, t_id ==> target_id
@@ -94,7 +94,7 @@ class NeoOperator(object):
             # institution_relation = self.neo.run(cql).data()
 
             agent_cql = """Match(ag:Agent{id:%d})-[r:knows]->(t:Teacher{school:'%s', institution:'%s'})
-                return ag.id as agent_id, r.visited as visited, r.activity as activity, t.id as t_id"""\
+                return r.visited as visited, r.activity as activity, t.id as id"""\
                 % (agent_id, school, institution)
 
             # list ==> [{agent_id: xxx, visited: xxx, activity: xxx, t_id:13213},...] or []

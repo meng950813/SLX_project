@@ -106,7 +106,7 @@ def change_institution():
     
     # 个人中心需要获取关系数据
     if get_relation:
-        json_data = agent_service.get_relations(school, institution, current_user.get("related_teacher"))
+        json_data = agent_service.get_relations(school, institution, current_user.id)
 
         if json_data:
             # 放在此处执行 + 1 操作是为了让无关系文件的学院靠后
