@@ -21,7 +21,7 @@ AGNET_TYPE = {
 
 class BaseConfig(object):
     # wtform库用于CSRF
-    SECRET_KEY = os.getenv('SECRET_KEY', uuid.uuid4().hex)
+    SECRET_KEY = os.getenv('SECRET_KEY', "secret key")
     # 邮件相关
     MAIL_SERVER = MAIL_CONFIG['server']
     MAIL_PORT = 465
