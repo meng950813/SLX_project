@@ -25,6 +25,7 @@ $(".btn-modify").on("click", (e)=>{
     $("#date").val(tds[1].innerText);
     $("#title").val(tds[2].innerText);
     $("#teacher").attr("readonly","readonly").val(tds[5].innerText);
+    $("#basic-addon").attr("disabled", "disabled");
     
     let school = tds[3].innerText;
     let institution = tds[4].innerText;
@@ -46,6 +47,10 @@ function wantToNewRecord() {
     $("#select-college").attr("disabled",false);
     $("#select-institution").attr("disabled",false);
     $("#teacher").attr("readonly",false);
+    
+    $("#basic-addon").attr("disabled", false);
+    $("#fill-basic-info").hide();
+
     getInstitutions($("#select-college").val())
     $(".modal-title").text("添加拜访记录");
 }
@@ -246,6 +251,8 @@ function saveVisitedRecord(e){
         send_data["school"] = cur_school;
         send_data["institution"] = cur_institution;
         send_data['teacher'] = teacher;
+
+        send_data["basic_info"] = get_basic_info()
     }
 
     //发送事件
@@ -255,29 +262,19 @@ function saveVisitedRecord(e){
         data: send_data,
         dataType: 'json'
     }).done(function (response) {
-        //新的拜访记录添加成功
+        // 修改/添加失败
         if (!response.success){
             return toggle_alert(false, "exampleModal", response.message);
         }
+        //新的拜访记录添加成功
         //显示新修改的记录
         if (!isModifying){
-            console.log("total" + $('#total').text());
-            let total = parseInt($('#total').text()) + 1;
-            console.log("total" + total);
-            let insert_html =
-                `<tr><td>${total}</td><td>${send_data.date}</td><td><a>${send_data.title}</a></td><td>${send_data.school}</td>
-                <td>${send_data.institution}</td> <td>${send_data.teacher}</td> 
-                <td class="operation" data-id="${send_data.record_id}">
-                    <button class="btn btn-info btn-modify">修改</button>
-                    <button class="btn btn-danger btn-delete">删除</button>
-                    <input type="hidden" id="detail" value="${send_data.content}">
-                </td></tr>`;
-            let $tr=$("#tab tr").eq(-2);
-            $tr.after(insert_html);
-            //修改总数目
-            $('#total').text(total);
+            insert_new_record(send_data);
 
             toggle_alert(true, "exampleModal", "拜访记录添加成功");
+
+            // 清除完善数据部分内容
+            clear_basic_info();
         }
         else{
             if(isModifying){
@@ -292,3 +289,59 @@ function saveVisitedRecord(e){
         }
     });
 }
+
+
+/**
+ * 给定数据插入一条新记录
+ * @param {object} send_data 
+ */
+function insert_new_record(send_data){
+    // console.log("total" + $('#total').text());
+    let total = parseInt($('#total').text()) + 1;
+    // console.log("total" + total);
+    let insert_html =
+        `<tr><td>${total}</td><td>${send_data.date}</td><td><a>${send_data.title}</a></td><td>${send_data.school}</td>
+        <td>${send_data.institution}</td> <td>${send_data.teacher}</td> 
+        <td class="operation" data-id="${send_data.record_id}">
+            <button class="btn btn-info btn-modify">修改</button>
+            <button class="btn btn-danger btn-delete">删除</button>
+            <input type="hidden" id="detail" value="${send_data.content}">
+        </td></tr>`;
+    let $tr=$("#tab tr").eq(-2);
+    $tr.after(insert_html);
+    //修改总数目
+    $('#total').text(total);
+}
+
+
+/**
+ * 获取模态框中 完善数据部分的内容
+ * return: object: {} or {xx:xx, ...}
+ */
+function get_basic_info(){
+    let inputs = $("#fill-basic-info input");
+    let result = {};
+    for(let i = 0; i < inputs.length; i++){
+        let v = $(inputs[i]).val();
+        let k = $(inputs[i]).attr("name");
+        if(v.length > 0 && k){
+            result[k] = v;
+        }
+    }
+    return result;
+}
+
+
+/**
+ * 清除模态框中 完善数据部分的内容，
+ */
+function clear_basic_info(){
+    let inputs = $("#fill-basic-info input");
+    for(let i = 0; i < inputs.length; i++)
+        $(inputs[i]).val("");
+}
+
+
+$("#basic-addon").on("click", function(){
+    $("#fill-basic-info").toggle(600);
+})

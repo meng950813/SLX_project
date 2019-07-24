@@ -26,7 +26,8 @@ def index():
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
     # 获取用户的uid
     uid = current_user.id
-
+    
+    user_info = {}
     if "charge_school" in current_user:
         user_info = {
             'charge_school': current_user['charge_school'],

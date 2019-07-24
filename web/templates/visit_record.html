@@ -25,6 +25,9 @@
         #add-new-record:hover{
             color:#007bff;
         }
+        #exampleModal .input-group{padding: 6px 0;}
+        #exampleModal .col{padding: 6px 3px;}
+        #fill-basic-info{display: none;}
     </style>
 {% endblock %}
 
@@ -77,7 +80,7 @@
 
     <!-- 模态框（Modal） -->
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog " role="document">
             
             <div class="modal-content">
                 <div class="modal-header">
@@ -91,21 +94,21 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" id="csrf_token">
                         <div class="input-group flex-nowrap">
                             <div class="input-group-prepend">
-                                <span class="input-group-text " id="addon-wrapping">日期</span>
+                                <span class="input-group-text ">日期</span>
                             </div>
                             <input id="date" class="form-control mod" type="date" name="date">
                         </div>
-                        <br>
+                        
                         <div class="input-group flex-nowrap">
                             <div class="input-group-prepend">
-                                <span class="input-group-text" id="addon-wrapping">标题</span>
+                                <span class="input-group-text">标题</span>
                             </div>
                             <input type="text" id="title" class="form-control mod" placeholder="" aria-describedby="addon-wrapping">
                         </div>
-                        <br>
+                        
                         <div class="input-group flex-nowrap">
                             <div class="input-group-prepend">
-                                <span class="input-group-text" id="addon-wrapping">学校</span>
+                                <span class="input-group-text">学校</span>
                             </div>
                             <select id="select-college">
                                 {% for school in schools %}
@@ -113,10 +116,10 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        <br>
+                        
                         <div class="input-group flex-nowrap">
                             <div class="input-group-prepend">
-                                <span class="input-group-text" id="addon-wrapping">学院</span>
+                                <span class="input-group-text">学院</span>
                             </div>
                             <select id="select-institution">
                                 {% for institution in institutions %}
@@ -124,19 +127,49 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        <br>
+                        
                         <div class="input-group flex-nowrap">
                             <div class="input-group-prepend">
-                                <span class="input-group-text" id="addon-wrapping">教师</span>
+                                <span class="input-group-text">教师</span>
                             </div>
                             <input type="text" name="teacher" id="teacher" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" id="basic-addon" type="button">完善信息</button>
+                            </div>
                         </div>
-                        <br>
+                        <div id="fill-basic-info">
+                            <div class="form-row">
+                                <div class="col">
+                                    <input type="text" class="form-control" id="position" name="position" placeholder="行政职务，如 院长">
+                                </div>
+                                <div class="col">
+                                    <input type="text" class="form-control" id="teacher-title" name="teacher-title" placeholder="职称，如 教授">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col">
+                                    <input type="tel" id="telphone" name="telphone" class="form-control" placeholder="手机号">
+                                </div>
+                                <div class="col">
+                                    <input type="email" id="email" name="email" class="form-control" placeholder="邮箱">
+                                </div>
+                            </div>
+                           
+                            <div class="form-row">
+                                <div class="col">
+                                    <input type="text" id="office-phone" name="office-phone" class="form-control" placeholder="办公室电话">
+                                </div>
+                                <div class="col">
+                                    <input type="text" id="department" name="department" class="form-control" placeholder="所属学院下的系">
+                                </div>
+                            </div>
+                            
+                        </div>
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text">内容</span>
                             </div>
-                            <textarea name="content" rows="6" id="content" class="form-control mod" aria-label="With textarea"></textarea>
+                            <textarea name="content" rows="5" id="content" class="form-control mod" aria-label="With textarea"></textarea>
                         </div>
                     </form>
                 </div>
