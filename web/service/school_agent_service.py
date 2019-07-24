@@ -342,22 +342,30 @@ class SchoolAgentService(object):
         """
         格式化商务在该学校建立的社交网络，生成 echarts 能渲染的数据格式
         :param data: list of dict ==>
-            [] or [{'visited': 1, 'activity': 0, 't_id': 001, 'name':xxx, ('institution': xxx)}, ...]
+            [] or [{'visited': 1, 'activity': 0, 't_id': 001, 'name':xxx, 'institution': xxx}, ...]
         :return:
         """
         back = {
             "nodes": [self.create_agent_node()],
-            "links": [],
-            "community": len(data)
+            "links": []
         }
+
+        institutions_dict, index = {}, 1
         for item in data:
-            node = {"name": str(item['t_id']), "label": item['name']}
-            if "institution" in item:
-                node["institution"] = item['institution']
+            node = {"name": str(item['t_id']), "label": item['name'], "symbolSize": 30,
+                    "draggable": True, "institution": item['institution']}
+
+            if item['institution'] not in institutions_dict:
+                institutions_dict[item['institution']] = index
+                index += 1
+
+            node["category"] = institutions_dict[item['institution']]
 
             back['nodes'].append(node)
             back['links'].append({"source": "0", "target": str(item['t_id']), "visited": item['visited'],
                                   "activity": item['activity']})
+        
+        back["institutions"] = [k for k in institutions_dict.keys()]
         return back
 
 

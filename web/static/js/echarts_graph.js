@@ -152,18 +152,29 @@ let treeOption = {
 function reloadGraph(data){
     if(!"nodes" in data) return;
     // console.log(data)
-    let nodes = data.nodes, links = data.links, cates = data.community;
+    let nodes = data.nodes, links = data.links;
     // console.log(nodes.length, links.length, cates.length);
     graphOption.series[0].data = nodes;
     graphOption.series[0].links = links;
 
     let categories = [];
     categories[0] = {name: '我'};
-    for (let i = 1; i <= cates; i++) {
-        categories[i] = {
-            name: '社区' + i
-        };
+
+    if ("community" in data){
+        for (let i = 1; i <= cates; i++) {
+            categories[i] = {
+                name: '社区' + i
+            };
+        }
     }
+    else if("institutions" in data){
+        for (let i = 0; i <= data.institutions.length; i++) {
+            categories[i+1] = {
+                name: data.institutions[i]
+            };
+        }
+    }
+    
     graphOption.series[0].categories = categories;
     graphOption.legend = [{
         data: categories.map(function (a) {
@@ -316,7 +327,7 @@ function getSchoolGraphData(school) {
         data: {"school": school},
         dataType: "json",
         success: function (response) {
-            // console.log(response);
+            console.log(response);
             reloadGraph(response);
         },
         error: function(){
