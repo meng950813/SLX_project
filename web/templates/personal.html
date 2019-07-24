@@ -36,8 +36,6 @@
     <script>
         {% if schools | length > 0 %}
             SCHOOL_NAME= "{{ schools[0] }}";
-            {#INSTITUTION_NAME = "{{ institutions[0] }}";#}
-            {#getInstitutionGraphData(SCHOOL_NAME, INSTITUTION_NAME)#}
             getSchoolGraphData(SCHOOL_NAME);
         {% endif %}
 

@@ -73,6 +73,7 @@ $.ajax({
     type: 'GET',
     dataType: 'json'
 }).done(function (data) {
+    console.log(data)
     if(data["success"] == true){
         schools = data["school_list"];
         // autocomplete(document.getElementById('school'), schools);
@@ -87,11 +88,10 @@ $.ajax({
         // 如果没有点击学校，则选取默认的学校进行其学院的加载
         loadInstitution();
     }else{
-        toggle_alert("获取学校失败");
+        toggle_alert(false,"","获取学校失败");
     }
 
 });
-
 
 
 if ($('#school').val()){
