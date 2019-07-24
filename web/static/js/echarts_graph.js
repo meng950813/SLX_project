@@ -282,6 +282,7 @@ function getInstitutions(school){
             // console.log(response);
             if(response.success == false){
                 toggle_alert(false, "", response.message);
+                myChart.hideLoading();
                 return;
             }
             setInstitution(response, school);
@@ -291,6 +292,7 @@ function getInstitutions(school){
         error: function(error){
             console.error(error);
             toggle_alert(false, "", "服务器连接失败,请稍后再试");
+            myChart.hideLoading();
         }
     });
 }
@@ -332,6 +334,7 @@ function getSchoolGraphData(school) {
         },
         error: function(){
             toggle_alert(false, "", "服务器连接失败,请稍后再试");
+            myChart.hideLoading();
         }
     });
     $("#toggle-node-btn").hide();
@@ -354,6 +357,7 @@ function getInstitutionGraphData(school, institution){
             // console.log(response);
             if(response.success == false){
                 toggle_alert(false, "", response.message);
+                myChart.hideLoading();
                 return;
             }
             SCHOOL_NAME = school;
@@ -368,6 +372,7 @@ function getInstitutionGraphData(school, institution){
         },
         error: function () {
             toggle_alert(false, "", "服务器连接失败,请稍后再试");
+            myChart.hideLoading();
         }
     });
     $("#toggle-node-btn").show();
