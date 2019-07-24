@@ -8,7 +8,6 @@ from flask_login import current_user
 from web.blueprints.auth import login_required
 from web.config import MongoDB_CONFIG
 from web.service.school_agent_service import agent_service
-from web.settings import basedir
 from web.utils.encrypt import encryption
 from web.utils.mongo_operator import MongoOperator
 
@@ -55,6 +54,16 @@ def index():
         return render_template('personal.html', schools=schools, institutions=institutions)
     else:
         return render_template('personal.html', schools=[], institutions=[])
+
+
+@school_agent_bp.route('/get_school_relation', methods=["GET"])
+@login_required
+def get_school_relation():
+    school = request.args.get("school")
+    # data ==> {nodes:[{},..], links:[{..},... , community:123]}
+    data = agent_service.get_school_relation_data(current_user.id, school)
+
+    return json.dumps(data)
 
 
 @school_agent_bp.route('/change_school', methods=["GET"])
