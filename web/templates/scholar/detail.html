@@ -67,11 +67,13 @@
             <legend>拜访记录</legend>
             <table class="table table-hover">
                 <tbody>
-                    <tr>
-                        <td style="width: 120px">2019-07-18</td>
-                        <td>拜访标题</td>
-                        <td>详细信息</td>
-                    </tr>
+                    {% for visit in visit_list %}
+                        <tr>
+                            <td style="width: 120px">{{ visit["date"] }}</td>
+                            <td>{{ visit["title"] }}</td>
+                            <td>{{ visit["content"] }}</td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </fieldset>
