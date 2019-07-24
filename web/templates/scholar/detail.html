@@ -26,8 +26,8 @@
                     <div class="scholar-depart half">手机： {{ teacher["phone_number"] }}</div>
                     <div class="scholar-depart half">办公室电话： {{ teacher["office_number"] }}</div>
                     <div class="scholar-tags">
-                        {% if teacher["other_title"] %}
-                        <span>{{ teacher["other_title"] }}</span>
+                        {% if teacher["other_title"] | length > 1 %}
+                            <span>{{ teacher["other_title"] }}</span>
                         {% endif %}
 
                         {% if 'age' in teacher %}

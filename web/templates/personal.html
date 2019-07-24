@@ -17,13 +17,14 @@
                 {% endfor %}
             </select>
             <select id="select-institution" class="ml-3">
+                <option data-type="all">——全部——</option>
                 {% for institution in institutions %}
                     <option>{{ institution }}</option>
                 {% endfor %}
             </select>
             <button class="btn btn-default float-right" onclick="showTree()">行政关系</button>
             <button class="btn btn-primary mr-3 float-right" onclick="showGraph()">学术关系</button>
-            <button class="btn btn-primary mr-3 float-right" id="toggle-node-btn">显示/隐藏非核心节点</button>
+            <button class="btn btn-primary mr-3 float-right hidden" id="toggle-node-btn">显示/隐藏非核心节点</button>
         </div>
     </div>
 {% endblock %}
@@ -35,8 +36,7 @@
     <script>
         {% if schools | length > 0 %}
             SCHOOL_NAME= "{{ schools[0] }}";
-            INSTITUTION_NAME = "{{ institutions[0] }}";
-            getInstitutionGraphData(SCHOOL_NAME, INSTITUTION_NAME)
+            getSchoolGraphData(SCHOOL_NAME);
         {% endif %}
 
     </script>

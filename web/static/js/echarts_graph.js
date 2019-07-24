@@ -26,12 +26,15 @@ let graphOption = {
                 if(params.data.label == "我"){
                     return "<strong>我</strong>";
                 }
-                //设置提示框的内容和格式 节点和边都显示name属性
-                return `<strong>节点属性</strong><hr>姓名：${params.data.label}<br>所属学校：${SCHOOL_NAME}<br>所属学院：${INSTITUTION_NAME}`;
+                let shcool = params.data.school == undefined? SCHOOL_NAME: params.data.school,
+                institution = params.data.institution == undefined? INSTITUTION_NAME: params.data.institution;
+                
+                 //设置提示框的内容和格式 节点和边都显示name属性
+                return `<strong>节点属性</strong><hr>姓名：${params.data.label}<br>所属学校：${shcool}<br>所属学院：${institution}`;
             }
             else{
                 if(params.data.visited){
-                    return  `<strong>关系属性</strong><hr>拜访次数：${params.data.visited}次`;
+                    return  `<strong>关系属性</strong><hr>拜访次数：${params.data.visited}次<br>参与活动：${params.data.activity}`;
                 }
                 return `<strong>关系属性</strong><hr>
                 论文合作：${params.data.paper}次<br>专利合作：${params.data.patent}次<br>项目合作：${params.data.project}次<br>`;
@@ -149,18 +152,29 @@ let treeOption = {
 function reloadGraph(data){
     if(!"nodes" in data) return;
     // console.log(data)
-    let nodes = data.nodes, links = data.links, cates = data.community;
+    let nodes = data.nodes, links = data.links;
     // console.log(nodes.length, links.length, cates.length);
     graphOption.series[0].data = nodes;
     graphOption.series[0].links = links;
 
     let categories = [];
     categories[0] = {name: '我'};
-    for (let i = 1; i <= cates; i++) {
-        categories[i] = {
-            name: '社区' + i
-        };
+
+    if ("community" in data){
+        for (let i = 1; i <= data.community; i++) {
+            categories[i] = {
+                name: '社区' + i
+            };
+        }
     }
+    else if("institutions" in data){
+        for (let i = 0; i <= data.institutions.length; i++) {
+            categories[i+1] = {
+                name: data.institutions[i]
+            };
+        }
+    }
+    
     graphOption.series[0].categories = categories;
     graphOption.legend = [{
         data: categories.map(function (a) {
@@ -168,6 +182,7 @@ function reloadGraph(data){
         })
     }];
     myChart.setOption(graphOption);
+    myChart.hideLoading();
 }
 
 //添加点击跳转事件
@@ -206,13 +221,20 @@ function showGraph() {
     //默认请求的是关系图
     let school = $("#select-college").children("option:selected").text();
     let institution = $('#select-institution').children("option:selected");
-    getInstitutionGraphData(school,institution.text(), institution.data("times"));
+    // 选中 "全部"
+    if(institution.data("type")){
+        getSchoolGraphData(school);
+    }
+    else{
+        getInstitutionGraphData(school,institution.text());
+    }
 }
 
 /**
  * 点击 显示/隐藏非核心节点 的事件
  */
 $("#toggle-node-btn").click((e)=>{
+    myChart.showLoading();
     toggle_unimportant_node(0, true);
     toggle_relation_with_core_node(0, true);
     reloadGraph(DATA);
@@ -284,12 +306,35 @@ function setInstitution(institution_list, school){
         alert("学院数据为空");
         return;
     }
-    let options = "";
+    let options = "<option data-type='all'>——全部——</option>";
     for (let i = 0; i < institution_list.length; i++) {
         options += `<option>${institution_list[i]}</option>`;
     }
     $("#select-institution").html(options);
-    getInstitutionGraphData(school, institution_list[0]);
+    // getInstitutionGraphData(school, institution_list[0]);
+    getSchoolGraphData(school);
+}
+
+/**
+ * 根据学校名，获取在当前学校建立的社交关系
+ * @param {String} school
+ */
+function getSchoolGraphData(school) {
+    myChart.showLoading();
+    $.ajax({
+        type: "get",
+        url: "/get_school_relation",
+        data: {"school": school},
+        dataType: "json",
+        success: function (response) {
+            console.log(response);
+            reloadGraph(response);
+        },
+        error: function(){
+            toggle_alert(false, "", "服务器连接失败,请稍后再试");
+        }
+    });
+    $("#toggle-node-btn").hide();
 }
 
 
@@ -299,6 +344,7 @@ function setInstitution(institution_list, school){
  * @param {String} institution 
  */
 function getInstitutionGraphData(school, institution){
+    myChart.showLoading();
     $.ajax({
         type: "get",
         url: "/change_institution",
@@ -324,6 +370,7 @@ function getInstitutionGraphData(school, institution){
             toggle_alert(false, "", "服务器连接失败,请稍后再试");
         }
     });
+    $("#toggle-node-btn").show();
 }
 
 
@@ -354,7 +401,7 @@ function toggle_unimportant_node(category, toggle_all = false){
 
 /**
  * 创建用户与核心节点的关系
- * @param {json} core_node_data 
+ * @param {json} core_node_data ==> [t_id : {"visited": 123, "activity": 234},...]
  */
 function create_relation_with_core_node(core_node_data){
     if(!core_node_data || core_node_data.length == 0) return;
@@ -366,7 +413,8 @@ function create_relation_with_core_node(core_node_data){
         CORE_NODE.push({
             "source":"0",
             "target":`-${id}`,
-            "visited": `共${core_node_data[id]}`,
+            "visited": `共${core_node_data[id].visited}`,
+            "activity": `共${core_node_data[id].activity}`,
             "lineStyle": {
                 "normal": {
                     // TODO 根据拜访次数设定连线宽度

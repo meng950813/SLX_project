@@ -73,20 +73,25 @@ $.ajax({
     type: 'GET',
     dataType: 'json'
 }).done(function (data) {
-    schools = data;
-    // autocomplete(document.getElementById('school'), schools);
-    // console.log("schools------------  :", schools);
-    var html;
-    for(var i = 0; i < schools.length; i++){
-        school = schools[i];
-        html += '<option>'+ school + '</option>';
+    console.log(data)
+    if(data["success"] == true){
+        schools = data["school_list"];
+        // autocomplete(document.getElementById('school'), schools);
+        // console.log("schools------------  :", schools);
+        var html;
+        for(var i = 0; i < schools.length; i++){
+            school = schools[i];
+            html += '<option>'+ school + '</option>';
+        }
+        $('#select-college').html(html);
+
+        // 如果没有点击学校，则选取默认的学校进行其学院的加载
+        loadInstitution();
+    }else{
+        toggle_alert(false,"","获取学校失败");
     }
-    $('#select-college').html(html);
 
-    // 如果没有点击学校，则选取默认的学校进行其学院的加载
-    loadInstitution();
 });
-
 
 
 if ($('#school').val()){
@@ -256,7 +261,9 @@ function saveVisitedRecord(e){
         }
         //显示新修改的记录
         if (!isModifying){
+            console.log("total" + $('#total').text());
             let total = parseInt($('#total').text()) + 1;
+            console.log("total" + total);
             let insert_html =
                 `<tr><td>${total}</td><td>${send_data.date}</td><td><a>${send_data.title}</a></td><td>${send_data.school}</td>
                 <td>${send_data.institution}</td> <td>${send_data.teacher}</td> 

@@ -5,9 +5,10 @@ by chen
 import json
 import os
 
-from web.config import MongoDB_CONFIG
+from web.config import NEO4J_CONFIG, MongoDB_CONFIG
 from web.settings import basedir
 from web.utils.mongo_operator import MongoOperator
+from web.utils.neo4j_operator import NeoOperator
 
 
 class SchoolAgentService(object):
@@ -18,6 +19,9 @@ class SchoolAgentService(object):
         :param school: str 学校名
         :return: [{"name":xxx, "visited": 132},...] or False
         """
+        if not school:
+            return {}
+
         back = MongoOperator(**MongoDB_CONFIG).get_collection("school").find_one({"name": school}, {"institutions": 1})
         if not back or not ("institutions" in back):
             return False
@@ -34,16 +38,19 @@ class SchoolAgentService(object):
         :param school: str 学校名
         :return: [xxx,xxx,xxx...] or False
         """
+        if not school:
+            return []
+
         institutions = self.get_institutions_dict(school)
         # 取出学院名，转为list
         return [item["name"] for item in institutions]
 
-    def get_relations(self, school, institution, agent_relation):
+    def get_relations(self, school, institution, agent_id):
         """
         获取当前用户与某一学院之中的人员关系及其中的内部社区分布
         :param school: 学校名
         :param institution: 学院名
-        :param agent_relation: 商务自己建立的联系, [{id:xxx, name: xxx, weight: 123},{...},....]
+        :param agent_id: 商务自己建立的联系, [{id:xxx, name: xxx, weight: 123},{...},....]
         :return: 可供echarts直接渲染的json文件 or False
         """
         file_path = os.path.join(basedir, 'web', 'static', 'relation_data', '%s%s.txt' % (school, institution))
@@ -55,13 +62,16 @@ class SchoolAgentService(object):
         with open(file_path, "r") as f:
             data = json.loads(f.read())
             # print(data)
-            # print("in get_relations, already open file")
-            relation_data = self.format_relation_data(data, agent_relation)
+            
+            # agent_relation => [{visited: xxx, activity: xxx, id:13213},...] or []
+            agent_relation = self.get_institutions_relation_data(agent_id, school, institution)
+
+            relation_data = self.format_institution_relation_data(data, agent_relation)
             return json.dumps(relation_data)
 
-    def format_relation_data(self, data, agent_relation):
+    def format_institution_relation_data(self, data, agent_relation):
         """
-        将关系数据简化为可发送的数据
+        将学院关系数据简化为可发送的数据
         :param data: 预处理过的社区网络数据
         :param agent_relation: 商务的社交数据
         :return: 可供echarts直接渲染的json文件 or False
@@ -99,7 +109,8 @@ class SchoolAgentService(object):
                 # 以其 class 为值是为了更方便的在隐藏非核心节点时, 将商务与其的关系累加到核心节点上
                 teacher_id_dict[node['teacherId']] = node["class"]
 
-                del node["teacherId"], node["class"], node["centrality"], node["code"], node["school"], node["insititution"]
+                del node["teacherId"], node["class"], node["centrality"], node["code"], node["school"], node[
+                    "insititution"]
 
             data["links"] = []
             for link in data["edges"]:
@@ -123,13 +134,12 @@ class SchoolAgentService(object):
             # 添加商务节点
             data["nodes"].append(self.create_agent_node())
 
-            # 添加商务创建的社交关系
-            if agent_relation:
-                agent_relation_data = self.create_agent_relation(agent_relation, teacher_id_dict, class_id_dict)
+            # 格式化商务创建的社交关系
+            agent_relation_links, core_node = self.create_agent_relation_links(agent_relation, teacher_id_dict, class_id_dict)
 
-                data["links"].extend(agent_relation_data[0])
+            data["links"].extend(agent_relation_links)
 
-                data["core_node"] = agent_relation_data[1]
+            data["core_node"] = core_node
 
             if "community_data" in data: del data['community_data']
             if "algorithm_compare" in data: del data['algorithm_compare']
@@ -164,10 +174,10 @@ class SchoolAgentService(object):
             }
         }
 
-    def create_agent_relation(self, data, teacher_dict, class_dict):
+    def create_agent_relation_links(self, data, teacher_dict, class_dict):
         """
         创建商务与当前学院中老师的关系
-        :param data: 商务创建的所有联系, [{id:xxx, name: xxx, weight: 123},{...},....]
+        :param data: 商务创建的所有联系, [{id:xxx, visited: 123, activity:123 },{...},....]
         :param teacher_dict: dict 当前学院的教师id列表, 值为其所属社区号
         :param class_dict: dict 当前学院中的社区号, 值为其中核心节点的 teacherId
         :return: tuple (
@@ -182,16 +192,14 @@ class SchoolAgentService(object):
         core_node = {}
 
         for item in data:
-            if not item.get("id") in teacher_dict:
+            if item.get("id") not in teacher_dict:
                 continue
-
-            if not ("weight" in item):
-                item["weight"] = 1
 
             info = {
                 "source": "0",
                 "target": str(item['id']),
-                "visited": item['weight'],
+                "visited": item['visited'],
+                "activity": item['activity'],
                 "lineStyle": {
                     "normal": {
                         # TODO 根据拜访次数设定连线宽度
@@ -201,13 +209,17 @@ class SchoolAgentService(object):
             }
             back.append(info)
 
+            # 防止取不到值
             try:
-                # 防止取不到值
                 core_teacher = class_dict[teacher_dict[item['id']]]
                 if core_teacher in core_node:
-                    core_node[core_teacher] += item["weight"]
+                    core_node[core_teacher]["visited"] += item["visited"]
+                    core_node[core_teacher]["activity"] += item["activity"]
                 else:
-                    core_node[core_teacher] = item["weight"]
+                    core_node[core_teacher] = {
+                        "visited" : item["visited"],
+                        "activity" : item["activity"]
+                    }
             except Exception as e:
                 print("取不到正确的值")
                 print(e)
@@ -245,16 +257,116 @@ class SchoolAgentService(object):
         :return:
         """
         try:
-
-            # {'_id': ObjectId('xxx'), 'institutions': [{'visited': 2, 'name': '公共卫生学院'}]}
+            # back => {'_id': ObjectId('xxx'), 'institutions': [{'visited': 2, 'name': '公共卫生学院'}]}
             back = MongoOperator(**MongoDB_CONFIG).get_collection("school").find_one(
-                {"name": school, "institutions.name": institution}, {"institutions.$.visited":1})
+                {"name": school, "institutions.name": institution}, {"institutions.$.visited": 1})
             visited = int(back['institutions'][0]["visited"]) + 1
             # 该学院增加一次点击
             MongoOperator(**MongoDB_CONFIG).get_collection("school").update_one(
-                {"name": school, "institutions.name": institution}, {"$set": {"institutions.$.visited": visited }})
+                {"name": school, "institutions.name": institution}, {"$set": {"institutions.$.visited": visited}})
         except Exception as e:
             print("点击次数加一失败， visited=%s")
             print(e)
+
+    def format_personal_relation_data(self, data):
+        """
+        格式化个人中心网络，生成 echarts 能渲染的数据格式
+        :param data: {
+            "relation": [
+                {
+                    source: {id, name, school, institution, code},
+                    r:{paper, patent, project},
+                    target: {id, name, school, institution, code}
+                }, ... ],
+            "agent_relation": [{agent_id: xxx, visited: xxx, activity: xxx, t_id:13213},...]
+        }
+        :return:
+        """
+        back = {
+            "nodes": [self.create_agent_node()],
+            "links": [],
+            "community": 2
+        }
+
+        # 若以该教师为核心的网络为空 ==> 只返回商务节点，教师节点由前端生成
+        if len(data['relation']) == 0:
+            back['community'] = 1
+
+        teacher_id_set = set()
+
+        for item in data["relation"]:
+            source, r, target = item['source'], item['r'], item['target']
+
+            if source['id'] not in teacher_id_set:
+                teacher_id_set.add(source[id])
+                back['nodes'].append(
+                    {"name": str(source['id']), "label": source['name'], "category": 1, "draggable": True})
+
+            if target['id'] not in teacher_id_set:
+                teacher_id_set.add(target['id'])
+                back['nodes'].append(
+                    {"name": str(target['id']), "label": target["name"], "category": 2, "draggable": True})
+
+            back['links'].append({"source": str(source['id']), "target": str(target["id"]), "paper": r['paper'],
+                                  "patent": r['patent'], "project": r['project']})
+
+        for item in data['agent_relation']:
+            back['links'].append({"source": "0", "target": str(item["t_id"]),
+                                  "visited": item['visited'], "activity": item['activity']})
+
+        return back
+
+    def get_institutions_relation_data(self, agent_id, school, institution):
+        # data ==> [{visited: xxx, activity: xxx, id:13213},...]
+        data = NeoOperator(**NEO4J_CONFIG).get_institution_relation_with_agent(agent_id, school, institution)
+
+        return data
+    
+    def get_school_relation_data(self, agent_id, school):
+        """
+        获取商务在该学校建立的社交关系数据
+        :param agent_id:
+        :param school:
+        :return:{
+            "nodes": [{name, label, institution}, ...],
+            "links": [{source, target, visited, activity}],
+             "community": 123
+        }
+        """
+        # data => [] or [{'visited': 1, 'activity': 0, 't_id': 001, 'name':xxx, 'institution': xxx}, ...]
+        data = NeoOperator(**NEO4J_CONFIG).get_school_relation_with_agent(agent_id, school)
+
+        return self.format_school_relation_data(data)
+
+    def format_school_relation_data(self, data):
+        """
+        格式化商务在该学校建立的社交网络，生成 echarts 能渲染的数据格式
+        :param data: list of dict ==>
+            [] or [{'visited': 1, 'activity': 0, 't_id': 001, 'name':xxx, 'institution': xxx}, ...]
+        :return:
+        """
+        back = {
+            "nodes": [self.create_agent_node()],
+            "links": []
+        }
+
+        institutions_dict, index = {}, 1
+        for item in data:
+            node = {"name": str(item['t_id']), "label": item['name'], "symbolSize": 30,
+                    "draggable": True, "institution": item['institution']}
+
+            if item['institution'] not in institutions_dict:
+                institutions_dict[item['institution']] = index
+                index += 1
+
+            node["category"] = institutions_dict[item['institution']]
+
+            back['nodes'].append(node)
+            back['links'].append({"source": "0", "target": str(item['t_id']), "visited": item['visited'],
+                                  "activity": item['activity']})
+        
+        back["institutions"] = [k for k in institutions_dict.keys()]
+        return back
+
 
 agent_service = SchoolAgentService()

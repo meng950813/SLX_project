@@ -5,8 +5,9 @@ from flask_login import current_user
 import threading
 
 from web.blueprints.auth import login_required
-from web.config import MongoDB_CONFIG
+from web.config import MongoDB_CONFIG, NEO4J_CONFIG
 from web.utils.mongo_operator import MongoOperator
+from web.utils.neo4j_operator import NeoOperator
 
 
 visit_record_bp = Blueprint('visit_record', __name__)
@@ -120,54 +121,30 @@ def delete_visit_record():
         return json.dumps({'success': False, "message": "删除失败"})
 
 
-def add_relation(teacher_id, uid):
-    """
-    将新建的拜访记录的用户与教师的关系存入数据库
-    :param teacher_id:
-    :param uid:
-    :return:
-    """
-    print("-----------------------add_relation-------------------------------")
-    print(teacher_id)
-    mongo = MongoOperator(**MongoDB_CONFIG)
-    # 获取教师基本信息集合
-    basic_info_col = mongo.get_collection("basic_info")
-    # 获取用户的集合
-    user_col = mongo.get_collection("user")
-    # 获取对应用户的文档
-    user_doc = user_col.find_one({"id": uid, "related_teacher": {"$elemMatch": {"id": teacher_id}}}, {"related_teacher": 1, "_id": 0})
-    if user_doc is None:
-        # print("---")
-        user_doc = user_col.find_one({"id": uid}, {"related_teacher": 1, "_id": 0})
-        name = basic_info_col.find_one({"id": teacher_id}, {"name": 1, "_id": 0})["name"]
-        teacher_list = user_doc["related_teacher"]
-        teacher_list.append({
-            "id": teacher_id,
-            "name": name,
-            "weight": 1
-        })
-        user_col.update({"id": uid}, {"$set": {"related_teacher": teacher_list}})
-
-    else:
-        for d in user_doc["related_teacher"]:
-            if d["id"] == teacher_id:
-                w = d["weight"]
-                d["weight"] = w+1
-                break
-        user_col.update({"id": uid}, {"$set": {"related_teacher": user_doc["related_teacher"]}})
-
-    # print(user_col.find_one({"id": uid, "related_teacher": {"$elemMatch": {"id": teacher_id}}}, {"related_teacher": 1, "_id": 0}))
-
 def upsert_relation_of_visited(user_id, teacher_id, teacher_name):
     """
-    添加拜访信息到 user 表中
+    by chen
+    在图数据库中添加拜访关系
+    添加拜访信息到 mongoDB 的user 表中
     :param user_id:
     :param teacher_id:
     :param teacher_name:
-    :return:
+    :return: None
     """
-    collection_user = MongoOperator(**MongoDB_CONFIG).get_collection("user")
+    # 操作neo4j
     try:
+        # back ==> {success: True / False, message:xxxx}
+        back = NeoOperator(**NEO4J_CONFIG).upsert_agent_relation(user_id, teacher_id)
+        if not back['success']:
+            print("更新拜访记录到图数据库失败，原因：%s" % back['message'])
+
+    except Exception as e:
+        print("更新拜访记录到图数据库失败，原因：%s" % e)
+
+    # TODO 后期剔除该部分
+    # 操作mongo
+    try:
+        collection_user = MongoOperator(**MongoDB_CONFIG).get_collection("user")
         # back => None or dict{"_id":ObjectId("xxx"), "related_teacher":[{id:xx, name, visited_count:12, acitve_count: 123}]}
         visited_record = collection_user.find_one({"id": user_id, "related_teacher.id": teacher_id}, {"related_teacher.$": 1})
 
@@ -186,8 +163,9 @@ def upsert_relation_of_visited(user_id, teacher_id, teacher_name):
             collection_user.update_one({"id": user_id}, {"$set": {"related_teacher": [insert_data]}})
 
     except Exception as e:
-        print("更新关系失败, 原因：%s" % e)
+        print("更新拜访记录到mongo失败, 原因：%s" % e)
 
 
 if __name__ == '__main__':
-    upsert_relation_of_visited(100003, 135495, "张三")
+    upsert_relation_of_visited(100000, 135495, "张三")
+    upsert_relation_of_visited(100000, 162702, "")

@@ -8,7 +8,6 @@ from flask_login import current_user
 from web.blueprints.auth import login_required
 from web.config import MongoDB_CONFIG
 from web.service.school_agent_service import agent_service
-from web.settings import basedir
 from web.utils.encrypt import encryption
 from web.utils.mongo_operator import MongoOperator
 
@@ -57,6 +56,16 @@ def index():
         return render_template('personal.html', schools=[], institutions=[])
 
 
+@school_agent_bp.route('/get_school_relation', methods=["GET"])
+@login_required
+def get_school_relation():
+    school = request.args.get("school")
+    # data ==> {nodes:[{},..], links:[{..},... , community:123]}
+    data = agent_service.get_school_relation_data(current_user.id, school)
+
+    return json.dumps(data)
+
+
 @school_agent_bp.route('/change_school', methods=["GET"])
 @login_required
 def change_school():
@@ -65,6 +74,27 @@ def change_school():
     if institutions:
         return json.dumps(institutions)
     return json.dumps({"success": False, "message": "学校名有误"})
+
+
+@school_agent_bp.route('/get_schools', methods=['GET'])
+@login_required
+def get_schools():
+    """
+    by zhang
+    获取所有学校的名称组成的列表
+    :return:
+    """
+    mongo = MongoOperator(**MongoDB_CONFIG)
+    try:
+        school_col = mongo.get_collection("school")
+        schools = list(school_col.find({}, {"_id": 0, "name": 1}))
+
+        # 转成学校列表
+        school_list = [d["name"] for d in schools]
+        return json.dumps({"success": True, "school_list": school_list})
+
+    except:
+        return json.dumps({"success": False, "school_list": []})
 
 
 @school_agent_bp.route('/change_institution', methods=["GET", "PUT"])
@@ -76,7 +106,7 @@ def change_institution():
     
     # 个人中心需要获取关系数据
     if get_relation:
-        json_data = agent_service.get_relations(school, institution, current_user.get("related_teacher"))
+        json_data = agent_service.get_relations(school, institution, current_user.id)
 
         if json_data:
             # 放在此处执行 + 1 操作是为了让无关系文件的学院靠后
