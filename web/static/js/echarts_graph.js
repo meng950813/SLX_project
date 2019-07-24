@@ -161,7 +161,7 @@ function reloadGraph(data){
     categories[0] = {name: '我'};
 
     if ("community" in data){
-        for (let i = 1; i <= cates; i++) {
+        for (let i = 1; i <= data.community; i++) {
             categories[i] = {
                 name: '社区' + i
             };
