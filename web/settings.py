@@ -1,4 +1,5 @@
 import os
+import uuid
 import datetime
 from web.config import MAIL_CONFIG
 
@@ -20,7 +21,7 @@ AGNET_TYPE = {
 
 class BaseConfig(object):
     # wtform库用于CSRF
-    SECRET_KEY = os.getenv('SECRET_KEY', 'dev key')
+    SECRET_KEY = os.getenv('SECRET_KEY', uuid.uuid4().hex)
     # 邮件相关
     MAIL_SERVER = MAIL_CONFIG['server']
     MAIL_PORT = 465
