@@ -51,7 +51,7 @@ def edit_schedule():
         "content": request.form.get("content"),
         "remind_date": request.form.get('date'),
         # 标识当前日程的状态: 0 => 已完成; 1 => 未处理; -1 => 已舍弃
-        "status": 0
+        "status": 1
     }
 
     back = insert_or_edit_schedule(data, schedule_id)
@@ -116,7 +116,7 @@ def set_whether_completed_or_canceled(schedule_id, status):
 
     schedule_col = MongoOperator(**MongoDB_CONFIG).get_collection("schedule")
 
-    status = 0 if status == 0 else -1
+    status = -1 if status == -1 else 0
 
     try:
         # 更新schedule_list
