@@ -67,6 +67,11 @@
             <legend>拜访记录</legend>
             <table class="table table-hover">
                 <tbody>
+                        <tr>
+                            <td style="width: 120px">日期</td>
+                            <td>标题</td>
+                            <td>内容</td>
+                        </tr>
                     {% for visit in visit_list %}
                         <tr>
                             <td style="width: 120px">{{ visit["date"] }}</td>
