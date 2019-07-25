@@ -3,6 +3,7 @@ from bson.objectid import ObjectId
 import json
 from flask_login import current_user
 import threading
+import datetime
 
 from web.blueprints.auth import login_required
 from web.config import MongoDB_CONFIG, NEO4J_CONFIG
@@ -49,14 +50,30 @@ def new_visit_record():
         # back => dict or None
         teacher_info = mongo_operator.get_collection("basic_info").find_one(
                 {"name": record['teacher'], "school": record['school'], "institution": record['institution']},
-                {"_id": 1, "id": 1, "name": 1}
+                {"_id": 0, 'paper_id': 0, 'patent_id': 0, 'funds_id': 0, 'honor': 0, 'edu_exp': 0, 'birth_year': 0, 'other_title': 0}
             )
         if teacher_info is None:
             return json.dumps({'success': False, "message": "教师不存在,请检查输入的信息"})
 
         # 插入拜访记录
-        result = mongo_operator.get_collection("visit_record").insert_one(record)
-        
+        result = mongo_operator.get_collection('visit_record').insert_one(record)
+        # 是否存在完善的信息
+        external_info = {'type': 'modify', 'status': 1, 'username': current_user.name, 'timestamp': datetime.datetime.utcnow()}
+        modifying = False
+        external_keys = [
+            ('position', 'position'), ('teacher-title', 'title'), ('telephone', 'phone_number')
+            , ('email', 'email'), ('office-phone', 'office_number'), ('department', 'department')]
+        for key in external_keys:
+            whole_key = 'basic_info[%s]' % key[0]
+            if whole_key in request.form:
+                modifying = True
+                external_info[key[1]] = request.form[whole_key]
+        # 更新老师信息 并写入到反馈中
+        if modifying:
+            teacher_info.update(external_info)
+            # 写入数据库
+            mongo_operator.db['agent_feedback'].insert_one(teacher_info)
+
         # 多线程执行插入用户与教师的关系
         threading.Thread(target=upsert_relation_of_visited, args=(uid, teacher_info['id'], teacher_info['name'])).start()
         # upsert_relation_of_visited(uid, teacher_info['id'], teacher_info['name'])
