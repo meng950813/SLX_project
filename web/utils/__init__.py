@@ -7,7 +7,7 @@ from web.settings import Operations
 # import web.service.user_service as user_service
 
 
-def generate_token(user, operation, expire_in=None, **kwargs):
+def generate_token(user, operation, expire_in=3600, **kwargs):
     """
     生成令牌
     :param user: 用户字典

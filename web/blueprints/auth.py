@@ -56,7 +56,7 @@ def forget_password():
     if form.validate_on_submit():
         # 获取邮箱 并查询数据库
         email = form.email.data.lower()
-        # TODO: user不是User对象
+        # TODO: 该user不是User对象
         user = user_service.get_user_by_email(email)
 
         # 发送到邮箱
