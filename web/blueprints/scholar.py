@@ -31,7 +31,7 @@ def get_visit_info(teacher_id):
     # 找到对应的拜访记录信息
     visit_info = visit_record_col.find({"user_id": user_id,
                 "teacher": teacher_dict["name"], "school": teacher_dict["school"],
-                "institution": teacher_dict["institution"]}, {"_id": 0, "date": 1, "title": 1, "content": 1})
+                "institution": teacher_dict["institution"], "status": 1}, {"_id": 0, "date": 1, "title": 1, "content": 1})
 
     # 转成列表
     visit_list = list(visit_info)
