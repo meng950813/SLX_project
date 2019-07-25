@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, session
+from flask import Flask, render_template
 from flask_login import current_user
 
 from web.settings import configuration
@@ -13,6 +13,7 @@ from web.blueprints.activity import activity_bp
 from web.extensions import bootstrap, csrf, moment, mail, login_manager
 from web.utils.mongo_operator import MongoOperator
 from web.config import MongoDB_CONFIG
+from web.settings import Message
 
 
 def create_app(config_name=None):
@@ -78,7 +79,7 @@ def register_template_context(app):
         if current_user.is_authenticated:
             uid = current_user.id
             mongo_operator = MongoOperator(**MongoDB_CONFIG)
-            unread_msg = mongo_operator.find({"to_id": uid, "state": 0}, "message").count()
+            unread_msg = mongo_operator.find({"to_id": uid, "state": Message.UNCHECKED}, "message").count()
 
         return dict(unread_msg=unread_msg)
 

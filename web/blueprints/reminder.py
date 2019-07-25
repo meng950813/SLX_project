@@ -6,6 +6,7 @@ import json
 from web.blueprints.auth import login_required
 from web.utils.mongo_operator import MongoOperator
 from web.config import MongoDB_CONFIG
+from web.settings import Message
 
 
 reminder_bp = Blueprint("reminder", __name__)
@@ -29,14 +30,14 @@ def info_reminder():
 
     # 把信息分为已读和未读
     for message in messages:
-        if message['state'] == 0:
+        if message['state'] == Message.CHECKED:
             checked_message.append(message)
         else:
             unchecked_message.append(message)
 
     # 标记未读的为已读
     collection = mongo_operator.get_collection("message")
-    collection.update_many({"to_id": uid}, {"$set": {"state": 0}})
+    collection.update_many({"to_id": uid}, {"$set": {"state": Message.CHECKED}})
 
     return render_template("info_reminder.html",
                            checked_message=checked_message, unchecked_message=unchecked_message)
@@ -45,7 +46,6 @@ def info_reminder():
 @reminder_bp.route('/add_message', methods=['POST'])
 @login_required
 def insert_message():
-    state = 0
     date = datetime.utcnow()
     # 发送者
     from_id = current_user.id
@@ -56,7 +56,7 @@ def insert_message():
     detail = request.form.get("content")
 
     message = {
-        'state': state,
+        'state': Message.UNCHECKED,
         'date': date,
         'from_id': from_id,
         'from_name': from_name,

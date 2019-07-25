@@ -13,6 +13,12 @@ class Operations:
     CHANGE_EMAIL = 'change-email'
 
 
+class Message:
+    """消息发送类型"""
+    UNCHECKED = 1
+    CHECKED = 0
+
+
 AGNET_TYPE = {
     "SCHOOL_AGENT": "0",
     "BUSINESS_AGENT": "1"
