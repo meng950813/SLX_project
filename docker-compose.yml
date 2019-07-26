@@ -2,7 +2,17 @@ version: "2.2"
 services:
  web:
   build: .
+  image: slx_project_web
   ports:
   - "5000:5000"
   volumes:
   - .:/code
+ nginx:
+  build: ./nginx
+  image: slx_project_nginx
+  ports:
+  - "80:80"
+  volumes:
+  - .:/code
+  links:
+  - "web:web"
