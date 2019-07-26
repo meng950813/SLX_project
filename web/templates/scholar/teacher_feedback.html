@@ -79,7 +79,12 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group col">
-                            {{ render_field(form.edu_exp, class="form-control", placeholder="教育经历", rows="5") }}
+                            {{ render_field(form.edu_exp, class="form-control", id="edu-exp", placeholder="教育经历", rows="5") }}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col">
+                            {{ render_field(form.work_exp, class="form-control", id="work-exp", placeholder="工作经历", rows="5") }}
                         </div>
                     </div>
                     <input class="btn btn-primary" onclick="submitData();" type="button" value="提交">

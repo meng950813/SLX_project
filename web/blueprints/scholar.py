@@ -29,8 +29,7 @@ def get_visit_info(teacher_id):
 
     user_id = current_user.id
     # 找到对应的拜访记录信息
-    visit_info = visit_record_col.find({"user_id": user_id,
-                "teacher": teacher_dict["name"], "school": teacher_dict["school"],
+    visit_info = visit_record_col.find({"user_id": user_id, "teacher": teacher_dict["name"], "school": teacher_dict["school"],
                 "institution": teacher_dict["institution"], "status": 1}, {"_id": 0, "date": 1, "title": 1, "content": 1})
 
     # 转成列表
@@ -71,7 +70,7 @@ def feedback():
     # 当前类型 添加or修改 add modify
     cur_type = 'modify' if teacher_id else 'add'
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
-    form = ScholarForm(teacher_id)
+    form = ScholarForm(teacher_id, type_get=request.method == 'GET')
 
     if request.method == 'POST':
         # 出现错误，则交给flash

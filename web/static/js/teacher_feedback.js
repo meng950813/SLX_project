@@ -67,7 +67,11 @@ function submitData() {
         content .push(text);
     }
     $('#domain').val(content.join(';'));
-
+    //格式化教育经历文本: 去除前后空格，换行符转为 <br>
+    let edu_exp = $("#edu-exp").val().trim() .split("\n").join("<br>");
+    $("#edu-exp").val(edu_exp);
+    let work_exp = $("#work-exp").val().trim() .split("\n").join("<br>");
+    $("#work-exp").val(work_exp);
     document.getElementById('teacher-info').submit();
 }
 
