@@ -71,11 +71,12 @@ def new_visit_record():
         # 更新老师信息 并写入到反馈中
         if modifying:
             teacher_info.update(external_info)
+            teacher_info['teacher_id'] = teacher_info.pop('id')
             # 写入数据库
             mongo_operator.db['agent_feedback'].insert_one(teacher_info)
 
         # 多线程执行插入用户与教师的关系
-        threading.Thread(target=upsert_relation_of_visited, args=(uid, teacher_info['id'], teacher_info['name'])).start()
+        threading.Thread(target=upsert_relation_of_visited, args=(uid, teacher_info['teacher_id'], teacher_info['name'])).start()
         # upsert_relation_of_visited(uid, teacher_info['id'], teacher_info['name'])
 
         return json.dumps({'success': True, 'record_id': str(result.inserted_id)})
