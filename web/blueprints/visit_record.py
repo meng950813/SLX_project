@@ -55,6 +55,7 @@ def new_visit_record():
         if teacher_info is None:
             return json.dumps({'success': False, "message": "教师不存在,请检查输入的信息"})
 
+        record['teacher_id'] = teacher_info['id']
         # 插入拜访记录
         result = mongo_operator.get_collection('visit_record').insert_one(record)
         # 是否存在完善的信息
@@ -76,7 +77,7 @@ def new_visit_record():
             mongo_operator.db['agent_feedback'].insert_one(teacher_info)
 
         # 多线程执行插入用户与教师的关系
-        threading.Thread(target=upsert_relation_of_visited, args=(uid, teacher_info['teacher_id'], teacher_info['name'])).start()
+        threading.Thread(target=upsert_relation_of_visited, args=(uid, record['teacher_id'], teacher_info['name'])).start()
         # upsert_relation_of_visited(uid, teacher_info['id'], teacher_info['name'])
 
         return json.dumps({'success': True, 'record_id': str(result.inserted_id)})
