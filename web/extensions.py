@@ -3,6 +3,7 @@ from flask_wtf.csrf import CSRFProtect
 from flask_moment import Moment
 from flask_mail import Mail
 from flask_login import LoginManager
+from flask_ckeditor import CKEditor
 
 from web.service import user_service
 
@@ -11,6 +12,7 @@ csrf = CSRFProtect()
 moment = Moment()
 mail = Mail()
 login_manager = LoginManager()
+ckeditor = CKEditor()
 
 # 当访问到受login_required时默认跳转到下面的视图
 login_manager.login_view = 'auth.login'

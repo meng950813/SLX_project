@@ -1,5 +1,4 @@
 import os
-import uuid
 import datetime
 from web.config import MAIL_CONFIG
 
@@ -39,6 +38,19 @@ class BaseConfig(object):
 
     # flask-login 会话过期时长
     REMEMBER_COOKIE_DURATION = datetime.timedelta(days=7)
+    # flask-ckeditor相关
+    # CKEditor包类型 (basic standard full)
+    CKEDITOR_PKG_TYPE = 'standard'
+    # 不使用本地资源
+    CKEDITOR_SERVE_LOCAL = True
+    # 使用简体中文
+    CKEDITOR_LANGUAGE = 'zh-cn'
+    # 对图片上传开启CSRF 保护
+    CKEDITOR_ENABLE_CSRF = True
+    # 处理文件上传的URL
+    CKEDITOR_FILE_UPLOADER = '/activity/upload'
+    # 图片文件上传保存路径
+    IMAGE_SAVE_PATH = os.path.join(basedir, 'uploads')
 
 
 class DevelopmentConfig(BaseConfig):

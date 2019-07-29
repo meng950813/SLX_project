@@ -10,7 +10,7 @@ from web.blueprints.schedule import schedule_bp
 from web.blueprints.auth import auth_bp
 from web.blueprints.reminder import reminder_bp
 from web.blueprints.activity import activity_bp
-from web.extensions import bootstrap, csrf, moment, mail, login_manager
+from web.extensions import bootstrap, csrf, moment, mail, login_manager, ckeditor
 from web.utils.mongo_operator import MongoOperator
 from web.config import MongoDB_CONFIG
 from web.settings import Message
@@ -24,7 +24,7 @@ def create_app(config_name=None):
     app.config.from_object(configuration[config_name])
 
     # 注册日志处理器
-    register_logging(app)
+    register_logger(app)
     # 初始化扩展
     register_extensions(app)
     # 注册蓝图
@@ -37,7 +37,7 @@ def create_app(config_name=None):
     return app
 
 
-def register_logging(app):
+def register_logger(app):
     pass
 
 
@@ -47,6 +47,7 @@ def register_extensions(app):
     moment.init_app(app)
     mail.init_app(app)
     login_manager.init_app(app)
+    ckeditor.init_app(app=app)
 
 
 def register_blueprints(app):

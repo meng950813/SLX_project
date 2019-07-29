@@ -9,3 +9,4 @@ venv/
 relation_data
 
 config.py
+uploads/
