@@ -128,7 +128,8 @@
                 </li>
                 <li class="nav-item" >
                     <a href="#paper-list" class="nav-link" data-toggle="tab">
-                        <i class="glyphicon glyphicon-book"></i> 论文成果(1)
+                        <i class="glyphicon glyphicon-book"></i> 论文成果
+                        ({% if 'papers' in teacher %}{{ teacher['papers'] | length }}{% else %}0{% endif %})
                     </a>
                 </li>
             </ul>
@@ -167,17 +168,21 @@
                     {% endif %}
                 </ul>
                 <ul class="tab-pane fade in" id="paper-list">
-                    <li>
-                        <!-- <div class="d-inline">
-                            <i class="glyphicon glyphicon-book"></i> 《基于因果发现的神经网络集成方法》
-                        </div>
-                        <div class="d-inline">
-                            <span>2018/6月 </span>
-                            <span>发表自《软件学报》</span>
-                            <span>引用次数：30</span>
-                            <span>作者:  凌锦江 周志华</span>
-                        </div> -->
-                    </li>
+                     {% if "papers" in teacher %}
+                        {% for paper in teacher["papers"] %}
+                            <li>
+                                <div class="d-inline">
+                                    <i class="glyphicon glyphicon-book"></i> 《{{ paper["name"] }}》
+                                </div>
+                                <div class="d-inline">
+                                    <span>{{ paper["year"] }} </span>
+                                    <span>发表自《{{ paper["org"] }}》</span>
+                                    <span>引用次数：{{ paper["cited_num"] }}</span>
+                                    <span>作者:  {{ paper["author"] }}</span>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
                 </ul>
             </div>
         </fieldset>
