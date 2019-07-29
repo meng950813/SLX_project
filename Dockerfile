@@ -9,5 +9,4 @@ COPY requirements.txt /code
 RUN pip install -r requirements.txt && pip install gunicorn
 #设置环境变量
 EXPOSE 5000
-
 CMD gunicorn --workers=4 --bind=0.0.0.0:5000 wsgi:app

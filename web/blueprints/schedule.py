@@ -79,10 +79,10 @@ def operate_schedule():
     return json.dumps({"success": False, "message": "操作失败, code: %s" % back})
 
 
-def insert_or_edit_schedule(data, schedule_id):
+def insert_or_edit_schedule(s_data, schedule_id):
     """
     根据 schedule_id 决定 插入/更新 日程数据
-    :param data: 具体数据
+    :param s_data: 具体数据
     :param schedule_id: string 类型的objectId
     :return: 0 / 1 or objectId
     """
@@ -91,14 +91,13 @@ def insert_or_edit_schedule(data, schedule_id):
     try:
         # 合法objectId ==> 修改
         obj_id = ObjectId(schedule_id)
-        result = schedule_col.update_one({'_id': obj_id}, {"$set": data})
+        result = schedule_col.update_one({'_id': obj_id}, {"$set": s_data})
         return result.modified_count
 
-    # TODO to checkout error type
-    except Exception as t:
+    except TypeError as t:
         # 非法objectId ==> 创建
         print("type error", type(t), t)
-        result = schedule_col.insert_one(data)
+        result = schedule_col.insert_one(s_data)
         return result.inserted_id
 
     except Exception as e:

@@ -57,7 +57,7 @@
     <div class="collapse navbar-collapse" id="navbarColor01">
         {% if current_user.is_authenticated %}
             <ul class="navbar-nav mr-auto">
-                {{ render_nav_item('activity.add_activity', '活动安排') }}
+{#                {{ render_nav_item('activity.add_activity', '活动安排') }}#}
                 {{ render_nav_item('schedule.schedule', '日程安排') }}
                 {{ render_nav_item('visit_record.manage_visit_record', '拜访记录') }}
             </ul>

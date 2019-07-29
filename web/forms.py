@@ -37,23 +37,38 @@ class ScholarForm(FlaskForm):
     institution = SelectField('学院：', validators=[DataRequired()], coerce=str)
     department = StringField('系：', validators=[Optional()])
 
-    title = SelectField('头衔：', choices=[('', '未知'), ('教授', '教授'), ('副教授', '副教授'), ('讲师', '讲师'), ('助教', '助教')], default='', coerce=str)
-    honor = SelectMultipleField('荣誉头衔：', choices=[('院士', '院士'), ('长江学者', '长江学者'), ('杰出青年', '杰出青年')], default='', coerce=str)
+    title = SelectField('职称：', choices=[('', '未知'), ('教授', '教授'), ('副教授', '副教授'),
+                                        ('讲师', '讲师'), ('助教', '助教')], default='', coerce=str)
+    honor = SelectMultipleField('荣誉头衔：', choices=[
+        ('中国科学院院士', '中国科学院院士院士'), ('中国工程院院士', '中国工程院院士院士'), ('长江学者', '长江学者'),
+        ('杰出青年', '杰出青年'), ('优秀青年', '优秀青年')], default='', coerce=str)
     phone_number = StringField('手机号：')
     office_number = StringField('办公电话：')
     email = StringField('邮箱：', validators=[Email(), Optional()])
     edu_exp = TextAreaField('教育经历：')
+    work_exp = TextAreaField('工作经历：')
     submit = SubmitField('提交')
 
-    def __init__(self, teacher_id, *args, **kwargs):
+    def __init__(self, teacher_id, type_get, *args, **kwargs):
+        """
+
+        :param teacher_id:
+        :param type_get:
+        :param args:
+        :param kwargs:
+        """
         super(ScholarForm, self).__init__(*args, **kwargs)
         mongo_operator = MongoOperator(**MongoDB_CONFIG)
         cur_school = None
         cur_institution = None
         # 设置数据
         if teacher_id:
-            result = mongo_operator.get_collection('basic_info').find_one({'id': teacher_id}, {'_id': 0})
-            self.set_data(result)
+            if type_get:
+                result = mongo_operator.get_collection('basic_info').find_one({'id': teacher_id}, {'_id': 0})
+                self.set_data(result)
+            else:
+                result = mongo_operator.get_collection('basic_info').find_one({'id': teacher_id},
+                                                                              {'school': 1, 'institution': 1})
             cur_school, cur_institution = result['school'], result['institution']
         # 获取所有的学校
         generator = mongo_operator.get_collection('school').find({}, {'_id': 0, 'name': 1})
@@ -64,6 +79,11 @@ class ScholarForm(FlaskForm):
         self.set_institutions(school['institutions'], cur_institution)
 
     def set_data(self, datum):
+        """
+        将从数据库中获取的数据渲染到前端页面
+        :param datum: dict
+        :return:
+        """
         self.name.data = datum['name']
         if 'gender' in datum:
             self.gender.data = datum['gender']
@@ -82,7 +102,9 @@ class ScholarForm(FlaskForm):
         self.email.data = datum['email'].strip()
         self.phone_number.data = datum['phone_number'].strip()
         self.office_number.data = datum['office_number'].strip()
-        self.edu_exp.data = datum['edu_exp']
+        self.edu_exp.data = datum['edu_exp'].strip().replace("<br>", "\n")
+        if "work_exp" in datum:
+            self.work_exp.data = datum['work_exp'].strip().replace("<br>", "\n")
 
     def get_data(self):
         datum = {
@@ -98,6 +120,7 @@ class ScholarForm(FlaskForm):
             'phone_number': self.phone_number.data,
             'office_number': self.office_number.data,
             'edu_exp': self.edu_exp.data,
+            'work_exp': self.work_exp.data
         }
         if len(self.domain.data.strip()) == 0:
             datum['domain'] = []
