@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, abort
+from flask import Blueprint, render_template, request, abort, Markup
 from bson.objectid import ObjectId
 import json
 from flask_login import current_user
@@ -153,6 +153,9 @@ def detail(objectId):
         mongo_operator = MongoOperator(**MongoDB_CONFIG)
         condition = {"_id": ObjectId(objectId)}
         record = mongo_operator.get_collection('visit_record').find_one(condition, {'_id': 0})
+        # 拜访记录的内容 进行安全转义
+        if 'content' in record:
+            record['content'] = Markup(record['content'])
     except Exception as e:
         print('error raised when viewing the detail of visit record %s' % e)
 
