@@ -51,7 +51,7 @@ def get_info(teacher_id):
         """
         重点研发计划的部分未显示
         """
-        print(basic_info)
+        # print(basic_info)
         return basic_info
 
     except Exception as e:
