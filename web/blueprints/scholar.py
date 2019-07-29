@@ -13,31 +13,6 @@ from web.utils import redirect_back
 scholar_bp = Blueprint('scholar', __name__)
 
 
-def get_visit_info(teacher_id):
-    """
-    by zhang
-    根据教师的id获取到该用户所拜访的该教师的拜访记录信息
-    :param teacher_id:
-    :return:
-    """
-    # 根据教师的id找出教师所在的学校和学院和名字
-    mongo = MongoOperator(**MongoDB_CONFIG)
-    basic_info_col = mongo.get_collection("basic_info")
-    teacher_dict = basic_info_col.find_one({"id": teacher_id}, {"_id": 0, "name": 1, "school": 1, "institution": 1})
-
-    visit_record_col = mongo.get_collection("visit_record")
-
-    user_id = current_user.id
-    # 找到对应的拜访记录信息
-    visit_info = visit_record_col.find({"user_id": user_id, "teacher": teacher_dict["name"], "school": teacher_dict["school"],
-                "institution": teacher_dict["institution"], "status": 1}, {"_id": 0, "date": 1, "title": 1, "content": 1})
-
-    # 转成列表
-    visit_list = list(visit_info)
-
-    return visit_list
-
-
 @scholar_bp.route('/detail/<int:teacher_id>')
 @login_required
 def scholar_info(teacher_id):
@@ -52,7 +27,19 @@ def scholar_info(teacher_id):
     if teacher is None:
         return abort(404)
 
-    visit_list = get_visit_info(teacher_id)
+    # 获取拜访记录
+    visit_list = None
+    try:
+        mongo = MongoOperator(**MongoDB_CONFIG)
+        collection = mongo.get_collection("visit_record")
+        user_id = current_user.id
+        # 找到对应的拜访记录信息
+        visit_info = collection.find({"user_id": user_id, "status": 1, "teacher_id": teacher_id},
+                                     {"_id": 0, "date": 1, "title": 1, "content": 1})
+        # 转成列表
+        visit_list = list(visit_info)
+    except Exception as e:
+        print('get_visit_info error:%s' % e)
 
     return render_template('scholar/detail.html', teacher=teacher, visit_list=visit_list)
 
