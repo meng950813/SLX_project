@@ -60,7 +60,7 @@
         <tr>
                 <td>{{ loop.index }}</td>
                 <td>{{ record.date }}</td>
-                <td><a data-toggle="modal" data-target="#exampleModal">{{ record.title }}</a></td>
+                <td><a href="{{ url_for('.detail', objectId=record._id) }}">{{ record.title }}</a></td>
                 <td>{{ record.school }}</td>
                 <td>{{ record.institution }}</td>
                 <td><a href="{{ url_for('scholar.scholar_info', teacher_id=record.teacher_id) }}">{{ record.teacher }}</a> </td>
