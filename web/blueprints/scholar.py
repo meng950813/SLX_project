@@ -7,7 +7,7 @@ import json
 from web.blueprints.auth import login_required
 from web.utils.mongo_operator import MongoOperator
 from web.config import MongoDB_CONFIG
-from web.forms import ScholarForm, ProjectForm
+from web.forms.scholar import ScholarForm, ProjectForm
 from web.utils import redirect_back
 
 scholar_bp = Blueprint('scholar', __name__)

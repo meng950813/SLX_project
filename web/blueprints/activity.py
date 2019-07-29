@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template
 
 
-from web.forms import ActivityForm
+from web.forms.activity import ActivityForm
 
 
 activity_bp = Blueprint('activity', __name__)
