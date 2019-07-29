@@ -28,7 +28,7 @@ class ScholarForm(FlaskForm):
 
     title = SelectField('职称：', choices=[('', '未知'), ('教授', '教授'), ('副教授', '副教授'),
                                         ('讲师', '讲师'), ('助教', '助教')], default='', coerce=str)
-    honor = SelectMultipleField('荣誉头衔：', choices=[
+    honor_title = SelectMultipleField('荣誉头衔：', choices=[
         ('中国科学院院士', '中国科学院院士院士'), ('中国工程院院士', '中国工程院院士院士'), ('长江学者', '长江学者'),
         ('杰出青年', '杰出青年'), ('优秀青年', '优秀青年')], default='', coerce=str)
     phone_number = StringField('手机号：')
@@ -83,8 +83,8 @@ class ScholarForm(FlaskForm):
             self.department.data = datum['department']
 
         self.title.data = datum['title'].strip()
-        if 'honor' in datum:
-            self.honor.data = datum['honor']
+        if 'honor_title' in datum:
+            self.honor_title.data = datum['honor_title']
         if 'domain' in datum:
             self.domain.data = ';'.join(datum['domain'])
 
@@ -104,7 +104,7 @@ class ScholarForm(FlaskForm):
             'institution': self.institution.data,
             'department': self.department.data,
             'title': self.title.data,
-            'honor': self.honor.data,
+            'honor_title': self.honor_title.data,
             'email': self.email.data,
             'phone_number': self.phone_number.data,
             'office_number': self.office_number.data,
