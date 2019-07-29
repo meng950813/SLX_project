@@ -36,8 +36,8 @@ def scholar_info(teacher_id):
         # 找到对应的拜访记录信息
         visit_info = collection.find({"user_id": user_id, "status": 1, "teacher_id": teacher_id},
                                      {"_id": 0, "date": 1, "title": 1, "content": 1})
-        # 转成列表
-        visit_list = list(visit_info)
+        # 转成列表 最多5个
+        visit_list = list(visit_info.limit(5))
     except Exception as e:
         print('get_visit_info error:%s' % e)
 

@@ -99,7 +99,7 @@
                             <tr>
                                 <td style="width: 120px">{{ visit["date"] }}</td>
                                 <td>{{ visit["title"] }}</td>
-                                <td>{{ visit["content"] }}</td>
+                                <td>{{ visit["content"] | truncate(50) }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
