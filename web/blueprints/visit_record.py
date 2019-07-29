@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, abort
 from bson.objectid import ObjectId
 import json
 from flask_login import current_user
@@ -22,7 +22,7 @@ def manage_visit_record():
     uid = current_user.id
     # 查询询该用户的日程安排
     generator = mongo_operator.find({'user_id': uid, 'status': 1}, 'visit_record')
-    return render_template('visit_record.html', visited_records=list(generator))
+    return render_template('visit_record/manager.html', visited_records=list(generator))
 
 
 @visit_record_bp.route('/visit_record/new', methods=['POST'])
@@ -55,6 +55,7 @@ def new_visit_record():
         if teacher_info is None:
             return json.dumps({'success': False, "message": "教师不存在,请检查输入的信息"})
 
+        record['teacher_id'] = teacher_info['id']
         # 插入拜访记录
         result = mongo_operator.get_collection('visit_record').insert_one(record)
         # 是否存在完善的信息
@@ -76,7 +77,7 @@ def new_visit_record():
             mongo_operator.db['agent_feedback'].insert_one(teacher_info)
 
         # 多线程执行插入用户与教师的关系
-        threading.Thread(target=upsert_relation_of_visited, args=(uid, teacher_info['teacher_id'], teacher_info['name'])).start()
+        threading.Thread(target=upsert_relation_of_visited, args=(uid, record['teacher_id'], teacher_info['name'])).start()
         # upsert_relation_of_visited(uid, teacher_info['id'], teacher_info['name'])
 
         return json.dumps({'success': True, 'record_id': str(result.inserted_id)})
@@ -124,9 +125,9 @@ def delete_visit_record():
     """
     # 获取当前的id
     record_id = request.form.get('id')
-    mongo_operator = MongoOperator(**MongoDB_CONFIG)
     # 设置条件
     try:
+        mongo_operator = MongoOperator(**MongoDB_CONFIG)
         condition = {"_id": ObjectId(record_id)}
         result = mongo_operator.db['visit_record'].update_one(condition, {"$set":  {"status": 0}})
         if result.matched_count > 0:
@@ -137,6 +138,27 @@ def delete_visit_record():
     except Exception as e:
         print("删除拜访记录失败，原因：%s" % e)
         return json.dumps({'success': False, "message": "删除失败"})
+
+
+@visit_record_bp.route('/visit_record/detail/<objectId>')
+@login_required
+def detail(objectId):
+    """
+    根据objectId获取对应的拜访记录的所有内容
+    :param objectId: mongoDb的主键 objectId
+    :return:
+    """
+    record = None
+    try:
+        mongo_operator = MongoOperator(**MongoDB_CONFIG)
+        condition = {"_id": ObjectId(objectId)}
+        record = mongo_operator.get_collection('visit_record').find_one(condition, {'_id': 0})
+    except Exception as e:
+        print('error raised when viewing the detail of visit record %s' % e)
+
+    if record is None:
+        abort(404)
+    return render_template('visit_record/detail.html', record=record)
 
 
 def upsert_relation_of_visited(user_id, teacher_id, teacher_name):

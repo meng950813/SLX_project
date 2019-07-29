@@ -2,7 +2,7 @@ from flask import Blueprint, redirect, url_for, render_template, flash
 from flask_login import login_required, current_user, login_user, logout_user
 
 from web.utils import redirect_back, generate_token, validate_token
-from web.forms import LoginForm, ForgetPasswordForm, ResetPasswordForm
+from web.forms.auth import LoginForm, ForgetPasswordForm, ResetPasswordForm
 from web.settings import Operations, AGNET_TYPE
 from web.emails import send_reset_password_email
 from web.service import user_service

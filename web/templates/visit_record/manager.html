@@ -5,8 +5,6 @@
 {% endblock %}
 
 {% block styles %}
-    <script src="https://cdn.bootcss.com/twitter-bootstrap/4.0.0-beta.3/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="../../static/css/autocomplete.css">
     <style type="text/css">
         .form-group input{
             width: 300px;
@@ -62,10 +60,10 @@
         <tr>
                 <td>{{ loop.index }}</td>
                 <td>{{ record.date }}</td>
-                <td><a data-toggle="modal" data-target="#exampleModal">{{ record.title }}</a></td>
+                <td><a href="{{ url_for('.detail', objectId=record._id) }}">{{ record.title }}</a></td>
                 <td>{{ record.school }}</td>
                 <td>{{ record.institution }}</td>
-                <td>{{ record.teacher }}</td>
+                <td><a href="{{ url_for('scholar.scholar_info', teacher_id=record.teacher_id) }}">{{ record.teacher }}</a> </td>
                 <td class="operation" data-id="{{ record._id }}">
                     <button class="btn btn-info btn-modify" data-toggle="modal">修改</button>
                     <button class="btn btn-danger btn-delete" type="button">删除</button>
@@ -185,5 +183,6 @@
 {% endblock %}
 
 {% block scripts %}
+    {{ super() }}
     <script src="{{ url_for('static', filename='js/visit_record.js') }}"></script>
 {% endblock %}

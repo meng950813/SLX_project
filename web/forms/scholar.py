@@ -1,27 +1,16 @@
 """
 author: xiaoniu
-date: 2019-07-22
-desc: 用作flask-wtf的表单类型
+date: 2019-07-29
+desc: 用作flask-wtf的表单类型 从原先的forms.py拆分得到
+主要包含老师的信息反馈表单和项目反馈表单
 """
 import json
-import datetime
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, \
-    SelectField, SelectMultipleField, DateTimeField, HiddenField, FloatField, DateField
-from wtforms.validators import DataRequired, Length, Email, Optional, EqualTo
+from wtforms import StringField, SelectField, HiddenField, SelectMultipleField, TextAreaField, SubmitField, FloatField, DateField
+from wtforms.validators import DataRequired, Optional, Email
 
-from web.utils.mongo_operator import MongoOperator
 from web.config import MongoDB_CONFIG
-
-
-class LoginForm(FlaskForm):
-    """
-    登录表单
-    """
-    username = StringField('用户名', validators=[DataRequired(), Length(1, 20)])
-    password = PasswordField('密码', validators=[DataRequired(), Length(1, 128, message='密码最少为8位')])
-    remember = BooleanField('七天免登陆')
-    submit = SubmitField('登录')
+from web.utils.mongo_operator import MongoOperator
 
 
 class ScholarForm(FlaskForm):
@@ -145,35 +134,6 @@ class ScholarForm(FlaskForm):
             self.institution.data = cur_institution
 
 
-class ForgetPasswordForm(FlaskForm):
-    """
-    忘记密码表单
-    """
-    email = StringField('', validators=[DataRequired(), Length(1, 254), Email()])
-    submit = SubmitField('下一步')
-
-
-class ResetPasswordForm(FlaskForm):
-    """
-    重置密码表单
-    """
-    email = StringField('邮箱', validators=[DataRequired(), Length(1, 254), Email()])
-    password = PasswordField('密码', validators=[
-        DataRequired(), Length(8, 128), EqualTo('password2')])
-    password2 = PasswordField('确认密码', validators=[DataRequired()])
-    submit = SubmitField('确认')
-
-
-class ActivityForm(FlaskForm):
-    """
-    活动表单
-    """
-    title = StringField('活动名：', validators=[DataRequired()])
-    location = StringField('活动地点：', validators=[DataRequired()])
-    date = DateTimeField('日期：')
-    content = TextAreaField('内容：')
-
-
 class ProjectForm(FlaskForm):
     """
     项目表单
@@ -199,14 +159,10 @@ class ProjectForm(FlaskForm):
             'name': self.name.data,
             'project_type': self.project_type.data,
             'fund': self.fund.data,
-            'start_time': ProjectForm.date2datetime(self.start_time.data),
-            'end_time': ProjectForm.date2datetime(self.end_time.data),
+            'start_time': self.start_time.data.strftime('%Y-%m-%d'),
+            'end_time': self.end_time.data.strftime('%Y-%m-%d'),
             'members': json.loads(self.members.data),
             'company': self.company.data,
             'content': self.content.data,
         }
         return datum
-
-    @staticmethod
-    def date2datetime(date):
-        return datetime.datetime(date.year, date.month, date.day)
