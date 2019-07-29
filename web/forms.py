@@ -199,14 +199,10 @@ class ProjectForm(FlaskForm):
             'name': self.name.data,
             'project_type': self.project_type.data,
             'fund': self.fund.data,
-            'start_time': ProjectForm.date2datetime(self.start_time.data),
-            'end_time': ProjectForm.date2datetime(self.end_time.data),
+            'start_time': self.start_time.data.strftime('%Y-%m-%d'),
+            'end_time': self.end_time.data.strftime('%Y-%m-%d'),
             'members': json.loads(self.members.data),
             'company': self.company.data,
             'content': self.content.data,
         }
         return datum
-
-    @staticmethod
-    def date2datetime(date):
-        return datetime.datetime(date.year, date.month, date.day)
