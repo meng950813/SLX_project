@@ -50,8 +50,19 @@ function addSpanCallback(teachers) {
         toggle_alert(false, "", "未找到该老师，请先添加该老师");
         return;
     }
-    //默认获取第一个老师的id
-    let teacherID = teachers[0].id;
+    //老师对应的ID
+    let teacherID = null;
+    for (let i = 0; i < teachers.length; i++){
+        let teacher = teachers[i];
+        if (teacher.school == school && teacher.institution == institution){
+            teacherID = teacher.id;
+            break;
+        }
+    }
+    if (teacherID == null){
+        toggle_alert(false, "", "未找到该老师，请先添加该老师");
+        return;
+    }
     //优先输入领导者
     let $target = null;
     if ($('#leader').children().length == 0){
