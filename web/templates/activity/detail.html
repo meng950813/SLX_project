@@ -1,20 +1,24 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    {{ record.title }}
+    {{ activity.title }}
 {% endblock %}
 
 {% block main %}
 <div class="container">
-    <h2 class="text-center">{{ record.title }}</h2>
+    <h2 class="text-center">{{ activity.title }}</h2>
     <p>
-        <small >{{ record.school }} {{ record.institution }} {{ record.teacher }}</small>
-        <small class="text-muted float-right">日期：{{ record.date }}</small>
+        <small class="text-muted">{{ activity.location }}&nbsp;日期：{{ activity.date }}</small>
+        {% if current_user.id == activity.uid %}
+            <a class="btn btn-link btn-sm float-right" href="{{ url_for('.edit', objectId=activity._id) }}">编辑</a>
+        {% else %}
+            <small class="text-primary float-right">作者：{{ activity.name }}</small>
+        {% endif %}
     </p>
     <hr>
     <div class="row">
         <div class="col">
-            <p class="text-justify">{{ record.content}}</p>
+            <p class="text-justify">{{ activity.content}}</p>
         </div>
     </div>
 </div>

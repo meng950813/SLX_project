@@ -3,6 +3,7 @@ author: xiaoniu
 date: 2019-07-29
 desc: 用作flask-wtf的表单类型 从原先的forms.py拆分得到
 """
+import datetime
 from flask_wtf import FlaskForm
 from flask_ckeditor import CKEditorField
 from wtforms import StringField, DateField, SubmitField
@@ -15,8 +16,8 @@ class ActivityForm(FlaskForm):
     """
     title = StringField('活动名：', validators=[DataRequired()])
     location = StringField('活动地点：', validators=[DataRequired()])
-    date = DateField('日期：')
-    content = CKEditorField('内容：')
+    date = DateField('日期：', validators=[DataRequired()])
+    content = CKEditorField('内容：', validators=[DataRequired()])
     submit = SubmitField('提交')
 
     def get_data(self):
@@ -29,3 +30,8 @@ class ActivityForm(FlaskForm):
         }
         return datum
 
+    def set_data(self, datum):
+        self.title.data = datum['title']
+        self.location.data = datum['location']
+        self.date.data = datetime.datetime.strptime(datum['date'], '%Y-%m-%d')
+        self.content.data = datum['content']

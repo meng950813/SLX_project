@@ -27,7 +27,7 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group col">
-                        {{ render_field(form.content, rows='5') }}
+                        {{ render_field(form.content) }}
                     </div>
                 </div>
                 <p>结果：</p>
@@ -56,6 +56,7 @@
 {% block scripts %}
     {{ super() }}
     {{ ckeditor.load() }}
-    {{ ckeditor.config(name='content') }}
+    {{ ckeditor.config(name='content', height=400) }}
     <script type="text/javascript" src="{{ url_for('static', filename='js/new_activity.js')}}"></script>
+
 {% endblock %}

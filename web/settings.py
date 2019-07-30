@@ -40,7 +40,7 @@ class BaseConfig(object):
     REMEMBER_COOKIE_DURATION = datetime.timedelta(days=7)
     # flask-ckeditor相关
     # CKEditor包类型 (basic standard full)
-    CKEDITOR_PKG_TYPE = 'standard'
+    CKEDITOR_PKG_TYPE = 'basic'
     # 不使用本地资源
     CKEDITOR_SERVE_LOCAL = True
     # 使用简体中文
@@ -49,6 +49,8 @@ class BaseConfig(object):
     CKEDITOR_ENABLE_CSRF = True
     # 处理文件上传的URL
     CKEDITOR_FILE_UPLOADER = '/activity/upload'
+    # 额外的插件
+    # CKEDITOR_EXTRA_PLUGINS = ['image2']
     # 图片文件上传保存路径
     IMAGE_SAVE_PATH = os.path.join(basedir, 'uploads')
 
