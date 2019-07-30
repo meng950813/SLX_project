@@ -7,11 +7,9 @@ function autocomplete(inp, arr) {
       /*关闭已经打开的自动完成值列表*/
       closeAllLists();
       //TODO:没有值的时候显示所有数据
-      /*
       if (!val) {
           return false;
       }
-       */
       currentFocus = -1;
       /*创建列表*/
       a = document.createElement("DIV");

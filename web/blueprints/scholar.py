@@ -109,12 +109,18 @@ def get_teachers(teacher_name):
     """
     # 是否把结果转换成json格式的字符串,默认为False
     result = None
-    is_json = request.args.get('is_json', type=bool) if 'is_json' in request.args else False
+    is_json = request.args.get('is_json', type=bool, default=False)
+    # 是否进行模糊查询
+    is_like = request.args.get('is_like', type=bool, default=False)
 
     try:
         # 查询数据库
         mongo_operator = MongoOperator(**MongoDB_CONFIG)
-        condition = {'name': teacher_name}
+        # 模糊查询
+        if is_like:
+            condition = {'name': {'$regex': teacher_name + '.*?'}}
+        else:
+            condition = {'name': teacher_name}
         scope = {'title': 1, 'school': 1, 'institution': 1, 'name': 1, '_id': 0, 'id': 1}
         generator = mongo_operator.get_collection('basic_info').find(condition, scope)
         teachers = list(generator)

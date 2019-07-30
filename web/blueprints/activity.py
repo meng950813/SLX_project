@@ -38,8 +38,21 @@ def add_activity():
         except Exception as e:
             print("error when adding activity: %s" % e)
             flash('活动插入失败，请稍微重试', 'danger')
+    try:
+        # 获取所有的学校
+        mongo = MongoOperator(**MongoDB_CONFIG)
+        generator = mongo.get_collection('school').find({}, {'_id': 0, 'name': 1})
+        schools = [school['name'] for school in generator]
+        cur_school = schools[0]
+        # 获取当前学校的所有院系
+        school = mongo.get_collection('school').find_one({'name': cur_school}, {'_id': 0, 'institutions': 1})
+        institutions = [result['name'] for result in school['institutions']]
+        return render_template('activity/new_activity.html', form=form, title='新建活动',
+                               schools=schools, institutions=institutions)
+    except Exception as e:
+        print("error when adding activity: %s" % e)
+        abort(404)
 
-    return render_template('activity/new_activity.html', form=form)
 
 
 @activity_bp.route('/manager')
@@ -93,7 +106,7 @@ def edit(objectId):
         print("error when editing activity: %s" % e)
         flash('数据编辑失败,请稍后重试', 'danger')
 
-    return render_template('activity/new_activity.html', form=form)
+    return render_template('activity/new_activity.html', form=form, title='编辑活动')
 
 
 @activity_bp.route('/detail/<objectId>')

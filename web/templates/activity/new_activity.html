@@ -2,14 +2,24 @@
 {% from 'bootstrap/form.html' import render_field %}
 
 {% block title %}
-    添加活动
+    {{ title }}
+{% endblock %}
+
+{% block styles %}
+    <style>
+        .member{
+            padding:1px 10px;
+            background: #e9e9e9;
+            display: inline-block;
+        }
+    </style>
 {% endblock %}
 
 {% block main %}
 <div class="container">
     <div class="row" style="padding-top: 30px;">
         <div class="col-md-10 offset-1">
-            <h2 class="text-center">添加活动</h2>
+            <h2 class="text-center">{{ title }}</h2>
             <form method="post">
                 {{ form.hidden_tag() }}
                 <div class="form-row">
@@ -31,20 +41,44 @@
                     </div>
                 </div>
                 <p>结果：</p>
-                <div>
-                    <div class="form-row">
-                        <div class="col-md-12 form-group">
-                            <input type="text" id="partner1" placeholder="合作人">
-                            <input type="text" id="partner2" placeholder="合作人">
-                            <input type="file" id="agreement">
-                            <i class="mdui-icon material-icons" onclick="addNewRow($(this));">&#xe148;</i>
-                            <i class="mdui-icon material-icons">&#xe15d;</i>
-                        </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">No</th>
+                            <th scope="col">老师</th>
+                            <th scope="col">企业</th>
+                            <th scope="col">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results"></tbody>
+                </table>
+                <div class="form-group row">
+                    <div class="col-sm-3">
+                        <select class="form-control" id="school" required="">
+                            {% for school in schools %}
+                                <option value="{{ school }}">{{ school }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-sm-3">
+                        <select class="form-control" id="institution" required="">
+                            {% for institution in institutions %}
+                                <option value="{{ institution }}">{{ institution }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-sm-3">
+                        <input class="form-control" id="person-name" placeholder="请输入老师的名字" required="" type="text" value="">
+                    </div>
+                    <div class="col-sm-3">
+                        <button class="btn btn-link" id="add-domain" type="button" onclick="addSpan();">
+                            <i class="mdui-icon material-icons">&#xe146;</i>添加
+                        </button>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group col">
-                        {{ render_field(form.submit, class='btn btn-primary') }}
+                        <input class="btn btn-primary" type="button" value="提交" onclick="submitData();">
                     </div>
                 </div>
             </form>
@@ -56,7 +90,7 @@
 {% block scripts %}
     {{ super() }}
     {{ ckeditor.load() }}
-    {{ ckeditor.config(name='content', height=400) }}
+    {{ ckeditor.config(name='content', height=300) }}
     <script type="text/javascript" src="{{ url_for('static', filename='js/new_activity.js')}}"></script>
 
 {% endblock %}
