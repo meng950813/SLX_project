@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    拜访记录
+{% endblock %}
+
+{% block styles %}
+    <style type="text/css">
+        .form-group input{
+            width: 300px;
+            height: 45px;
+            font-size: 23px;
+        }
+        .form-group textarea{
+            height: 200px;
+            width: 600px;
+            font-size: 23px;
+        }
+        #add-new-record{
+            text-align: center;
+            cursor: pointer;
+        }
+        #add-new-record:hover{
+            color:#007bff;
+        }
+        #exampleModal .input-group{padding: 6px 0;}
+        #exampleModal .col{padding: 6px 3px;}
+        #fill-basic-info{display: none;}
+    </style>
+{% endblock %}
+
+{% block main %}
+<div class="container">
+    <div class="input-group">
+        <h2 style="margin: auto;text-align: center">
+            拜访记录
+            <small class="text-muted">(<span id="total">{{ visited_records | length }}</span>)</small>
+        </h2>
+    </div>
+    <div>
+        <form class="form form-inline">
+
+            <div class="input-group float-right h3 ml-auto">
+                <input id="search-name-input" type="text" class="form-control" placeholder="搜索拜访记录">
+                <button class="btn btn-primary">搜索</button>
+            </div>
+        </form>
+    </div>
+    <table class="table table-bordered  table-hover" id = "tab">
+        <tr>
+            <th>No.</th>
+            <th>日期</th>
+            <th>标题</th>
+            <th>学校</th>
+            <th>学院</th>
+            <th>教师</th>
+            <th>编辑</th>
+        </tr>
+        {% for record in visited_records %}
+        <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ record.date }}</td>
+                <td><a href="{{ url_for('.detail', objectId=record._id) }}">{{ record.title }}</a></td>
+                <td>{{ record.school }}</td>
+                <td>{{ record.institution }}</td>
+                <td><a href="{{ url_for('scholar.scholar_info', teacher_id=record.teacher_id) }}">{{ record.teacher }}</a> </td>
+                <td class="operation" data-id="{{ record._id }}">
+                    <button class="btn btn-info btn-modify" data-toggle="modal">修改</button>
+                    <button class="btn btn-danger btn-delete" type="button">删除</button>
+                    <input type="hidden" class="detail" value="{{ record.content }}">
+                </td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="7" id="add-new-record" data-toggle="modal" data-target="#exampleModal" onclick="wantToNewRecord($(this));"> +添加新纪录 </td>
+        </tr>
+    </table>
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog " role="document">
+            
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" id="csrf_token">
+                        <div class="input-group flex-nowrap">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text ">日期</span>
+                            </div>
+                            <input id="date" class="form-control mod" type="date" name="date">
+                        </div>
+                        
+                        <div class="input-group flex-nowrap">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">标题</span>
+                            </div>
+                            <input type="text" id="title" class="form-control mod" placeholder="" aria-describedby="addon-wrapping">
+                        </div>
+                        
+                        <div class="input-group flex-nowrap">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">学校</span>
+                            </div>
+                            <select id="select-college">
+                                {% for school in schools %}
+                                    <option>{{ school }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="input-group flex-nowrap">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">学院</span>
+                            </div>
+                            <select id="select-institution">
+                                {% for institution in institutions %}
+                                    <option>{{ institution }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="input-group flex-nowrap">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">教师</span>
+                            </div>
+                            <input type="text" name="teacher" id="teacher" class="form-control mod" placeholder="" aria-label="Username" aria-describedby="addon-wrapping">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" id="basic-addon" type="button">完善信息</button>
+                            </div>
+                        </div>
+                        <div id="fill-basic-info">
+                            <div class="form-row">
+                                <div class="col">
+                                    <input type="text" class="form-control" id="position" name="position" placeholder="行政职务，如 院长">
+                                </div>
+                                <div class="col">
+                                    <input type="text" class="form-control" id="teacher-title" name="teacher-title" placeholder="职称，如 教授">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col">
+                                    <input type="tel" id="telphone" name="telphone" class="form-control" placeholder="手机号">
+                                </div>
+                                <div class="col">
+                                    <input type="email" id="email" name="email" class="form-control" placeholder="邮箱">
+                                </div>
+                            </div>
+                           
+                            <div class="form-row">
+                                <div class="col">
+                                    <input type="text" id="office-phone" name="office-phone" class="form-control" placeholder="办公室电话">
+                                </div>
+                                <div class="col">
+                                    <input type="text" id="department" name="department" class="form-control" placeholder="所属学院下的系">
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">内容</span>
+                            </div>
+                            <textarea name="content" rows="5" id="content" class="form-control mod" aria-label="With textarea"></textarea>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary preservation" onclick="saveVisitedRecord($(this))">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/visit_record.js') }}"></script>
+{% endblock %}

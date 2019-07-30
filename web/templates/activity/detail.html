@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ record.title }}
+{% endblock %}
+
+{% block main %}
+<div class="container">
+    <h2 class="text-center">{{ record.title }}</h2>
+    <p>
+        <small >{{ record.school }} {{ record.institution }} {{ record.teacher }}</small>
+        <small class="text-muted float-right">日期：{{ record.date }}</small>
+    </p>
+    <hr>
+    <div class="row">
+        <div class="col">
+            <p class="text-justify">{{ record.content}}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
