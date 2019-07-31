@@ -23,6 +23,8 @@
 > 简化时间的显示
 >5. flask-login
 > 简化登录
+6. flask-ckeditor
+> 富文本编辑器
 ## 3. 关于用户登录
 >1. 登录目前使用到了mongodb，对应的配置文件为web/config.py。
 >2. 当用户登录成功后，会把user字典中的所有数据都保存在类为User的一个对象
@@ -33,3 +35,5 @@
 > 4. 应当避免使用session中的user_id 和remember_token字段
 ## 4. 控制台输出
 >程序输出尽量使用logging库，这样在使用docker部署服务器时可以docker logs [name] 直接观察到输出的内容(logging.warning及以上)
+## 5. Docker部署
+>目前使用到了docker-compose，会生成两个容器，分别是flask容器和nginx容器,但目前的容器通信存在一些问题。

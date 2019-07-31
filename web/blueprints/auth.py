@@ -1,7 +1,7 @@
-from flask import Blueprint, redirect, url_for, render_template, flash
+from flask import Blueprint, redirect, url_for, render_template, flash, abort
 from flask_login import login_required, current_user, login_user, logout_user
 
-from web.utils import redirect_back, generate_token, validate_token
+from web.utils import redirect_back, generate_token, validate_token, is_validate_token
 from web.forms.auth import LoginForm, ForgetPasswordForm, ResetPasswordForm
 from web.settings import Operations, AGNET_TYPE
 from web.emails import send_reset_password_email
@@ -74,6 +74,10 @@ def forget_password():
 @auth_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     form = ResetPasswordForm()
+    # 在进入时会判断token是否过期
+    if not is_validate_token(token):
+        flash('该邮件已经过期，请重新发送邮件', 'info')
+        return redirect(url_for('.login'))
 
     if form.validate_on_submit():
         email = form.email.data.lower()

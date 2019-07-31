@@ -85,4 +85,4 @@ def set_password(user, new_password):
     condition = {'id': user['id']}
     user['password'] = password_hash
     result = collection.update_one(condition, {'$set': user})
-    return result.modified_count == 1
+    return result.matched_count == 1
