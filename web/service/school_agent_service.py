@@ -5,10 +5,10 @@ by chen
 import json
 import os
 
-from web.config import NEO4J_CONFIG, MongoDB_CONFIG
+from web.config import MongoDB_CONFIG
 from web.settings import basedir
 from web.utils.mongo_operator import MongoOperator
-from web.utils.neo4j_operator import NeoOperator
+from web.utils.neo4jAPI import *
 
 
 class SchoolAgentService(object):
@@ -318,7 +318,7 @@ class SchoolAgentService(object):
 
     def get_institutions_relation_data(self, agent_id, school, institution):
         # data ==> [{visited: xxx, activity: xxx, id:13213},...]
-        data = NeoOperator(**NEO4J_CONFIG).get_institution_relation_with_agent(agent_id, school, institution)
+        data = get_institution_relation_with_agent(agent_id, school, institution)
 
         return data
     
@@ -334,7 +334,7 @@ class SchoolAgentService(object):
         }
         """
         # data => [] or [{'visited': 1, 'activity': 0, 't_id': 001, 'name':xxx, 'institution': xxx}, ...]
-        data = NeoOperator(**NEO4J_CONFIG).get_school_relation_with_agent(agent_id, school)
+        data = get_school_relation_with_agent(agent_id, school)
 
         return self.format_school_relation_data(data)
 

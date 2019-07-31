@@ -77,7 +77,7 @@ class ScholarForm(FlaskForm):
         if 'gender' in datum:
             self.gender.data = datum['gender']
         if 'birth_year' in datum and datum['birth_year']:
-            self.birth_year.data = datum['birth_year'].strip()
+            self.birth_year.data = datum['birth_year']
 
         if 'department' in datum:
             self.department.data = datum['department']

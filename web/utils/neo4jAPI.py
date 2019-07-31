@@ -33,7 +33,7 @@ def get_teacher_central_network(teacher_id, school=None):
 
 def get_teacher_central_network_with_agent(agent_id, teacher_id):
     """
-    获取当前商务在该教师的个人网络中的位置
+    获取某教师的个人中心网络及商务在该教师的个人网络中的位置
     :param agent_id: int
     :param teacher_id: int
     :return: {

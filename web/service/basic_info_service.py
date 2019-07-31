@@ -48,9 +48,6 @@ def get_info(teacher_id):
         if birth_year:
             basic_info['age'] = datetime.datetime.now().year - int(birth_year)
 
-        """
-        重点研发计划的部分未显示
-        """
         # print(basic_info)
         return basic_info
 
