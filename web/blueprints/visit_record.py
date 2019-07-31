@@ -6,9 +6,9 @@ import threading
 import datetime
 
 from web.blueprints.auth import login_required
-from web.config import MongoDB_CONFIG, NEO4J_CONFIG
+from web.config import MongoDB_CONFIG
 from web.utils.mongo_operator import MongoOperator
-from web.utils.neo4j_operator import NeoOperator
+from web.utils.neo4jAPI import *
 
 
 visit_record_bp = Blueprint('visit_record', __name__)
@@ -151,7 +151,7 @@ def upsert_relation_of_visited(user_id, teacher_id, teacher_name):
     # 操作neo4j
     try:
         # back ==> {success: True / False, message:xxxx}
-        back = NeoOperator(**NEO4J_CONFIG).upsert_agent_relation(user_id, teacher_id)
+        back = upsert_relation_of_agent2teacher(user_id, teacher_id)
         if not back['success']:
             print("更新拜访记录到图数据库失败，原因：%s" % back['message'])
 
