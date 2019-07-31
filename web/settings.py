@@ -40,7 +40,7 @@ class BaseConfig(object):
     REMEMBER_COOKIE_DURATION = datetime.timedelta(days=7)
     # flask-ckeditor相关
     # CKEditor包类型 (basic standard full)
-    CKEDITOR_PKG_TYPE = 'standard'
+    CKEDITOR_PKG_TYPE = 'full'
     # 不使用本地资源
     CKEDITOR_SERVE_LOCAL = False
     # 使用简体中文
