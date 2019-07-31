@@ -4,13 +4,21 @@
     {{ activity.title }}
 {% endblock %}
 
+{% block styles %}
+    <style>
+    img{
+        max-width: 100%;
+    }
+    </style>
+{% endblock %}
+
 {% block main %}
 <div class="container">
     <h2 class="text-center">{{ activity.title }}</h2>
     <p>
         <small class="text-muted">{{ activity.location }}&nbsp;日期：{{ activity.date }}</small>
         {% if current_user.id == activity.uid %}
-            <a class="btn btn-link btn-sm float-right" href="{{ url_for('.edit', objectId=activity._id) }}">编辑</a>
+            <a class="btn btn-link btn-sm float-right" href="{{ url_for('.show_interface', objectId=activity._id) }}">编辑</a>
         {% else %}
             <small class="text-primary float-right">作者：{{ activity.name }}</small>
         {% endif %}
@@ -19,6 +27,24 @@
     <div class="row">
         <div class="col">
             <p class="text-justify">{{ activity.content}}</p>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col">
+            <details open>
+                <summary>活动成果</summary>
+                {% for relationship in activity.relationship %}
+                    <p>
+                    {{ relationship.name }}({{ relationship.school }} {{ relationship.institution }})和{{ relationship.company }}
+                    {% if relationship.level %}
+                        达成了合作关系。
+                    {% else %}
+                        结识。
+                    {% endif %}
+                    </p>
+                {% endfor %}
+            </details>
         </div>
     </div>
 </div>

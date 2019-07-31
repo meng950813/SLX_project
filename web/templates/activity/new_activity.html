@@ -20,7 +20,7 @@
     <div class="row" style="padding-top: 30px;">
         <div class="col-md-10 offset-1">
             <h2 class="text-center">{{ title }}</h2>
-            <form method="post">
+            <form method="post" id="activity-form">
                 {{ form.hidden_tag() }}
                 <div class="form-row">
                     <div class="form-group col-md-12">
@@ -37,7 +37,7 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group col">
-                        {{ render_field(form.content) }}
+                        {{ render_field(form.content, class="ckeditor") }}
                     </div>
                 </div>
                 <p>结果：</p>
@@ -47,6 +47,7 @@
                             <th scope="col">No</th>
                             <th scope="col">老师</th>
                             <th scope="col">企业</th>
+                            <th scope="col">合作</th>
                             <th scope="col">操作</th>
                         </tr>
                     </thead>

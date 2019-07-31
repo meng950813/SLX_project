@@ -1,7 +1,8 @@
 import os
 import datetime
 from bson import ObjectId
-from flask import Blueprint, render_template, current_app, send_from_directory, request, url_for, flash, Markup, abort
+from flask import Blueprint, render_template, current_app, send_from_directory, request, url_for,\
+    flash, Markup, abort, redirect
 from flask_ckeditor import upload_success, upload_fail
 from flask_login import login_required, current_user
 
@@ -15,44 +16,79 @@ from web.utils import redirect_back
 activity_bp = Blueprint('activity', __name__)
 
 
-@activity_bp.route('/', methods=['GET', 'POST'])
+@activity_bp.route('/operate', methods=['GET'], defaults={'objectId': None})
+@activity_bp.route('/operate/<objectId>', methods=['GET'])
 @login_required
-def add_activity():
+def show_interface(objectId):
     """
-    添加活动的路由
+    显示活动操作界面
+    :param objectId: 活动的objectID
     :return:
     """
     form = ActivityForm()
-    # POST且验证通过
-    if form.validate_on_submit():
-        # 获取数据，并放入数据库中
-        activity = form.get_data()
-        # 放入作者和最后一次编辑时间
-        activity.update({'uid': current_user.id, 'name': current_user.name, 'timestamp': datetime.datetime.now()})
-        try:
-            mongo_operator = MongoOperator(**MongoDB_CONFIG)
-            collection = mongo_operator.get_collection("activity")
-            collection.insert_one(activity)
-            flash('活动写入成功', 'success')
-            return redirect_back()
-        except Exception as e:
-            print("error when adding activity: %s" % e)
-            flash('活动插入失败，请稍微重试', 'danger')
     try:
-        # 获取所有的学校
         mongo = MongoOperator(**MongoDB_CONFIG)
+        collection = mongo.get_collection('activity')
+        title = '新建活动'
+        # 仅仅在存在objectId下数据填充
+        if objectId:
+            activity = collection.find_one({'_id': ObjectId(objectId)})
+            # 检测用户是否可编辑
+            if activity and activity['uid'] != current_user.id:
+                abort(403)
+            form.set_data(activity)
+            title = '编辑活动'
+        # 获取所有的学校
         generator = mongo.get_collection('school').find({}, {'_id': 0, 'name': 1})
         schools = [school['name'] for school in generator]
         cur_school = schools[0]
         # 获取当前学校的所有院系
         school = mongo.get_collection('school').find_one({'name': cur_school}, {'_id': 0, 'institutions': 1})
         institutions = [result['name'] for result in school['institutions']]
-        return render_template('activity/new_activity.html', form=form, title='新建活动',
+        return render_template('activity/new_activity.html', form=form, title=title,
                                schools=schools, institutions=institutions)
     except Exception as e:
         print("error when adding activity: %s" % e)
+        flash('活动界面显示出错，请稍后重试', 'danger')
         abort(404)
 
+
+@activity_bp.route('/operate', methods=['POST'], defaults={'objectId': None})
+@activity_bp.route('/operate/<objectId>', methods=['POST'])
+@login_required
+def operation(objectId):
+    """
+    添加/编辑活动的路由
+    :param objectId 存在则表示编辑 否则表示新增
+    :return:
+    """
+    form = ActivityForm()
+    try:
+        mongo = MongoOperator(**MongoDB_CONFIG)
+        collection = mongo.get_collection('activity')
+        # POST且验证通过
+        if form.validate_on_submit():
+            # 获取数据，并放入数据库中
+            activity = form.get_data()
+            # 插入数据
+            if not objectId:
+                # 放入作者和最后一次编辑时间
+                activity.update({'uid': current_user.id, 'name': current_user.name, 'timestamp': datetime.datetime.now()})
+                collection.insert_one(activity)
+                flash('活动写入成功', 'success')
+                return redirect_back('.manager')
+            # 放入最后一次编辑时间
+            activity.update({'timestamp': datetime.datetime.now()})
+            collection.update_one({'_id': ObjectId(objectId)}, {'$set': activity})
+            flash('数据编辑成功', 'success')
+            return redirect_back('activity.detail', objectId=objectId)
+        else:
+            flash('数据验证出错，请确定后重试', 'info')
+            return redirect(url_for('.show_interface', objectId=objectId))
+    except Exception as e:
+        print("error when adding activity: %s" % e)
+        flash('活动插入失败，请稍微重试', 'danger')
+        abort(404)
 
 
 @activity_bp.route('/manager')
@@ -73,40 +109,6 @@ def manager():
         print('error when visiting activities: %s' % e)
 
     return render_template('activity/manager.html', activities=activities)
-
-
-@activity_bp.route('/edit/<objectId>', methods=['GET', 'POST'])
-@login_required
-def edit(objectId):
-    """
-    编辑活动
-    :return:
-    """
-    form = ActivityForm()
-    try:
-        mongo_operator = MongoOperator(**MongoDB_CONFIG)
-        collection = mongo_operator.get_collection("activity")
-        activity = collection.find_one({'_id': ObjectId(objectId)})
-        # 检测用户是否可编辑
-        if activity and activity['uid'] != current_user.id:
-            abort(403)
-        # 仅仅在GET下数据填充
-        if request.method == 'GET':
-            form.set_data(activity)
-
-        if form.validate_on_submit():
-            # 获取数据，并放入数据库中
-            activity = form.get_data()
-            # 放入最后一次编辑时间
-            activity.update({'timestamp': datetime.datetime.now()})
-            collection.update_one({'_id': ObjectId(objectId)}, {'$set': activity})
-            flash('数据编辑成功', 'success')
-            return redirect_back('activity.detail', objectId=objectId)
-    except Exception as e:
-        print("error when editing activity: %s" % e)
-        flash('数据编辑失败,请稍后重试', 'danger')
-
-    return render_template('activity/new_activity.html', form=form, title='编辑活动')
 
 
 @activity_bp.route('/detail/<objectId>')

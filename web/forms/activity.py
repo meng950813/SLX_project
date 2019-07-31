@@ -3,6 +3,7 @@ author: xiaoniu
 date: 2019-07-29
 desc: 用作flask-wtf的表单类型 从原先的forms.py拆分得到
 """
+import json
 import datetime
 from flask_wtf import FlaskForm
 from flask_ckeditor import CKEditorField
@@ -23,12 +24,9 @@ class ActivityForm(FlaskForm):
 
     def get_data(self):
         """从form表单中提取数据"""
-        datum = {
-            'title': self.title.data,
-            'location': self.location.data,
-            'date': self.date.data.strftime('%Y-%m-%d'),
-            'content': self.content.data,
-        }
+        datum = {'title': self.title.data, 'location': self.location.data, 'date': self.date.data.strftime('%Y-%m-%d'),
+                 'content': self.content.data, 'relationship': json.loads(self.relationship.data)}
+        # 获取关系
         return datum
 
     def set_data(self, datum):
@@ -36,3 +34,4 @@ class ActivityForm(FlaskForm):
         self.location.data = datum['location']
         self.date.data = datetime.datetime.strptime(datum['date'], '%Y-%m-%d')
         self.content.data = datum['content']
+        self.relationship.data = json.dumps(datum['relationship'], ensure_ascii=False)

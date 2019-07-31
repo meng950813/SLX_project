@@ -17,6 +17,16 @@ $('#school').on('change', function () {
         }
     });
 });
+//数据填充，会在进入该页面时进行判断
+if ($('#relationship').val().length > 0)
+{
+    let data = JSON.parse($('#relationship').val());
+    for (let i = 0; i < data.length; i++){
+        let datum = data[i];
+        let checked = datum.level? "checked": "";
+        insertTr(i + 1, datum.school, datum.institution, datum.teacherID, datum.name, datum.company, checked);
+    }
+}
 /**
  * 添加Span 会先判断该老师是否存在
  */
@@ -45,8 +55,6 @@ function addSpanCallback(teachers) {
     let institution = $('#institution').val();
     let personName = $('#person-name').val();
 
-    console.log(teachers);
-
     if (teachers == null || teachers.length == 0){
         toggle_alert(false, "", "未找到该老师，请先添加该老师");
         return;
@@ -67,21 +75,43 @@ function addSpanCallback(teachers) {
     //添加行
     let $target = $('#results');
     let order = $target.children().length + 1;
+    insertTr(order, school, institution, teacherID, personName, "", false);
+    //让最新产生的输入获得焦点
+    $('.other').focus();
+}
+
+/**
+ * 插入一个新的结果行
+ * @param order
+ * @param school
+ * @param institution
+ * @param teacherID
+ * @param teacherName
+ * @param companyName
+ * @param checked
+ */
+function insertTr(order, school, institution, teacherID, teacherName, companyName, checked) {
+    let $target = $('#results');
+    //生成一个唯一的标识
+    let id = "checkbox" + order;
     $target.append(`
     <tr>
         <th scope="row">${order}</th>
         <td>
-            <span class="member" data-school="${school}" data-institution="${institution}" data-id="${teacherID}">${personName}</span>
+            <span class="member" data-school="${school}" data-institution="${institution}" data-id="${teacherID}">${teacherName}</span>
         </td>
         <td>
-            <input type="text" name="other" class="other form-control" placeholder="企业名称">
+            <input type="text" name="other" class="other form-control" placeholder="企业名称" value="${companyName}">
+        </td>
+        <td>
+            <input type="checkbox" class="form-check-input" type="checkbox" value="1" id="${id}" ${checked}>
+            <label class="form-check-label" for="${id}">达成合作关系</label>
         </td>
         <td>
             <i class="mdui-icon material-icons" style="cursor: pointer" onclick="removeTheSpan($(this));">&#xe14c;</i>
         </td>
     </tr>`);
-    //让最新产生的输入获得焦点
-    $('.other').focus();
+
 }
 
 //移除指定的行
@@ -89,11 +119,30 @@ function removeTheSpan($target) {
     $target.parent().parent().remove();
 }
 
+
+/**
+ * 检测输入框中存在内容
+ */
+function checkVaild() {
+    let ids = ["#title", '#location', '#date'];
+    let texts = ['标题', '活动地点', '日期'];
+    for (let i = 0;i < ids.length; i++){
+        if ($(ids[i]).val().length == 0){
+            toggle_alert(false, "", "请输入" + texts[i]);
+            return false;
+        }
+    }
+    return true;
+}
 /**
  * 提交form表单，在提交之前会组合所有的class="domain"的span的值，然后使用;拼接
  * 赋值给#domain中，之后发给后端
  */
 function submitData() {
+    //检测各个输入框的内容要存在输入
+    if (!checkVaild())
+        return;
+
     let results = $('#results').children();
     let relations = [];
     for (let i = 0; i < results.length; i++){
@@ -112,15 +161,28 @@ function submitData() {
             let id = teacher.getAttribute('data-id');
             let name = teacher.innerHTML;
             let company = $(other).val();
+            let checked = $('#checkbox' + (i + 1)).prop('checked');
+            //公司去除所有空格
+            company = company.replace(/\s+/g, "");
 
             if (company.length == 0){
                 toggle_alert(false, "", "请输入企业的名称");
                 return;
             }
-            relations.push('' + id + " " + company);
+            relations.push({
+                teacherID: id,
+                school: school,
+                institution: institution,
+                name: name,
+                company: company,
+                level: checked,
+            });
         }
     }
     console.log(relations);
-    //document.getElementById('teacher-info').submit();
+    //关系拼接
+    $('#relationship').val(JSON.stringify(relations));
+    //提交表单
+    $('#activity-form').submit();
 }
 
