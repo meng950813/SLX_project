@@ -4,7 +4,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from urllib.parse import urljoin, urlparse
 
 from web.settings import Operations
-# import web.service.user_service as user_service
+from web.service import user_service
 
 
 def generate_token(user, operation, expire_in=3600, **kwargs):
@@ -21,6 +21,22 @@ def generate_token(user, operation, expire_in=3600, **kwargs):
     data = {'id': user['id'], 'operation': operation}
     data.update(**kwargs)
     return s.dumps(data)
+
+
+def is_validate_token(token):
+    """
+    判断token是否合法
+    :param token: 令牌
+    :return: 解析成功则返回True
+    """
+    s = Serializer(current_app.config['SECRET_KEY'])
+
+    # 尝试解析数据
+    try:
+        s.loads(token)
+    except (SignatureExpired, BadSignature):
+        return False
+    return True
 
 
 def validate_token(user, token, operation, new_password=None):
