@@ -5,11 +5,7 @@ by chen
 import json
 import os
 
-<<<<<<< HEAD
 from web.config import MongoDB_CONFIG
-=======
-from web.config import  MongoDB_CONFIG
->>>>>>> origin/chen
 from web.settings import basedir
 from web.utils.mongo_operator import MongoOperator
 from web.utils.neo4jAPI import *
