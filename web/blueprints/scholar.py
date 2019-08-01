@@ -8,7 +8,8 @@ from web.blueprints.auth import login_required
 from web.utils.mongo_operator import MongoOperator
 from web.config import MongoDB_CONFIG
 from web.forms.scholar import ScholarForm, ProjectForm
-from web.utils import redirect_back
+from web.utils import redirect_back, flash_errors
+import web.service.school as school_service
 
 scholar_bp = Blueprint('scholar', __name__)
 
@@ -44,41 +45,68 @@ def scholar_info(teacher_id):
     return render_template('scholar/detail.html', teacher=teacher, visit_list=visit_list)
 
 
-@scholar_bp.route('/feedback', methods=['GET', 'POST'])
+@scholar_bp.route('/feedback', methods=['GET'], defaults={'teacher_id': None})
+@scholar_bp.route('/feedback/<int:teacher_id>', methods=['GET'])
 @login_required
-def feedback():
+def feedback_get(teacher_id):
+    """
+    老师信息的反馈页面的GET方法 显示页面
+    :return:
+    """
+    cur_school = None
+    cur_institution = None
+    form = ScholarForm()
+    try:
+        mongo = MongoOperator(**MongoDB_CONFIG)
+        # 填充数据
+        if teacher_id:
+            result = mongo.get_collection('basic_info').find_one({'id': teacher_id}, {'_id': 0})
+            cur_school, cur_institution = result['school'], result['institution']
+            form.set_data(result)
+        # 获取所有的学校
+        cur_school, schools, institutions = school_service.get_schools_institutions(mongo=mongo, cur_school=cur_school)
+        form.set_schools(schools, cur_school)
+        form.set_institutions(institutions, cur_institution)
+        title = '添加老师' if teacher_id is None else '修改老师信息'
+
+        return render_template('scholar/teacher_feedback.html', form=form, title=title)
+    except Exception as e:
+        print('when feedback: %s' % e)
+        abort(404)
+
+
+@scholar_bp.route('/feedback', methods=['POST'], defaults={'teacher_id': None})
+@scholar_bp.route('/feedback/<int:teacher_id>', methods=['POST'])
+@login_required
+def feedback_post(teacher_id):
     """
     老师信息反馈页面
-    GET 返回当前页面
     POST 进行数据库操作
     :return:
     """
-    teacher_id = request.args.get('tid', type=int, default=None)
-    # 当前类型 添加or修改 add modify
-    cur_type = 'modify' if teacher_id else 'add'
-    mongo_operator = MongoOperator(**MongoDB_CONFIG)
-    form = ScholarForm(teacher_id, type_get=request.method == 'GET')
+    form = ScholarForm()
+    # 根据已经提交的数据，进行数据的填充
+    cur_school = form.school.data
+    cur_institution = form.institution.data
+    mongo = MongoOperator(**MongoDB_CONFIG)
+    # 获取所有的学校
+    cur_school, schools, institutions = school_service.get_schools_institutions(mongo=mongo, cur_school=cur_school)
+    form.set_schools(schools, cur_school)
+    form.set_institutions(institutions, cur_institution)
 
-    if request.method == 'POST':
-        # 出现错误，则交给flash
-        if not form.validate():
-            warning = []
-            for _, errors in form.errors.items():
-                warning.extend(errors)
-            flash(','.join(warning), 'warning')
-        else:
-            datum = form.get_data()
-            datum.update({
-                'type': cur_type, 'status': 1, 'username': current_user.name,
-                'timestamp': datetime.datetime.utcnow(), 'teacher_id': teacher_id
-            })
-            # 写入数据库
-            result = mongo_operator.db['agent_feedback'].insert_one(datum)
-            flash('操作成功，感谢您的反馈', 'success')
+    if form.validate_on_submit():
+        datum = form.get_data()
+        datum.update({'status': 1, 'username': current_user.name,'timestamp': datetime.datetime.utcnow()})
+        if teacher_id:
+            datum['teacher_id'] = teacher_id
+        # 写入数据库
+        result = mongo.db['agent_feedback'].insert_one(datum)
+        flash('操作成功，感谢您的反馈', 'success')
+    else:
+        flash_errors(form)
 
-            return redirect_back()
+    return redirect_back()
 
-    return render_template('scholar/teacher_feedback.html', form=form, cur_type=cur_type)
 
 
 @scholar_bp.route('/search', methods=['GET'])

@@ -12,7 +12,7 @@
     <div class="container">
         <fieldset class="card-mine">
             <legend>基本信息</legend>
-            <a href="{{ url_for('scholar.feedback', tid=teacher['id'], next=request.full_path) }}" target="_self">
+            <a href="{{ url_for('scholar.feedback_get', teacher_id=teacher['id'], next=request.full_path) }}" target="_self">
                 <i title="编辑" class="editor mdui-icon material-icons">&#xe3c9;</i>
             </a>
             <div id="basic-info" class="row">

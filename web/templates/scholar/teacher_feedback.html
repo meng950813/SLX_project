@@ -22,11 +22,7 @@
     <div class="container">
         <div class="row" style="padding-top: 30px;">
             <div class="col-md-8 offset-2">
-                {% if cur_type == 'add' %}
-                    <h2 class="text-center">添加老师</h2>
-                {% else %}
-                    <h2 class="text-center">修改老师信息</h2>
-                {% endif %}
+                <h2 class="text-center">{{ title }}</h2>
 
                 <form method="post" class="card-body bg-light" id="teacher-info">
                     {{ form.hidden_tag() }}
