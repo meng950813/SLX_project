@@ -7,7 +7,7 @@ desc: 用作flask-wtf的表单类型 从原先的forms.py拆分得到
 import json
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, HiddenField, SelectMultipleField, TextAreaField, SubmitField, FloatField, DateField
-from wtforms.validators import DataRequired, Optional, Email
+from wtforms.validators import DataRequired, Optional, Email, ValidationError
 
 from web.config import MongoDB_CONFIG
 from web.utils.mongo_operator import MongoOperator
@@ -38,34 +38,15 @@ class ScholarForm(FlaskForm):
     work_exp = TextAreaField('工作经历：')
     submit = SubmitField('提交')
 
-    def __init__(self, teacher_id, type_get, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         """
 
         :param teacher_id:
-        :param type_get:
+        :param mongo:
         :param args:
         :param kwargs:
         """
         super(ScholarForm, self).__init__(*args, **kwargs)
-        mongo_operator = MongoOperator(**MongoDB_CONFIG)
-        cur_school = None
-        cur_institution = None
-        # 设置数据
-        if teacher_id:
-            if type_get:
-                result = mongo_operator.get_collection('basic_info').find_one({'id': teacher_id}, {'_id': 0})
-                self.set_data(result)
-            else:
-                result = mongo_operator.get_collection('basic_info').find_one({'id': teacher_id},
-                                                                              {'school': 1, 'institution': 1})
-            cur_school, cur_institution = result['school'], result['institution']
-        # 获取所有的学校
-        generator = mongo_operator.get_collection('school').find({}, {'_id': 0, 'name': 1})
-        cur_school = self.set_schools(generator, cur_school)
-        # 获取当前学校的所有院系
-        school = mongo_operator.get_collection('school'). \
-            find_one({'name': cur_school}, {'_id': 0, 'institutions': 1})
-        self.set_institutions(school['institutions'], cur_institution)
 
     def set_data(self, datum):
         """
@@ -119,17 +100,11 @@ class ScholarForm(FlaskForm):
         return datum
 
     def set_schools(self, schools, cur_school):
-        self.school.choices = [(school['name'], school['name']) for school in schools]
-        if cur_school:
-            self.school.data = cur_school
-        elif self.school.data != 'None':
-            cur_school = self.school.data
-        else:
-            cur_school = self.school.choices[0][0]
-        return cur_school
+        self.school.choices = [(school, school) for school in schools]
+        self.school.data = cur_school
 
     def set_institutions(self, institutions, cur_institution):
-        self.institution.choices = [(institution['name'], institution['name']) for institution in institutions]
+        self.institution.choices = [(institution, institution) for institution in institutions]
         if cur_institution:
             self.institution.data = cur_institution
 
@@ -153,6 +128,8 @@ class ProjectForm(FlaskForm):
 
     def __init__(self, *args, **kwargs):
         super(ProjectForm, self).__init__(*args, **kwargs)
+        # 保存参与者的信息
+        self.participants = None
 
     def get_data(self):
         datum = {
@@ -161,8 +138,36 @@ class ProjectForm(FlaskForm):
             'fund': self.fund.data,
             'start_time': self.start_time.data.strftime('%Y-%m-%d'),
             'end_time': self.end_time.data.strftime('%Y-%m-%d'),
-            'members': json.loads(self.members.data),
+            'members': self.participants,
             'company': self.company.data,
             'content': self.content.data,
         }
         return datum
+
+    def validate_members(self, field):
+        """
+        自定义验证器，会验证relationship字段的值与数据库的值是否匹配
+        :param field: relationship字段
+        当id未找到或者名称等不匹配时都会验证失败
+        当验证不通过会抛出ValidateError错误
+        """
+        self.participants = json.loads(field.data)
+        ids = [result['id'] for result in self.participants]
+
+        mongo = MongoOperator(**MongoDB_CONFIG)
+        collection = mongo.get_collection('basic_info')
+        # 验证id是否和名字 学校 学院匹配
+        teachers = collection.find({'id': {'$in': ids}}, {'_id': 0, 'id': 1, 'name': 1, 'school': 1, 'institution': 1})
+        # 验证通过的个数
+        nums = 0
+        for teacher in teachers:
+            for result in self.participants:
+                if teacher['id'] == result['id']:
+                    if teacher['school'] != result['school'] or teacher['name'] != result['name'] or \
+                            teacher['institution'] != result['institution']:
+                        raise ValidationError('老师信息验证失败，请确定后重试')
+                    else:
+                        nums += 1
+
+        if nums != len(ids):
+            raise ValidationError('老师信息验证失败，请确定后重试')

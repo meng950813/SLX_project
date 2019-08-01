@@ -33,7 +33,7 @@ class ActivityForm(FlaskForm):
     def get_data(self):
         """从form表单中提取数据"""
         datum = {'title': self.title.data, 'location': self.location.data, 'date': self.date.data.strftime('%Y-%m-%d'),
-                 'content': self.content.data, 'relationship': json.loads(self.relationship.data)}
+                 'content': self.content.data, 'relationship': self.results}
         # 获取关系
         return datum
 

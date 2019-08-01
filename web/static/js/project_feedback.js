@@ -144,7 +144,7 @@ function submitData() {
         let datum = {
             'school': member.getAttribute('data-school'),
             'institution': member.getAttribute('data-institution'),
-            'id': member.getAttribute('data-id'),
+            'id': parseInt(member.getAttribute('data-id')),
             'name': member.innerText,
         };
         data.push(datum);

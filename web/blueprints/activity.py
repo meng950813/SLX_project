@@ -11,6 +11,7 @@ from web.settings import basedir
 from web.config import MongoDB_CONFIG
 from web.utils.mongo_operator import MongoOperator
 from web.utils import redirect_back, flash_errors
+import web.service.school as school_service
 
 
 activity_bp = Blueprint('activity', __name__)
@@ -38,13 +39,9 @@ def show_interface(objectId):
                 abort(403)
             form.set_data(activity)
             title = '编辑活动'
-        # 获取所有的学校
-        generator = mongo.get_collection('school').find({}, {'_id': 0, 'name': 1})
-        schools = [school['name'] for school in generator]
-        cur_school = schools[0]
-        # 获取当前学校的所有院系
-        school = mongo.get_collection('school').find_one({'name': cur_school}, {'_id': 0, 'institutions': 1})
-        institutions = [result['name'] for result in school['institutions']]
+        # 获取选中的学校和对应的所有学院、所有学校
+        cur_school, schools, institutions = school_service.get_schools_institutions(mongo=mongo)
+
         return render_template('activity/new_activity.html', form=form, title=title,
                                schools=schools, institutions=institutions)
     except Exception as e:
