@@ -23,18 +23,22 @@ def login():
         password = form.password.data
         remember = form.remember.data
 
-        # 检验账号密码
-        user = user_service.check_user(username, password)
-        if user:
-            # flash('登录成功，欢迎回来', 'success')
-            if user["type"] == AGNET_TYPE["SCHOOL_AGENT"]:
-                login_user(user, remember)
-                return redirect_back('school_agent.index')
-            else:
-                # TODO 企业商务主页
-                flash('暂不支持企业商务登陆', 'danger')
-                return render_template('auth/login.html', form=form)
-        flash('登录失败，请检测账号或者密码后重新输入', 'danger')
+        try:
+            # 检验账号密码
+            user = user_service.check_user(username, password)
+            if user:
+                # flash('登录成功，欢迎回来', 'success')
+                if user["type"] == AGNET_TYPE["SCHOOL_AGENT"]:
+                    login_user(user, remember)
+                    return redirect_back('school_agent.index')
+                else:
+                    # TODO 企业商务主页
+                    flash('暂不支持企业商务登陆', 'danger')
+                    return render_template('auth/login.html', form=form)
+            flash('登录失败，请检测账号或者密码后重新输入', 'danger')
+        except Exception as e:
+            print('error when login: %s' % e)
+            flash('服务器发送故障，请稍后重试', 'info')
     return render_template('auth/login.html', form=form)
 
 

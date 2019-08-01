@@ -1,4 +1,3 @@
-from web.dao import user_dao
 from web.utils import encrypt
 import re
 from web.config import MongoDB_CONFIG
@@ -17,25 +16,26 @@ def check_user(username, password):
     tel = re.compile(r"^\d{11}$")
     email = re.compile(r"^[\w\d]+@[\w\d]+\.com$")
     u_id = re.compile(r"^\d{6,8}$")
-    #  加密出密码
+    # 加密密码
     password = encrypt.encryption(password)
-
-    back = None
-
-    # 利用正则判断用户名是否符合标准，以减少 sql 注入可能性
+    # 查询条件
+    condition = {'password': password, "status": "1"}
+    # 以电话登陆
     if tel.match(username):
-        # 以电话登陆
-        back = user_dao.do_login(telephone=username, pwd=password)
+        condition['tel_number'] = username
+    # 以邮件登陆
     elif email.match(username):
-        # 以邮件登陆
-        back = user_dao.do_login(email=username, pwd=password)
+        condition['email'] = username
+    # 以 id 登陆
     elif u_id.match(username):
-        # 以 id 登陆
-        back = user_dao.do_login(u_id=username, pwd=password)
+        condition['id'] = int(username)
 
-    # 返回查询结果
-    if back:
-        return User(**back)
+    # 连接服务器
+    mongo = MongoOperator(**MongoDB_CONFIG)
+    # 除_id 外全部获取
+    result = mongo.get_collection('user').find_one(condition, {"_id": 0})
+    if result:
+        return User(**result)
     return None
 
 
