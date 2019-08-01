@@ -158,7 +158,7 @@ function submitData() {
             //获取名字
             let school = teacher.getAttribute('data-school');
             let institution = teacher.getAttribute('data-institution');
-            let id = teacher.getAttribute('data-id');
+            let id = parseInt(teacher.getAttribute('data-id'));
             let name = teacher.innerHTML;
             let company = $(other).val();
             let checked = $('#checkbox' + (i + 1)).prop('checked');
