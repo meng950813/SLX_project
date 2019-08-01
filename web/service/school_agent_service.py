@@ -316,13 +316,13 @@ class SchoolAgentService(object):
 
         return back
 
-    def get_institutions_relation_data(self, agent_id, school, institution):
+    def get_agent_relation_in_institution(self, agent_id, school, institution):
         # data ==> [{visited: xxx, activity: xxx, id:13213},...]
         data = get_institution_relation_with_agent(agent_id, school, institution)
 
         return data
     
-    def get_school_relation_data(self, agent_id, school):
+    def get_agent_relation_in_school(self, agent_id, school):
         """
         获取商务在该学校建立的社交关系数据
         :param agent_id:

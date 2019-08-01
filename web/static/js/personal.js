@@ -18,7 +18,7 @@ function showGraph() {
         getSchoolGraphData(school);
     }
     else{
-        getInstitutionGraphData(school,institution.text());
+        getInstitutionGraphData(school, institution.text());
     }
 }
 
@@ -28,7 +28,7 @@ function showGraph() {
 $("#toggle-node-btn").click((e)=>{
     myChart.showLoading();
     toggle_unimportant_node(0, true);
-    toggle_relation_with_core_node(-1, true);
+    // toggle_relation_with_core_node(-1, true);
     reloadGraph(DATA);
 })
 
@@ -201,29 +201,32 @@ function toggle_unimportant_node(category, toggle_all = false){
  * 创建用户与核心节点的关系
  * @param {json} core_node_data ==> [t_id : {"visited": 123, "activity": 234},...]
  */
-function create_relation_with_core_node(core_node_data){
+/**
+ function create_relation_with_core_node(core_node_data){
     if(!core_node_data || core_node_data.length == 0) return;
     
     // 重置
     CORE_NODE = [];
 
-    // for(let id in core_node_data){
-    //     CORE_NODE.push({
-    //         "source":"0",
-    //         "target":`-${id}`,
-    //         "visited": `共${core_node_data[id].visited}`,
-    //         "activity": `共${core_node_data[id].activity}`,
-    //         "lineStyle": {
-    //             "normal": {
-    //                 // TODO 根据拜访次数设定连线宽度
-    //                 "width": 10
-    //             }
-    //         }
-    //     })
-    // }
+    for(let id in core_node_data){
+        CORE_NODE.push({
+            "source":"0",
+            "target":`-${id}`,
+            "visited": `共${core_node_data[id].visited}`,
+            "activity": `共${core_node_data[id].activity}`,
+            "lineStyle": {
+                "normal": {
+                    // TODO 根据拜访次数设定连线宽度
+                    "width": 10
+                }
+            }
+        })
+    }
 
     DATA.links = DATA.links.concat(CORE_NODE);
 }
+*/
+
 
 /**
  * 
