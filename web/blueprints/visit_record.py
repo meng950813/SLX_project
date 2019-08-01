@@ -21,7 +21,7 @@ def manage_visit_record():
     # 获取用户的uid
     uid = current_user.id
     # 查询询该用户的日程安排
-    generator = mongo_operator.find({'user_id': uid, 'status': 1}, 'visit_record')
+    generator = mongo_operator.find({'user_id': uid, 'status': 1}, 'visit_record').sort("date", -1)
     return render_template('visit_record/manager.html', visited_records=list(generator))
 
 
@@ -43,6 +43,7 @@ def new_visit_record():
         'teacher': request.form.get('teacher'),
         'title': request.form.get('title'),
         "user_id": uid,
+        "user_name": current_user.name,
         "status": 1,
     }
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
@@ -50,8 +51,8 @@ def new_visit_record():
         # back => dict or None
         teacher_info = mongo_operator.get_collection("basic_info").find_one(
                 {"name": record['teacher'], "school": record['school'], "institution": record['institution']},
-                {"_id": 0, 'paper_id': 0, 'patent_id': 0, 'funds_id': 0, 'honor': 0, 'edu_exp': 0, 'birth_year': 0, 'other_title': 0}
-            )
+                {"id": 1})
+
         if teacher_info is None:
             return json.dumps({'success': False, "message": "教师不存在,请检查输入的信息"})
 
@@ -69,6 +70,7 @@ def new_visit_record():
             if whole_key in request.form:
                 modifying = True
                 external_info[key[1]] = request.form[whole_key]
+
         # 更新老师信息 并写入到反馈中
         if modifying:
             teacher_info.update(external_info)
