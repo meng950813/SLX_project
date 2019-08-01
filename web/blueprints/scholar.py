@@ -33,11 +33,11 @@ def scholar_info(teacher_id):
         mongo = MongoOperator(**MongoDB_CONFIG)
         collection = mongo.get_collection("visit_record")
         user_id = current_user.id
-        # 找到对应的拜访记录信息
+        # 找到对应的拜访记录信息, 按时间排序, 最多5个
         visit_info = collection.find({"user_id": user_id, "status": 1, "teacher_id": teacher_id},
-                                     {"_id": 0, "date": 1, "title": 1, "content": 1})
-        # 转成列表 最多5个
-        visit_list = list(visit_info.limit(5))
+                            {"_id": 0, "date": 1, "title": 1, "content": 1, "user_name": 1}).sort("date", -1).limit(5)
+        # 转成列表 
+        visit_list = list(visit_info)
     except Exception as e:
         print('get_visit_info error:%s' % e)
 
