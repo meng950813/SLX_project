@@ -108,7 +108,6 @@ def feedback_post(teacher_id):
     return redirect_back()
 
 
-
 @scholar_bp.route('/search', methods=['GET'])
 @login_required
 def search():
@@ -185,17 +184,12 @@ def project_feedback():
     form = ProjectForm()
     mongo = MongoOperator(**MongoDB_CONFIG)
     # 获取所有的学校
-    generator = mongo.get_collection('school').find({}, {'_id': 0, 'name': 1})
-    schools = [school['name'] for school in generator]
-    cur_school = schools[0]
-    # 获取当前学校的所有院系
-    school = mongo.get_collection('school').find_one({'name': cur_school}, {'_id': 0, 'institutions': 1})
-    institutions = [result['name'] for result in school['institutions']]
+    cur_school, schools, institutions = school_service.get_schools_institutions(mongo=mongo)
 
     if request.method == 'POST':
         # 出现错误，则交给flash
         if not form.validate():
-            flash('数据输入有误，请确认后输入', 'warning')
+            flash_errors(form)
         else:
             datum = form.get_data()
             datum.update({'timestamp': datetime.datetime.utcnow(), 'username': current_user.name, 'status': 1})
