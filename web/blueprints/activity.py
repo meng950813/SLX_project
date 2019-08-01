@@ -10,7 +10,7 @@ from web.forms.activity import ActivityForm
 from web.settings import basedir
 from web.config import MongoDB_CONFIG
 from web.utils.mongo_operator import MongoOperator
-from web.utils import redirect_back
+from web.utils import redirect_back, flash_errors
 
 
 activity_bp = Blueprint('activity', __name__)
@@ -83,7 +83,8 @@ def operation(objectId):
             flash('数据编辑成功', 'success')
             return redirect_back('activity.detail', objectId=objectId)
         else:
-            flash('数据验证出错，请确定后重试', 'info')
+            # flash('数据验证出错，请确定后重试', 'info')
+            flash_errors(form, 'danger')
             return redirect(url_for('.show_interface', objectId=objectId))
     except Exception as e:
         print("error when adding activity: %s" % e)

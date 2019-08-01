@@ -1,4 +1,4 @@
-from flask import current_app, request, url_for, redirect
+from flask import current_app, request, url_for, redirect, flash
 from itsdangerous import BadSignature, SignatureExpired
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from urllib.parse import urljoin, urlparse
@@ -91,3 +91,15 @@ def redirect_back(default='school_agent.index', **kwargs):
         if is_safe_url(target) and urlparse(target).path != urlparse(request.full_path).path:
             return redirect(target)
     return redirect(url_for(default, **kwargs))
+
+
+def flash_errors(form, level='info'):
+    """
+    flask-wtf表单验证出错时可以调用此函数打印错误消息
+    :param form:flask-wtf表单
+    :param level: 错误等级 和bootstrap4相关 主要用于背景颜色
+    :return:
+    """
+    for field, errors in form.errors.items():
+        for error in errors:
+            flash(u'Error in the %s field - %s' % (getattr(form, field).label.text, error), level)
