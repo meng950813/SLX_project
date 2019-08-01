@@ -26,7 +26,7 @@ def get_info(teacher_id):
         if 'honor_title' in basic_info and len(basic_info['honor_title']) > 0:
             basic_info['honor_title'].sort(key=lambda k: (k.get('year', 0)), reverse=True)
 
-        # 获取基金集合
+        # 获取项目集合
         if 'funds_id' in basic_info and len(basic_info["funds_id"]) > 0:
             basic_info["funds"] = getFundsInfo(mongo, basic_info["funds_id"])
 
