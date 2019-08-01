@@ -91,10 +91,10 @@ def get_schools():
         schools = list(school_col.find({}, {"_id": 0, "name": 1}))
 
         # 转成学校列表
-        school_list = [d["name"] for d in schools]
+        school_list = [school["name"] for school in schools]
         return json.dumps({"success": True, "school_list": school_list})
-
-    except:
+    except Exception as e:
+        print(e)
         return json.dumps({"success": False, "school_list": []})
 
 
@@ -107,7 +107,8 @@ def change_institution():
     
     # 个人中心需要获取关系数据
     if get_relation:
-        json_data = agent_service.get_relations(school, institution, current_user.id)
+        # json_data = agent_service.get_relations(school, institution, current_user.id)
+        json_data = agent_service.get_relations(school, institution)
 
         if json_data:
             # 放在此处执行 + 1 操作是为了让无关系文件的学院靠后

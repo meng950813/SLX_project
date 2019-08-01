@@ -45,7 +45,7 @@ class SchoolAgentService(object):
         # 取出学院名，转为list
         return [item["name"] for item in institutions]
 
-    def get_relations(self, school, institution, agent_id):
+    def get_relations(self, school, institution):
         """
         获取当前用户与某一学院之中的人员关系及其中的内部社区分布
         :param school: 学校名
@@ -64,23 +64,23 @@ class SchoolAgentService(object):
             # print(data)
             
             # agent_relation => [{visited: xxx, activity: xxx, id:13213},...] or []
-            agent_relation = self.get_institutions_relation_data(agent_id, school, institution)
+            # agent_relation = self.get_institutions_relation_data(agent_id, school, institution)
 
-            relation_data = self.format_institution_relation_data(data, agent_relation)
+            # relation_data = self.format_institution_relation_data(data, agent_relation)
+            relation_data = self.format_institution_relation_data(data)
             return json.dumps(relation_data)
 
-    def format_institution_relation_data(self, data, agent_relation):
+    def format_institution_relation_data(self, data):
         """
         将学院关系数据简化为可发送的数据
         :param data: 预处理过的社区网络数据
-        :param agent_relation: 商务的社交数据
         :return: 可供echarts直接渲染的json文件 or False
         """
         try:
             """
                 nodes 中舍弃 code, school, insititution, centrality, class 属性, 
                 添加 label,symbolSize 属性
-                class 属性是指节点所属社区，从 1 开始
+                class 属性是指节点所属社区, 从 1 开始
             """
             teacher_id_dict = dict()
             class_id_dict = dict()
@@ -95,7 +95,7 @@ class SchoolAgentService(object):
                     node["itemStyle"] = {
                         "normal": {
                             "borderColor": 'yellow',
-                            "borderWidth": 5,
+                            "borderWidth": 2,
                             "shadowBlur": 10,
                             "shadowColor": 'rgba(0, 0, 0, 0.3)'
                         }
@@ -103,14 +103,13 @@ class SchoolAgentService(object):
 
                     # 保存 class 的种类是为了划分社区 ==> 实现这一功能的前提是 class 值不存在断档
                     # 其值为该社区核心节点 id
-                    class_id_dict[node["class"]] = node["teacherId"]
+                    class_id_dict[str(node["class"])] = node["label"]
 
                 # 保存 teacherId => 判定商务创建的所有关系中有哪些属于当前社区;
                 # 以其 class 为值是为了更方便的在隐藏非核心节点时, 将商务与其的关系累加到核心节点上
                 teacher_id_dict[node['teacherId']] = node["class"]
 
-                del node["teacherId"], node["class"], node["centrality"], node["code"], node["school"], node[
-                    "insititution"]
+                del node["teacherId"], node["class"], node["centrality"], node["code"], node["school"], node["insititution"]
 
             data["links"] = []
             for link in data["edges"]:
@@ -132,14 +131,15 @@ class SchoolAgentService(object):
             data["community"] = len(class_id_dict)
 
             # 添加商务节点
-            data["nodes"].append(self.create_agent_node())
+            # data["nodes"].append(self.create_agent_node())
 
             # 格式化商务创建的社交关系
-            agent_relation_links, core_node = self.create_agent_relation_links(agent_relation, teacher_id_dict, class_id_dict)
+            # agent_relation_links, core_node = self.create_agent_relation_links(agent_relation, teacher_id_dict, class_id_dict)
 
-            data["links"].extend(agent_relation_links)
+            # data["links"].extend(agent_relation_links)
 
-            data["core_node"] = core_node
+            # data["core_node"] = core_node
+            data["core_node"] = class_id_dict
 
             if "community_data" in data: del data['community_data']
             if "algorithm_compare" in data: del data['algorithm_compare']
@@ -288,7 +288,7 @@ class SchoolAgentService(object):
             "community": 2
         }
 
-        # 若以该教师为核心的网络为空 ==> 只返回商务节点，教师节点由前端生成
+        # 若以该教师为核心的网络为空 ==> 只返回商务节点, 教师节点由前端生成
         if len(data['relation']) == 0:
             back['community'] = 1
 
