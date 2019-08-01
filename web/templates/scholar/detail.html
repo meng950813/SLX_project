@@ -62,6 +62,7 @@
 
         <fieldset id="edu-exp" class="row card-mine">
             <legend>教育经历</legend>
+            <i title="编辑" class="editor mdui-icon material-icons">&#xe3c9;</i>
             {% if teacher["edu_exp"] %}
                 <p>{{ teacher["edu_exp"] }}</p>
             {% endif %}
@@ -99,7 +100,8 @@
                             <tr>
                                 <td style="width: 120px">{{ visit["date"] }}</td>
                                 <td>{{ visit["title"] }}</td>
-                                <td>{{ visit["content"] | truncate(50) }}</td>
+                                <td>{{ visit["content"] | truncate(36) | replace("<br>", " ") }}</td>
+                                <td>{{ visit["user_name"]}}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -187,6 +189,18 @@
             </div>
         </fieldset>
 
+    </div>
+
+    <!-- 模态框 -->
+    <div class="modal fade" id="personalNetworkModal" >
+        <div class="modal-dialog" >
+            <div class="modal-content">
+                <!-- 模态框主体 -->
+                <div class="modal-body">
+                    
+                </div>
+            </div>
+        </div>
     </div>
 
 {% endblock %}
