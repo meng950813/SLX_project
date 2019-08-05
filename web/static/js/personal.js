@@ -39,6 +39,7 @@ function showTree() {
     myChart.showLoading();
     $.get('static/relation_data/back_tree.json', function (data) {
         myChart.hideLoading();
+        console.log(data);
         treeOption.series[0].data = [data];
         myChart.setOption(treeOption);
     });

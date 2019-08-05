@@ -95,45 +95,35 @@ let treeOption = {
             return "行政关系。。。"
         }
     },
-    series:[
-        {
-            type: 'tree',
-
-            data: [],
-
-            left: '2%',
-            right: '2%',
-            top: '8%',
-            bottom: '20%',
-
-            symbol: 'emptyCircle',
-
-            orient: 'vertical',
-
-            expandAndCollapse: false,
-
-            label: {
-                normal: {
-                    position: 'top',
-                    rotate: -90,
-                    verticalAlign: 'middle',
-                    align: 'right',
-                    fontSize: 9
-                }
-            },
-
-            leaves: {
+    series:[{
+                type: 'tree',
+                data: [],
+                top: '1%',
+                left: '7%',
+                bottom: '1%',
+                right: '20%',
+                symbolSize: 7,
                 label: {
                     normal: {
-                        position: 'bottom',
-                        rotate: -90,
+                        position: 'left',
                         verticalAlign: 'middle',
-                        align: 'left'
+                        align: 'right',
+                        fontSize: 16
                     }
-                }
-            },
-            animationDurationUpdate: 750
-        }
+                },
+                leaves: {
+                    label: {
+                        normal: {
+                            position: 'right',
+                            verticalAlign: 'middle',
+                            align: 'left'
+                        }
+                    }
+                },
+                expandAndCollapse: true,
+                animationDuration: 550,
+                animationDurationUpdate: 750
+            }
     ]
 };
 
