@@ -60,6 +60,19 @@
                 {{ render_nav_item('activity.manager', '活动安排') }}
                 {{ render_nav_item('schedule.schedule', '日程安排') }}
                 {{ render_nav_item('visit_record.manage_visit_record', '拜访记录') }}
+                <li>
+                    <div class="dropdown">
+                        <a class="nav-item nav-link dropdown-toggle" id="schoolChoose" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">
+                            选择学校
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="schoolChoose">
+                            {% for school in current_user.charge_school %}
+                                <a class="dropdown-item" href="{{ url_for('school.index', school=school) }}">{{ school }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </li>
             </ul>
             <ul class="navbar-nav ml-auto">
                 <form class="form-inline" method="get" action="{{ url_for('scholar.search') }}">

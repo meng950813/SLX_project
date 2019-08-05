@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        {% block breadcrum %}
+        <li class="breadcrumb-item "><a href="#">{{ school }}</a></li>
+        <li class="breadcrumb-item "><a href="#"> 理学院</a></li>
+        <li class="breadcrumb-item active" aria-current="page">李开复团队</li>
+        {% endblock %}
+    </ol>
+</nav>
+<div class="container-fluid">
+    <div class="painting"></div>
+    {# 相关信息 客观 #}
+    <div class="row">
+        <div class="col">
+            客观信息
+        </div>
+    </div>
+    {# 与我有关的信息 #}
+    <div class="row">
+        <div class="col">
+            <details>
+                <summary>与我有关</summary>
+                <p>主观信息</p>
+            </details>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+{% endblock %}
+
