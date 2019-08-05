@@ -62,7 +62,7 @@ def index():
 def get_school_relation():
     school = request.args.get("school")
     # data ==> {nodes:[{},..], links:[{..},... , community:123]}
-    data = agent_service.get_school_relation_data(current_user.id, school)
+    data = agent_service.get_agent_relation_in_school(current_user.id, school)
 
     return json.dumps(data)
 
