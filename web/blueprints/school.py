@@ -1,5 +1,8 @@
+import json
 from flask import Blueprint, render_template
 from flask_login import login_required
+
+import web.service.school as school_service
 
 
 school_bp = Blueprint('school', __name__)
@@ -28,11 +31,17 @@ def institution(school, institution):
     return render_template('school/institution.html', school=school, institution=institution)
 
 
-@school_bp.route('/team')
+@school_bp.route('/<school>/<institution>/<int:team_index>')
 @login_required
-def show_team():
+def show_team(school, institution, team_index):
     """
     显示某一个团队的相关信息 关系图
+    :param school: 学校名
+    :param institution: 学院名
+    :param team_index: 团队的索引
     :return:
     """
-    pass
+    graph_data = school_service.get_team(school, institution, team_index)
+    core_node = graph_data['core_node']
+    return render_template('school/team.html', school=school, institution=institution,
+                           graph_data=json.dumps(graph_data, ensure_ascii=False), core_node=core_node)

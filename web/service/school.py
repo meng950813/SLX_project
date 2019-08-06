@@ -1,5 +1,9 @@
+import os
+import json
+
 from web.config import MongoDB_CONFIG
 from web.utils.mongo_operator import MongoOperator
+from web.settings import basedir
 
 
 def get_schools_institutions(cur_school=None, mongo=None):
@@ -22,3 +26,62 @@ def get_schools_institutions(cur_school=None, mongo=None):
     school = collection.find_one({'name': cur_school}, {'_id': 0, 'institutions': 1})
     institutions = [result['name'] for result in school['institutions']]
     return cur_school, schools, institutions
+
+
+def get_team(school, institution, team_index):
+    """
+    获取院系的某一个团队
+    :param school: 学校的名称
+    :param institution: 学院名
+    :param team_index: 团队id
+    :return:False 或者dict
+    """
+    file_path = os.path.join(basedir, 'web', 'static', 'relation_data', '%s%s.txt' % (school, institution))
+
+    # 判断该学院社区网络文件是否存在
+    if not os.path.exists(file_path):
+        print("%s %s 的社交网络尚未生成！" % (school, institution))
+        return False
+
+    with open(file_path, "r") as f:
+        # 获取所有的相关节点
+        data = json.loads(f.read())
+        nodes = []
+        ids = []
+        core_node = ""
+        for node in data['nodes']:
+            if node['class'] == team_index:
+                nodes.append(node)
+                ids.append(node['teacherId'])
+
+                node['label'], node['name'] = node['name'], str(node['teacherId'])
+                node['category'], node["draggable"] = 1, True
+                node['symbolSize'] = int(node['centrality'] * 30 + 5)
+                # 核心节点
+                if node['teacherId'] in data["core_node"]:
+                    node["itemStyle"] = {
+                        "normal": {"borderColor": 'yellow', "borderWidth": 2, "shadowBlur": 10,
+                                   "shadowColor": 'rgba(0, 0, 0, 0.3)'}}
+                    core_node = node['label']
+
+                del node["teacherId"], node["class"], node["centrality"], node["code"], node["school"], node["insititution"]
+        # 链接
+        links = []
+        for link in data["edges"]:
+            if "source" not in link or "target" not in link:
+                print("缺少 起点 / 终点：", link)
+            elif link['source'] in ids and link['target'] in ids:
+                link["source"], link["target"] = str(link["source"]), str(link["target"])
+                link["value"] = link["weight"]
+                if "weight" in link:
+                    del link['weight']
+                links.append(link)
+        # 覆盖
+        relation_data = {
+            "nodes": nodes,
+            "links": links,
+            "core_node": core_node,
+            "community": 1,
+        }
+        return relation_data
+
