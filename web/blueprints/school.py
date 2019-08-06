@@ -3,6 +3,8 @@ from flask import Blueprint, render_template
 from flask_login import login_required
 
 import web.service.school as school_service
+from web.config import MongoDB_CONFIG
+from web.utils.mongo_operator import MongoOperator
 
 
 school_bp = Blueprint('school', __name__)
@@ -28,6 +30,12 @@ def institution(school, institution):
     :param institution:
     :return:
     """
+    mongo = MongoOperator(**MongoDB_CONFIG)
+    # 获取学校
+    collection = mongo.get_collection('institution')
+    result = collection.find_one({'school': school, 'institution': institution},
+                                 {'_id': 0, 'school': 0, 'institution': 0})
+    keys = [('academician_num', '院士'), ('cjsp_num', '长江学者'), ('dfc_num', ''), ('nkd_num', ''), ('outstanding_num', ''), ('skl_num', '')]
     return render_template('school/institution.html', school=school, institution=institution)
 
 
