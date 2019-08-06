@@ -22,3 +22,23 @@ def get_schools_institutions(cur_school=None, mongo=None):
     school = collection.find_one({'name': cur_school}, {'_id': 0, 'institutions': 1})
     institutions = [result['name'] for result in school['institutions']]
     return cur_school, schools, institutions
+
+def get_school_info(school_name,mongo=None):
+    """
+    根据学校名获取学校的简介信息
+    :param school_name: 学校名
+    :return: school_info: 学校名，学院数量，一流学科数量，重点学科数量，国家重点实验室数量，院士数量，长江学者数量，杰出青年数量
+    """
+    if mongo is None:
+        mongo = MongoOperator(**MongoDB_CONFIG)
+    collection = mongo.get_collection("school")
+    school_info = collection.find_one({"name":school_name}, {"_id":0,"institutions":1,"dfc_num":1,"nkd_num":1,
+                           "skl_num":1,"academician_num":1,"outstanding_num":1,"cjsp_num":1})
+    school_info['institutions'] = len(school_info['institutions'])
+    return school_info
+
+if __name__ == "__main__":
+    #测试
+    s = get_school_info("大连理工大学")
+    print(s)
+

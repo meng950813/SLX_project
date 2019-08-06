@@ -13,16 +13,19 @@
 <div class="container-fluid">
     <div class="painting"></div>
     {# 相关信息 客观 #}
-    <div class="row">
+    <div class="row" >
         <div class="col">
-            客观信息
+            <details>
+                <summary style="outline: none !important">学校简介</summary>
+                <p>{{ school_intro }}</p>
+            </details>
         </div>
     </div>
     {# 与我有关的信息 #}
     <div class="row">
         <div class="col">
             <details>
-                <summary>与我有关</summary>
+                <summary style="outline: none !important">与我有关</summary>
                 <p>主观信息</p>
             </details>
         </div>
