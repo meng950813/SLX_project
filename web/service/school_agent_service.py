@@ -70,6 +70,34 @@ class SchoolAgentService(object):
             relation_data = self.format_institution_relation_data(data)
             return json.dumps(relation_data)
 
+    def get_team(self, school, institution, team_index):
+        """
+        获取院系的某一个团队
+        :param school: 学校的名称
+        :param institution: 学院名
+        :param team_index: 团队id
+        :return: 可供echarts直接渲染的json文件 or False
+        """
+        file_path = os.path.join(basedir, 'web', 'static', 'relation_data', '%s%s.txt' % (school, institution))
+
+        # 判断该学院社区网络文件是否存在
+        if not os.path.exists(file_path):
+            print("%s %s 的社交网络尚未生成！" % (school, institution))
+            return False
+
+        with open(file_path, "r") as f:
+            # 获取所有的相关节点
+            data = json.loads(f.read())
+            nodes = [node for node in data['nodes'] if node['class'] == team_index]
+            ids = [node['teacherId'] for node in nodes]
+            # 链接
+            links = [link for link in data['edges'] if link['source'] in ids and link['target'] in ids]
+            # 覆盖
+            data['nodes'], data['edges'] = nodes, links
+
+            relation_data = self.format_institution_relation_data(data)
+            return json.dumps(relation_data)
+
     def format_institution_relation_data(self, data):
         """
         将学院关系数据简化为可发送的数据

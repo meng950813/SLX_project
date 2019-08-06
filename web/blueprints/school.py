@@ -16,7 +16,7 @@ def index(school):
     return render_template('school/index.html', school=school)
 
 
-@school_bp.route('/>school>/<institution>')
+@school_bp.route('/<school>/<institution>')
 @login_required
 def institution(school, institution):
     """
@@ -25,7 +25,7 @@ def institution(school, institution):
     :param institution:
     :return:
     """
-    return render_template('school/base.html', school=school)
+    return render_template('school/institution.html', school=school, institution=institution)
 
 
 @school_bp.route('/team')
