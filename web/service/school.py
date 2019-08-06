@@ -115,6 +115,11 @@ def filter_data(data, team_index):
 
 
 def get_details(teacher_ids):
+    """
+    根据老师的id数组获取老师的相关信息
+    :param teacher_ids:
+    :return:
+    """
     mongo = MongoOperator(**MongoDB_CONFIG)
     # 获取学校
     collection = mongo.get_collection('basic_info')

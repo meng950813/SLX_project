@@ -35,8 +35,16 @@ def institution(school, institution):
     collection = mongo.get_collection('institution')
     result = collection.find_one({'school': school, 'institution': institution},
                                  {'_id': 0, 'school': 0, 'institution': 0})
-    keys = [('academician_num', '院士'), ('cjsp_num', '长江学者'), ('dfc_num', ''), ('nkd_num', ''), ('outstanding_num', ''), ('skl_num', '')]
-    return render_template('school/institution.html', school=school, institution=institution)
+    keys = [('academician_num', '院士'), ('cjsp_num', '长江学者'), ('dfc_num', '一流学科'),
+            ('nkd_num', '重点学科'), ('outstanding_num', '杰出青年'), ('skl_num', '重点实验室')]
+    objects = []
+    for key, value in keys:
+        if result[key] != 0:
+            objects.append("%s数量%d个" % (value, result[key]))
+    object_text = ",".join(objects)
+
+    return render_template('school/institution.html', school=school, institution=institution,
+                           object_text=object_text)
 
 
 @school_bp.route('/<school>/<institution>/<int:team_index>')
