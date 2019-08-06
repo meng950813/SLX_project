@@ -44,4 +44,4 @@ def show_team(school, institution, team_index):
     graph_data = school_service.get_team(school, institution, team_index)
     core_node = graph_data['core_node']
     return render_template('school/team.html', school=school, institution=institution,
-                           graph_data=json.dumps(graph_data, ensure_ascii=False), core_node=core_node)
+                           graph_data=json.dumps(graph_data), core_node=core_node)
