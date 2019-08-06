@@ -1,0 +1,23 @@
+{% extends 'school/base.html' %}
+
+{% block title %}
+    {{ school }}-{{ institution }}-{{ core_node }}团队
+{% endblock %}
+
+{% block breadcrum %}
+    <li class="breadcrumb-item"><a href="{{ url_for('school.index', school=school) }}">{{ school }}</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('school.institution', school=school, institution=institution) }}"> {{ institution }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ core_node }}团队</li>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts.min.js"></script>
+    <script type="text/javascript">
+    let DATA = {{ graph_data | safe}};
+    let SCHOOL_NAME = "{{ school }}";
+    let INSTITUTION_NAME = "{{ institution }}";
+    </script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/school/team.js') }}"></script>
+{% endblock %}
+

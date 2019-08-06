@@ -1,6 +1,21 @@
 {% extends 'base.html' %}
 
+{% block styles %}
+<style>
+    #container{
+        position: absolute;
+        top: 120px;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: -1;
+    }
+</style>
+{% endblock %}
+
+
 {% block main %}
+<div id="container"></div>
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         {% block breadcrum %}
@@ -10,24 +25,27 @@
         {% endblock %}
     </ol>
 </nav>
-<div class="container-fluid">
-    <div class="painting"></div>
+<div class="container-fluid" style="position: absolute;top: 80%">
     {# 相关信息 客观 #}
     <div class="row" >
         <div class="col">
-            <details>
-                <summary style="outline: none !important">学校简介</summary>
+        {% block object %}
+            <details open>
+                <summary style="outline: none !important">客观信息</summary>
                 <p>{{ school_intro }}</p>
             </details>
+        {% endblock %}
         </div>
     </div>
     {# 与我有关的信息 #}
     <div class="row">
         <div class="col">
-            <details>
-                <summary style="outline: none !important">与我有关</summary>
-                <p>主观信息</p>
-            </details>
+            {% block subject %}
+                <details>
+                    <summary style="outline: none !important">与我有关</summary>
+                    <p>主观信息</p>
+                </details>
+            {% endblock %}
         </div>
     </div>
 </div>

@@ -1,5 +1,7 @@
+import json
 from flask import Blueprint, render_template
 from flask_login import login_required
+
 import web.service.school as school_service
 
 
@@ -27,12 +29,12 @@ def index(school):
     if school_info["outstanding_num"] != 0:
         school_intro = school_intro + str(school_info['outstanding_num'])+"名杰出青年，"
     if school_info["cjsp_num"] != 0:
-        school_intro = school_intro + str(school_info['cjsp_num'])+"名长江学者，"
+        school_intro = school_intro + str(school_info['cjsp_num'])+"名长江学者。"
 
     return render_template('school/index.html', school=school, school_intro=school_intro)
 
 
-@school_bp.route('/>school>/<institution>')
+@school_bp.route('/<school>/<institution>')
 @login_required
 def institution(school, institution):
     """
@@ -41,14 +43,20 @@ def institution(school, institution):
     :param institution:
     :return:
     """
-    return render_template('school/base.html', school=school)
+    return render_template('school/institution.html', school=school, institution=institution)
 
 
-@school_bp.route('/team')
+@school_bp.route('/<school>/<institution>/<int:team_index>')
 @login_required
-def show_team():
+def show_team(school, institution, team_index):
     """
     显示某一个团队的相关信息 关系图
+    :param school: 学校名
+    :param institution: 学院名
+    :param team_index: 团队的索引
     :return:
     """
-    pass
+    graph_data = school_service.get_team(school, institution, team_index)
+    core_node = graph_data['core_node']
+    return render_template('school/team.html', school=school, institution=institution,
+                           graph_data=json.dumps(graph_data), core_node=core_node)
