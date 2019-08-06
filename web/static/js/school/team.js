@@ -84,9 +84,10 @@ function reloadGraph(data){
     graphOption.series[0].data = data.nodes;
     graphOption.series[0].links = links;
 
-    let categories = [{name: ''}, {name: `${data.core_node}团队`}];
-
-    graphOption.series[0].categories = categories;
+    //let categories = [{name: ''}, {name: `${data.core_node}团队`}];
+    let categories = data.categories;
+    //graphOption.series[0].categories = categories;
+    graphOption.series[0].categories = data.categories;
     graphOption.legend = [{
         data: categories.map(function (a) {
             return a.name;
