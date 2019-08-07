@@ -18,13 +18,13 @@ let treeOption = {
                 left: '7%',
                 bottom: '1%',
                 right: '20%',
-                symbolSize: 7,
+                symbolSize: 15,
                 label: {
                     normal: {
                         position: 'left',
                         verticalAlign: 'middle',
                         align: 'right',
-                        fontSize: 16
+                        fontSize: 12
                     }
                 },
                 leaves: {
@@ -39,7 +39,7 @@ let treeOption = {
                 height:600,
 
                 roam: true,
-                initialTreeDepth:1,
+                initialTreeDepth:2,
                 expandAndCollapse: true,
                 animationDuration: 550,
                 animationDurationUpdate: 750
@@ -65,8 +65,28 @@ function showTree() {
             $.get('../static/relation_data/back_tree.json', function (data) {
                 data = response.data
                 myChart.hideLoading();
+                echarts.util.each(data.children, function (datum, index) {
+                    index === 1 && (datum.collapsed = true);
+                });
                 treeOption.series[0].data = [data];
                 myChart.setOption(treeOption);
+                myChart.on('click', function (params) {
+                        if(params.name!="重点学院" && params.name!="非重点学院" && params.name!=schoolname) {
+                            url = schoolname + '/' + params.name;
+                            window.open(url);
+                            // getInstitutionGraphData(schoolname,params.name)
+                            // $.ajax({
+                            //     type:"get",
+                            //     url:"/<school>/<institution>",
+                            //     dataType: "json",
+                            //     data:{
+                            //         school:schoolname,
+                            //         institution:params.name,
+                            //     }
+                            // })
+                        }
+
+            });
             })
         },
         error: function(error){
