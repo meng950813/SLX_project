@@ -8,7 +8,7 @@ let treeOption = {
         triggerOn: 'mousemove',
         formatter: function (params) {
             //设置提示框的内容和格式 节点和边都显示name属性
-            return "todo"
+            return ""
         }
     },
     series:[{

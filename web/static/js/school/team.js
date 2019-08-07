@@ -35,7 +35,7 @@ let graphOption = {
             categories: [],
 
             // // 边的长度范围
-            // edgeLength: [10, 50],
+             //edgeLength: [10, 50],
 
             //是否开启鼠标缩放和平移漫游。默认不开启。如果只想要开启缩放或者平移，可以设置成 'scale' 或者 'move'。设置成 true 为都开启
             roam: true,
@@ -57,8 +57,8 @@ let graphOption = {
                 }
             },
             force: {
-                repulsion : [20,100],//节点之间的斥力因子。支持数组表达斥力范围，值越大斥力越大。
-                gravity : 0.05,//节点受到的向中心的引力因子。该值越大节点越往中心点靠拢。
+                repulsion : [50,100],//节点之间的斥力因子。支持数组表达斥力范围，值越大斥力越大。
+                gravity : 0.01,//节点受到的向中心的引力因子。该值越大节点越往中心点靠拢。
                 edgeLength :[20,100],//边的两个节点之间的距离，这个距离也会受 repulsion。[10, 50] 。值越小则长度越长
                 layoutAnimation : true
             },
@@ -107,3 +107,5 @@ myChart.on('click', function (params) {
 });
 //页面加载完成
 reloadGraph(DATA);
+
+//window.onresize = myChart.resize;
