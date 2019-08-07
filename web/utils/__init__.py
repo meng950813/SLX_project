@@ -1,4 +1,4 @@
-from flask import current_app, request, url_for, redirect, flash
+from flask import current_app, request, url_for, redirect, flash, abort, Response, render_template
 from itsdangerous import BadSignature, SignatureExpired
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from urllib.parse import urljoin, urlparse
@@ -103,3 +103,14 @@ def flash_errors(form, level='info'):
     for field, errors in form.errors.items():
         for error in errors:
             flash(u'Error in the %s field - %s' % (getattr(form, field).label.text, error), level)
+
+
+def rich_abort(status, error=None):
+    """
+    富文本报错
+    :param status: 状态码 404 400
+    :param error: 错误信息 会代替默认的错误
+    :return:
+    """
+    template = render_template('errors/%d.html' % status, error=error)
+    abort(Response(response=template, status=404))

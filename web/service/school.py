@@ -33,8 +33,7 @@ def get_school_info(school_name, mongo=None):
     根据学校名获取学校的简介信息
     :param school_name: 学校名
     :param mongo: MongoOperator对象
-    :return: school_info: 学校名，学院数量，一流学科数量，重点学科数量，国家重点实验室数量，院士数量，长江学者数量，杰出青年数量
-    :return ((院士，2)...)
+    :return ((院士，数目)...)
     """
     if mongo is None:
         mongo = MongoOperator(**MongoDB_CONFIG)
@@ -42,6 +41,8 @@ def get_school_info(school_name, mongo=None):
     school_info = collection.find_one({"name": school_name}, {"_id": 0, "institutions": 1, "dfc_num": 1, "nkd_num": 1,
                                                               "skl_num": 1, "academician_num": 1, "outstanding_num": 1,
                                                               "cjsp_num": 1})
+    if school_info is None:
+        return None
 
     keys = [('academician_num', '院士'), ('cjsp_num', '长江学者'), ('dfc_num', '一流学科'),
             ('nkd_num', '重点学科'), ('outstanding_num', '杰出青年'), ('skl_num', '重点实验室')]
@@ -51,7 +52,30 @@ def get_school_info(school_name, mongo=None):
     return objects
 
 
-def get_institution_info(school_name, mongo=None):
+def get_institution_info(school, institution):
+    """
+    获取学校中该学院的相关信息
+    :param school: 学校名称
+    :param institution: 学院名称
+    :return: 学科、荣誉头衔和个数tuple数组，如果不存在学校.学院则返回None
+    """
+    mongo = MongoOperator(**MongoDB_CONFIG)
+    # 获取学校
+    collection = mongo.get_collection('institution')
+    result = collection.find_one({'school': school, 'institution': institution},
+                                 {'_id': 0, 'school': 0, 'institution': 0})
+    # 学校或院系不存在
+    if result is None:
+        return None
+    keys = [('academician_num', '院士'), ('cjsp_num', '长江学者'), ('dfc_num', '一流学科'),
+            ('nkd_num', '重点学科'), ('outstanding_num', '杰出青年'), ('skl_num', '重点实验室')]
+    objects = []
+    for key, value in keys:
+        objects.append((value, result[key]))
+    return objects
+
+
+def get_total_institutions(school_name, mongo=None):
     """
     根据学校名获取学校中的重点学院和非重点学院，将有一流学科、重点学科和国家重点实验室
     :param school_name:学校名

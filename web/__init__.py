@@ -68,8 +68,8 @@ def register_errors(app):
         return render_template('errors/400.html', description="会话过期或失效，请返回上一页重试"), 400
 
     @app.errorhandler(404)
-    def bad_request(e):
-        return render_template('errors/404.html'), 404
+    def bad_request(error):
+        return render_template('errors/404.html', error=error), 404
 
 
 def register_template_context(app):

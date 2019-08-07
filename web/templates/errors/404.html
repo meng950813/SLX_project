@@ -9,7 +9,7 @@
                 <img class="card-img-top img-fluid" src="{{ url_for('static', filename='images/error.jpg') }}">
                 <div class="card-body">
                     <h5 class="card-title">404 Error</h5>
-                    <p class="card-text">该页面未找到</p>
+                    <p class="card-text">{{ error | default('该页面未找到') }}</p>
                 </div>
                 <div class="card-footer">
                     <div class="float-right">

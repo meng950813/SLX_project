@@ -1,11 +1,10 @@
 import json
-from flask import Blueprint, render_template, abort, request
+from flask import Blueprint, render_template, request
 from flask_login import login_required, current_user
 
 import web.service.school as school_service
 from web.service.school_agent_service import agent_service
-from web.config import MongoDB_CONFIG
-from web.utils.mongo_operator import MongoOperator
+from web.utils import rich_abort
 
 school_bp = Blueprint('school', __name__)
 
@@ -19,6 +18,8 @@ def index(school):
     :return:
     """
     objects = school_service.get_school_info(school)
+    if objects is None:
+        rich_abort(404, '未找到该学校的信息，请确认学校名称后重试')
     subjects = []
     return render_template('school/index.html', school=school, objects=objects, subjects=subjects)
 
@@ -31,7 +32,7 @@ def get_institution_info():
     :return:
     """
     school = request.args.get("school")
-    data = school_service.get_institution_info(school)
+    data = school_service.get_total_institutions(school)
     return json.dumps({"success": True, "data": data})
 
 
@@ -44,25 +45,16 @@ def show_institution(school, institution):
     :param institution:
     :return:
     """
-    mongo = MongoOperator(**MongoDB_CONFIG)
-    # 获取学校
-    collection = mongo.get_collection('institution')
-    result = collection.find_one({'school': school, 'institution': institution},
-                                 {'_id': 0, 'school': 0, 'institution': 0})
-    # 学校或院系不存在
-    if result is None:
-        abort(404)
-    keys = [('academician_num', '院士'), ('cjsp_num', '长江学者'), ('dfc_num', '一流学科'),
-            ('nkd_num', '重点学科'), ('outstanding_num', '杰出青年'), ('skl_num', '重点实验室')]
-    objects = []
-    for key, value in keys:
-        objects.append((value, result[key]))
     # 获取院系的关系网络
     graph_json = agent_service.get_relations(school, institution)
     if graph_json is False:
-        abort(404)
+        rich_abort(404, '暂时没有该学院的社交网络，请确认名称或联系管理员')
     # 获取拜访次数
     subjects = school_service.get_related_teachers(current_user.related_teacher, json.loads(graph_json))
+    # 获取客观信息
+    objects = school_service.get_institution_info(school, institution)
+    if objects is None:
+        rich_abort(404, '未找到关于该学校和学院的相关信息，请确认后重试')
 
     return render_template('school/institution.html', school=school, institution=institution,
                            objects=objects, subjects=subjects, graph_json=graph_json)
@@ -81,11 +73,11 @@ def show_team(school, institution, team_index):
     graph_data, objects = school_service.get_team(school, institution, team_index)
     # 学校或者是学院不存在
     if graph_data is False:
-        abort(404)
+        rich_abort(404, '暂时没有该学院的社交网络，请确认名称或联系管理员')
     # 团队不存在
     core_node = graph_data['core_node']
     if len(core_node) == 0:
-        abort(404)
+        rich_abort(404, '未找到该团队')
     # 获取当前用户的有联系的老师
     subjects = school_service.get_related_teachers(current_user.related_teacher, graph_data)
     return render_template('school/team.html', school=school, institution=institution,
