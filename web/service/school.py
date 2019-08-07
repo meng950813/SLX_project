@@ -27,7 +27,8 @@ def get_schools_institutions(cur_school=None, mongo=None):
     institutions = [result['name'] for result in school['institutions']]
     return cur_school, schools, institutions
 
-def get_school_info(school_name,mongo=None):
+
+def get_school_info(school_name, mongo=None):
     """
     根据学校名获取学校的简介信息
     :param school_name: 学校名
@@ -36,12 +37,14 @@ def get_school_info(school_name,mongo=None):
     if mongo is None:
         mongo = MongoOperator(**MongoDB_CONFIG)
     collection = mongo.get_collection("school")
-    school_info = collection.find_one({"name":school_name}, {"_id":0,"institutions":1,"dfc_num":1,"nkd_num":1,
-                           "skl_num":1,"academician_num":1,"outstanding_num":1,"cjsp_num":1})
+    school_info = collection.find_one({"name": school_name}, {"_id": 0, "institutions": 1, "dfc_num": 1, "nkd_num": 1,
+                                                              "skl_num": 1, "academician_num": 1, "outstanding_num": 1,
+                                                              "cjsp_num": 1})
     school_info['institutions'] = len(school_info['institutions'])
     return school_info
 
-def get_institution_info(school_name,mongo=None):
+
+def get_institution_info(school_name, mongo=None):
     """
     根据学校名获取学校中的重点学院和非重点学院，将有一流学科、重点学科和国家重点实验室
     :param school_name:学校名
@@ -51,14 +54,14 @@ def get_institution_info(school_name,mongo=None):
     if mongo is None:
         mongo = MongoOperator(**MongoDB_CONFIG)
     collection = mongo.get_collection("institution")
-    institution = collection.find({"school":school_name},{"_id":0,"institution":1,"dfc_num":1,"nkd_num":1,
-                           "skl_num":1})
-    #重点学院
+    institution = collection.find({"school": school_name}, {"_id": 0, "institution": 1, "dfc_num": 1, "nkd_num": 1,
+                                                            "skl_num": 1})
+    # 重点学院
     main_institution = []
-    #非重点学院
+    # 非重点学院
     dis_main_institution = []
     for i in institution:
-        #筛选同时拥有一流学科和重点学科的学院或者拥有国家重点实验室的学院为重点学院
+        # 筛选同时拥有一流学科和重点学科的学院或者拥有国家重点实验室的学院为重点学院
         if (i['dfc_num'] > 0 and i['nkd_num'] > 0) or i['skl_num'] > 0:
             main_institution.append(i['institution'])
         else:
@@ -71,14 +74,14 @@ def get_institution_info(school_name,mongo=None):
     main_institution_dict['name'] = "重点学院"
     main_institution_children = []
     for i in main_institution:
-        main_institution_children.append({"name":i})
+        main_institution_children.append({"name": i})
     main_institution_dict['children'] = main_institution_children
 
     dis_main_institution_dict = {}
     dis_main_institution_dict['name'] = "非重点学院"
     dis_main_institution_children = []
     for i in dis_main_institution:
-        dis_main_institution_children.append({"name":i})
+        dis_main_institution_children.append({"name": i})
     dis_main_institution_dict['children'] = dis_main_institution_children
 
     data['children'].append(main_institution_dict)
@@ -112,7 +115,7 @@ def get_team(school, institution, team_index):
         # 保留客观数据 各种头衔及其人数
         subjects = {}
         for _, teacher in teacher_map.items():
-            titles = teacher['honor_title']
+            titles = [title['type'] for title in teacher['honor_title']]
             titles.append(teacher['title'])
             for title in titles:
                 if len(title.strip()) == 0:
@@ -127,9 +130,9 @@ def get_team(school, institution, team_index):
             teacher_id = int(node['name'])
             detail = teacher_map.get(teacher_id, None)
             try:
-                index = categories.index(detail['title'])
+                index = categories.index(detail['category'])
             except (KeyError, ValueError):
-                categories.append(detail['title'])
+                categories.append(detail['category'])
                 index = len(categories) - 1
             node['category'] = index
 
@@ -234,7 +237,7 @@ def get_related_teachers(related_teachers, graph_data):
     return subjects
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     ins = get_institution_info("清华大学")
     print(ins)
     pass
