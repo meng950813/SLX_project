@@ -89,7 +89,7 @@ def get_institution_info(school_name,mongo=None):
 
 def get_team(school, institution, team_index):
     """
-    获取院系的某一个团队
+    获取院系的某一个团队 category为头衔或者荣誉
     :param school: 学校的名称
     :param institution: 学院名
     :param team_index: 团队id
@@ -109,6 +109,18 @@ def get_team(school, institution, team_index):
         teacher_ids = relation_data['teacher_ids']
         teacher_map = get_details(teacher_ids)
         categories = []
+        # 保留客观数据 各种头衔及其人数
+        subjects = {}
+        for _, teacher in teacher_map.items():
+            titles = teacher['honor_title']
+            titles.append(teacher['title'])
+            for title in titles:
+                if len(title.strip()) == 0:
+                    continue
+                if title in subjects:
+                    subjects[title] += 1
+                else:
+                    subjects[title] = 1
         # 重新设置类别
         nodes = relation_data['nodes']
         for node in nodes:
@@ -123,7 +135,7 @@ def get_team(school, institution, team_index):
 
         del relation_data['teacher_ids']
         relation_data['categories'] = [{'name': c} for c in categories]
-        return relation_data
+        return relation_data, subjects
 
 
 def filter_data(data, team_index):
@@ -187,12 +199,39 @@ def get_details(teacher_ids):
     teacher_map = {}
     for teacher in teachers:
         if len(teacher['honor_title']) > 0:
-            teacher['title'] = teacher['honor_title'][0]['type']
+            teacher['category'] = teacher['honor_title'][0]['type']
         elif len(teacher['title'].strip()) == 0:
-            teacher['title'] = '未知'
+            teacher['category'] = '未知'
+        else:
+            teacher['category'] = teacher['title']
         teacher_map[teacher['id']] = teacher
 
     return teacher_map
+
+
+def get_related_teachers(related_teachers, graph_data):
+    """
+    根据图数据，获取与当前用户建立联系的(老师名，次数)数组
+    :param related_teachers: 有联系的老师数组
+    :param graph_data: 图数据
+    :return: (老师名，拜访次数) 数组
+    """
+    # 获取当前用户的有联系的老师
+    related_teacher_ids = []
+    related_teacher_cnts = []
+
+    for teacher in related_teachers:
+        related_teacher_ids.append(str(teacher['id']))
+        related_teacher_cnts.append(teacher['visited_count'])
+    subjects = []
+    # 获取这个院系的节点信息
+    for node in graph_data['nodes']:
+        try:
+            i = related_teacher_ids.index(node['name'])
+            subjects.append((node['label'], related_teacher_cnts[i]))
+        except ValueError:
+            pass
+    return subjects
 
 
 if __name__=="__main__":

@@ -11,28 +11,29 @@
 
 {% block detail %}
 <div class="float-right mt-5 mr-5">
-<p>
-  <a class="btn btn-link" data-toggle="collapse" href="#object" role="button" aria-expanded="false" onclick="$('#subject').collapse('hide')">
-    客观信息
-  </a>
-  <a class="btn btn-link" data-toggle="collapse" href="#subject" aria-expanded="false" onclick="$('#object').collapse('hide')">
-      拜访次数
-  </a>
-</p>
-<div class="collapse" id="object">
+    <p>
+        <a class="btn btn-link" data-toggle="collapse" href="#object" role="button" aria-expanded="false" onclick="$('#subject').collapse('hide')">客观信息</a>
+        <a class="btn btn-link" data-toggle="collapse" href="#subject" aria-expanded="false" onclick="$('#object').collapse('hide')">拜访次数
+        </a>
+    </p>
+    <div class="collapse" id="object">
     <ul class="list-group">
         {% for name, num in objects %}
             <li class="list-group-item">{{ name }} <span class="badge badge-primary float-right">{{ num }}</span> </li>
         {% endfor %}
     </ul>
-</div>
-<div class="collapse" id="subject">
+    </div>
+    <div class="collapse" id="subject">
     <ul class="list-group">
+    {% if subjects | length %}
         {% for name, num in subjects %}
             <li class="list-group-item">{{ name }} <span class="badge badge-primary float-right">{{ num }}</span> </li>
         {% endfor %}
+    {% else %}
+        <li class="list-group-item">无拜访人员</li>
+    {% endif %}
     </ul>
-</div>
+    </div>
 </div>
 {% endblock %}
 
@@ -45,6 +46,7 @@
         let SCHOOL_NAME= "{{ school }}";
         let INSTITUTION_NAME = "{{ institution }}";
         reloadGraph(DATA);
+        $('#object').collapse('toggle');
     </script>
 {% endblock %}
 

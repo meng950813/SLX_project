@@ -70,26 +70,11 @@ def show_institution(school, institution):
             ('nkd_num', '重点学科'), ('outstanding_num', '杰出青年'), ('skl_num', '重点实验室')]
     objects = []
     for key, value in keys:
-        if result[key] != 0:
-            objects.append((value, result[key]))
+        objects.append((value, result[key]))
     # 获取院系的关系网络
     graph_json = agent_service.get_relations(school, institution)
-    # 获取当前用户的有联系的老师
-    related_teacher_ids = []
-    related_teacher_cnts = []
-
-    for teacher in current_user.related_teacher:
-        related_teacher_ids.append(str(teacher['id']))
-        related_teacher_cnts.append(teacher['visited_count'])
-    # TODO: 获取这个院系的节点信息
-    subjects = []
-    graph_data = json.loads(graph_json)
-    for node in graph_data['nodes']:
-        try:
-            i = related_teacher_ids.index(node['name'])
-            subjects.append((node['label'], related_teacher_cnts[i]))
-        except ValueError:
-            pass
+    # 获取拜访次数
+    subjects = school_service.get_related_teachers(current_user.related_teacher, json.loads(graph_json))
 
     return render_template('school/institution.html', school=school, institution=institution,
                            objects=objects, subjects=subjects, graph_json=graph_json)
@@ -105,7 +90,7 @@ def show_team(school, institution, team_index):
     :param team_index: 团队的索引
     :return:
     """
-    graph_data = school_service.get_team(school, institution, team_index)
+    graph_data, objects = school_service.get_team(school, institution, team_index)
     # 学校或者是学院不存在
     if graph_data is False:
         abort(404)
@@ -113,5 +98,8 @@ def show_team(school, institution, team_index):
     core_node = graph_data['core_node']
     if len(core_node) == 0:
         abort(404)
+    # 获取当前用户的有联系的老师
+    subjects = school_service.get_related_teachers(current_user.related_teacher, graph_data)
     return render_template('school/team.html', school=school, institution=institution,
-                           graph_data=json.dumps(graph_data), core_node=core_node)
+                           graph_data=json.dumps(graph_data), core_node=core_node,
+                           objects=objects, subjects=subjects)

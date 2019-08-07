@@ -10,6 +10,34 @@
     <li class="breadcrumb-item active" aria-current="page">{{ core_node }}团队</li>
 {% endblock %}
 
+{% block detail %}
+    <div class="float-right mt-5 mr-5">
+        <p>
+            <a class="btn btn-link" data-toggle="collapse" href="#object" role="button" aria-expanded="false" onclick="$('#subject').collapse('hide')">团队信息</a>
+            <a class="btn btn-link" data-toggle="collapse" href="#subject" aria-expanded="false" onclick="$('#object').collapse('hide')">拜访次数
+            </a>
+        </p>
+        <div class="collapse" id="object">
+            <ul class="list-group">
+                {% for name, num in objects.items() %}
+                    <li class="list-group-item">{{ name }} <span class="badge badge-primary float-right">{{ num }}</span> </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="collapse" id="subject">
+            <ul class="list-group">
+                {% if subjects | length %}
+                    {% for name, num in subjects %}
+                        <li class="list-group-item">{{ name }} <span class="badge badge-primary float-right">{{ num }}</span> </li>
+                    {% endfor %}
+                {% else %}
+                    <li class="list-group-item">无拜访人员</li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+
 {% block scripts %}
     {{ super() }}
     <script src="https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts.min.js"></script>
@@ -17,6 +45,7 @@
     let DATA = {{ graph_data | safe}};
     let SCHOOL_NAME = "{{ school }}";
     let INSTITUTION_NAME = "{{ institution }}";
+    $('#object').collapse('toggle');
     </script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/school/team.js') }}"></script>
 {% endblock %}
