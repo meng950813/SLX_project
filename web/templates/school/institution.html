@@ -10,6 +10,29 @@
     <li class="breadcrumb-item active" aria-current="page">{{ institution }}</li>
 {% endblock %}
 
+{% block detail %}
+<div class="float-right mt-5 mr-5">
+<p>
+  <a class="btn btn-link" data-toggle="collapse" href="#object" role="button" aria-expanded="false" onclick="$('#subject').collapse('hide')">
+    客观信息
+  </a>
+  <a class="btn btn-link" data-toggle="collapse" href="#subject" aria-expanded="false" onclick="$('#object').collapse('hide')">
+      主观信息
+  </a>
+</p>
+<div class="collapse" id="object">
+    <ul class="list-group">
+        {% for name, num in objects %}
+            <li class="list-group-item">{{ name }} <span class="badge badge-primary float-right">{{ num}}</span> </li>
+        {% endfor %}
+    </ul>
+</div>
+<div class="collapse" id="subject">
+    <p>Hello</p>
+</div>
+</div>
+{% endblock %}
+
 {% block scripts %}
     {{ super() }}
     <script src="https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts.min.js"></script>

@@ -25,30 +25,8 @@
         {% endblock %}
     </ol>
 </nav>
-<div class="container-fluid" style="position: absolute;top: 80%">
-    {# 相关信息 客观 #}
-    <div class="row" >
-        <div class="col">
-        {% block object %}
-            <details open>
-                <summary style="outline: none !important">学院简介</summary>
-                <p>{{ school_intro }}</p>
-            </details>
-        {% endblock %}
-        </div>
-    </div>
-    {# 与我有关的信息 #}
-    <div class="row">
-        <div class="col">
-            {% block subject %}
-                <details>
-                    <summary style="outline: none !important">与我有关</summary>
-                    <p>已拜访老师：</p>
-                </details>
-            {% endblock %}
-        </div>
-    </div>
-</div>
+    {% block detail %}
+    {% endblock %}
 {% endblock %}
 
 {% block scripts %}
