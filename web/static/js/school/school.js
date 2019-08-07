@@ -17,7 +17,7 @@ let treeOption = {
         top: '1%',
         left: '7%',
         bottom: '1%',
-        right: '20%',
+        right: '30%',
         symbolSize: 15,
         label: {
             normal: {
@@ -36,7 +36,7 @@ let treeOption = {
                 }
             }
         },
-        height:600,
+        //height:600,
 
         roam: true,
         initialTreeDepth:2,
@@ -70,8 +70,8 @@ function showTree() {
             treeOption.series[0].data = [data];
             myChart.setOption(treeOption);
             myChart.on('click', function (params) {
-                if(params.name!="重点学院" && params.name!="非重点学院" && params.name!=schoolname) {
-                    let url = schoolname + '/' + params.name;
+                if(params.name!="重点学院" && params.name!="非重点学院" && params.name!=schoolName) {
+                    let url = schoolName + '/' + params.name;
                     //window.open(url);
                     window.location.href = url;
                 }

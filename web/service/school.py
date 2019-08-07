@@ -32,7 +32,9 @@ def get_school_info(school_name, mongo=None):
     """
     根据学校名获取学校的简介信息
     :param school_name: 学校名
+    :param mongo: MongoOperator对象
     :return: school_info: 学校名，学院数量，一流学科数量，重点学科数量，国家重点实验室数量，院士数量，长江学者数量，杰出青年数量
+    :return ((院士，2)...)
     """
     if mongo is None:
         mongo = MongoOperator(**MongoDB_CONFIG)
@@ -40,8 +42,13 @@ def get_school_info(school_name, mongo=None):
     school_info = collection.find_one({"name": school_name}, {"_id": 0, "institutions": 1, "dfc_num": 1, "nkd_num": 1,
                                                               "skl_num": 1, "academician_num": 1, "outstanding_num": 1,
                                                               "cjsp_num": 1})
-    school_info['institutions'] = len(school_info['institutions'])
-    return school_info
+
+    keys = [('academician_num', '院士'), ('cjsp_num', '长江学者'), ('dfc_num', '一流学科'),
+            ('nkd_num', '重点学科'), ('outstanding_num', '杰出青年'), ('skl_num', '重点实验室')]
+    objects = []
+    for key, value in keys:
+        objects.append((value, school_info[key]))
+    return objects
 
 
 def get_institution_info(school_name, mongo=None):
@@ -107,7 +114,7 @@ def get_team(school, institution, team_index):
     with open(file_path, "r") as f:
         # 获取所有的相关节点
         data = json.loads(f.read())
-        relation_data = filter_data(data, team_index)
+        relation_data = _filter_teachers(data, team_index)
         # 获取所有的老师id
         teacher_ids = relation_data['teacher_ids']
         teacher_map = get_details(teacher_ids)
@@ -141,7 +148,7 @@ def get_team(school, institution, team_index):
         return relation_data, subjects
 
 
-def filter_data(data, team_index):
+def _filter_teachers(data, team_index):
     """
     根据team_index过滤出仅这个团队的成员节点和联系
     :param data: dict数据
