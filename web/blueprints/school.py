@@ -1,5 +1,5 @@
 import json
-from flask import Blueprint, render_template, request, abort
+from flask import Blueprint, render_template, abort, request
 from flask_login import login_required
 
 import web.service.school as school_service
@@ -62,7 +62,7 @@ def show_institution(school, institution):
     collection = mongo.get_collection('institution')
     result = collection.find_one({'school': school, 'institution': institution},
                                  {'_id': 0, 'school': 0, 'institution': 0})
-    # 结果为空，404
+    # 学校或院系不存在
     if result is None:
         abort(404)
     keys = [('academician_num', '院士'), ('cjsp_num', '长江学者'), ('dfc_num', '一流学科'),
@@ -94,6 +94,5 @@ def show_team(school, institution, team_index):
     core_node = graph_data['core_node']
     if len(core_node) == 0:
         abort(404)
-
     return render_template('school/team.html', school=school, institution=institution,
                            graph_data=json.dumps(graph_data), core_node=core_node)
