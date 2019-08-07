@@ -1,38 +1,3 @@
-// 全局变量
-var SCHOOL_NAME= "";
-var INSTITUTION_NAME = "";
-var DATA = {};
-/**
- * 根据学校名及学院名，获取学院内的关系数据
- * @param {String} school
- * @param {String} institution
- */
-function getInstitutionGraphData(school, institution){
-    myChart.showLoading();
-    $.ajax({
-        type: "get",
-        url: "/change_institution",
-        data: {"school": school, "institution": institution, "relation": true},
-        dataType: "json",
-        success: function (response) {
-            // console.log(response);
-            if(response.success == false){
-                toggle_alert(false, "", response.message);
-                myChart.hideLoading();
-                return;
-            }
-            SCHOOL_NAME = school;
-            INSTITUTION_NAME = institution;
-            DATA = response;
-            reloadGraph(DATA);
-        },
-        error: function () {
-            toggle_alert(false, "", "服务器连接失败,请稍后再试");
-            myChart.hideLoading();
-        }
-    });
-}
-
 //echarts 对象
 let myChart = echarts.init(document.getElementById('container'));
 
@@ -149,8 +114,3 @@ myChart.on('click', function (params) {
         window.location.href = url;
     }
 });
-
-//页面加载完成
-let school = $('#info').data('school');
-let institution = $('#info').data('institution');
-getInstitutionGraphData(school, institution);

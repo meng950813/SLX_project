@@ -1,8 +1,9 @@
 import json
 from flask import Blueprint, render_template, abort, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 import web.service.school as school_service
+from web.service.school_agent_service import agent_service
 from web.config import MongoDB_CONFIG
 from web.utils.mongo_operator import MongoOperator
 
@@ -71,9 +72,27 @@ def show_institution(school, institution):
     for key, value in keys:
         if result[key] != 0:
             objects.append((value, result[key]))
+    # 获取院系的关系网络
+    graph_json = agent_service.get_relations(school, institution)
+    # 获取当前用户的有联系的老师
+    related_teacher_ids = []
+    related_teacher_cnts = []
+
+    for teacher in current_user.related_teacher:
+        related_teacher_ids.append(str(teacher['id']))
+        related_teacher_cnts.append(teacher['visited_count'])
+    # TODO: 获取这个院系的节点信息
+    subjects = []
+    graph_data = json.loads(graph_json)
+    for node in graph_data['nodes']:
+        try:
+            i = related_teacher_ids.index(node['name'])
+            subjects.append((node['label'], related_teacher_cnts[i]))
+        except ValueError:
+            pass
 
     return render_template('school/institution.html', school=school, institution=institution,
-                           objects=objects)
+                           objects=objects, subjects=subjects, graph_json=graph_json)
 
 
 @school_bp.route('/<school>/<institution>/<int:team_index>')
