@@ -6,7 +6,7 @@
 
 {% block breadcrum %}
     <li class="breadcrumb-item"><a href="{{ url_for('school.index', school=school) }}">{{ school }}</a></li>
-    <li class="breadcrumb-item"><a href="{{ url_for('school.institution', school=school, institution=institution) }}"> {{ institution }}</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('school.show_institution', school=school, institution=institution) }}"> {{ institution }}</a></li>
     <li class="breadcrumb-item active" aria-current="page">{{ core_node }}团队</li>
 {% endblock %}
 
