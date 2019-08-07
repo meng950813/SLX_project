@@ -25,30 +25,8 @@
         {% endblock %}
     </ol>
 </nav>
-<div class="container-fluid" style="position: absolute;top: 80%">
-    {# 相关信息 客观 #}
-    <div class="row">
-        <div class="col">
-        {% block object %}
-            <details open>
-                <summary>客观信息</summary>
-                <p>客观信息</p>
-            </details>
-        {% endblock %}
-        </div>
-    </div>
-    {# 与我有关的信息 #}
-    <div class="row">
-        <div class="col">
-            {% block subject %}
-                <details>
-                    <summary>与我有关</summary>
-                    <p>主观信息</p>
-                </details>
-            {% endblock %}
-        </div>
-    </div>
-</div>
+    {% block detail %}
+    {% endblock %}
 {% endblock %}
 
 {% block scripts %}

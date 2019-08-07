@@ -40,11 +40,10 @@ def institution(school, institution):
     objects = []
     for key, value in keys:
         if result[key] != 0:
-            objects.append("%s数量%d个" % (value, result[key]))
-    object_text = ",".join(objects)
+            objects.append((value, result[key]))
 
     return render_template('school/institution.html', school=school, institution=institution,
-                           object_text=object_text)
+                           objects=objects)
 
 
 @school_bp.route('/<school>/<institution>/<int:team_index>')
