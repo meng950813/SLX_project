@@ -41,6 +41,50 @@ def get_school_info(school_name,mongo=None):
     school_info['institutions'] = len(school_info['institutions'])
     return school_info
 
+def get_institution_info(school_name,mongo=None):
+    """
+    根据学校名获取学校中的重点学院和非重点学院，将有一流学科、重点学科和国家重点实验室
+    :param school_name:学校名
+    :param mongo:为空则自己创建一个mongo
+    :return:
+    """
+    if mongo is None:
+        mongo = MongoOperator(**MongoDB_CONFIG)
+    collection = mongo.get_collection("institution")
+    institution = collection.find({"school":school_name},{"_id":0,"institution":1,"dfc_num":1,"nkd_num":1,
+                           "skl_num":1})
+    #重点学院
+    main_institution = []
+    #非重点学院
+    dis_main_institution = []
+    for i in institution:
+        #筛选同时拥有一流学科和重点学科的学院或者拥有国家重点实验室的学院为重点学院
+        if (i['dfc_num'] > 0 and i['nkd_num'] > 0) or i['skl_num'] > 0:
+            main_institution.append(i['institution'])
+        else:
+            dis_main_institution.append(i['institution'])
+    data = {}
+    data['name'] = school_name
+    data['children'] = []
+
+    main_institution_dict = {}
+    main_institution_dict['name'] = "重点学院"
+    main_institution_children = []
+    for i in main_institution:
+        main_institution_children.append({"name":i})
+    main_institution_dict['children'] = main_institution_children
+
+    dis_main_institution_dict = {}
+    dis_main_institution_dict['name'] = "非重点学院"
+    dis_main_institution_children = []
+    for i in dis_main_institution:
+        dis_main_institution_children.append({"name":i})
+    dis_main_institution_dict['children'] = dis_main_institution_children
+
+    data['children'].append(main_institution_dict)
+    data['children'].append(dis_main_institution_dict)
+
+    return data
 
 
 def get_team(school, institution, team_index):
@@ -144,3 +188,9 @@ def get_details(teacher_ids):
         teacher_map[teacher['id']] = teacher
 
     return teacher_map
+
+
+if __name__=="__main__":
+    ins = get_institution_info("清华大学")
+    print(ins)
+    pass

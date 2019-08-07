@@ -68,7 +68,7 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="schoolChoose">
                             {% for school in current_user.charge_school %}
-                                <a class="dropdown-item" href="{{ url_for('school.index', school=school) }}">{{ school }}</a>
+                                <a class="dropdown-item" id="charge_school" href="{{ url_for('school.index', school=school) }}">{{ school }}</a>
                             {% endfor %}
                         </div>
                     </div>

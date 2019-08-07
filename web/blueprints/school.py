@@ -1,5 +1,5 @@
 import json
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template,request
 from flask_login import login_required
 
 import web.service.school as school_service
@@ -32,6 +32,18 @@ def index(school):
         school_intro = school_intro + str(school_info['cjsp_num'])+"名长江学者。"
 
     return render_template('school/index.html', school=school, school_intro=school_intro)
+
+
+@school_bp.route('/get_institution_info',methods=["GET"])
+@login_required
+def get_institution_info():
+    """
+    获取重点学院和非重点学院
+    :return:
+    """
+    school = request.args.get("school")
+    data = school_service.get_institution_info(school)
+    return json.dumps({"success":True,"data":data})
 
 
 @school_bp.route('/<school>/<institution>')

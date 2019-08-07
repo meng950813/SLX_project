@@ -5,16 +5,18 @@
       "name": "重点院系",
       "children": [
         {
-          "name": "理学院",
-          "value": 3938
+          "name": "理学院"
         },
         {
-          "name": "建筑学院",
-          "value": 3812
+          "name": "建筑学院"
         },
         {
           "name": "HierarchicalCluster",
           "value": 6714
+        },
+        {
+          "name": "MergeEdge",
+          "value": 743
         },
         {
           "name": "MergeEdge",
@@ -49,3 +51,5 @@
     }
   ]
 }
+
+
