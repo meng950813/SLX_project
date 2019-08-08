@@ -69,13 +69,6 @@ function showTree() {
             });
             treeOption.series[0].data = [data];
             myChart.setOption(treeOption);
-            myChart.on('click', function (params) {
-                if(params.name!="重点学院" && params.name!="非重点学院" && params.name!=schoolName) {
-                    let url = schoolName + '/' + params.name;
-                    //window.open(url);
-                    window.location.href = url;
-                }
-            })
         },
         error: function(error){
             myChart.hideLoading();
@@ -88,3 +81,13 @@ function showTree() {
 showTree();
 //图跟随屏幕尺寸而改变
 window.onresize = myChart.resize;
+
+myChart.on('click', function (params) {
+    let schoolName = $('#cur_school').val();
+    console.log(params);
+    if(params.name!="重点学院" && params.name!="非重点学院" && params.name!=schoolName) {
+        let url = schoolName + '/' + params.name;
+        //window.open(url);
+        window.location.href = url;
+    }
+});
