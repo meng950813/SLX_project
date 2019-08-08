@@ -80,6 +80,7 @@ def show_team(school, institution, team_index):
         rich_abort(404, '未找到该团队')
     # 获取当前用户的有联系的老师
     subjects = school_service.get_related_teachers(current_user.related_teacher, graph_data)
+
     return render_template('school/team.html', school=school, institution=institution,
                            graph_data=json.dumps(graph_data), core_node=core_node,
                            objects=objects, subjects=subjects)

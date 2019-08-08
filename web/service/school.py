@@ -141,7 +141,7 @@ def get_team(school, institution, team_index):
         relation_data = _filter_teachers(data, team_index)
         # 获取所有的老师id
         teacher_ids = relation_data['teacher_ids']
-        teacher_map = get_details(teacher_ids)
+        teacher_map = _get_details(teacher_ids)
         categories = []
         # 保留客观数据 各种头衔及其人数
         subjects = {}
@@ -219,7 +219,7 @@ def _filter_teachers(data, team_index):
     return relation_data
 
 
-def get_details(teacher_ids):
+def _get_details(teacher_ids):
     """
     根据老师的id数组获取老师的相关信息
     :param teacher_ids:
@@ -266,9 +266,3 @@ def get_related_teachers(related_teachers, graph_data):
         except ValueError:
             pass
     return subjects
-
-
-if __name__ == "__main__":
-    ins = get_institution_info("清华大学")
-    print(ins)
-    pass
