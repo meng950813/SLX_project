@@ -84,7 +84,6 @@ window.onresize = myChart.resize;
 
 myChart.on('click', function (params) {
     let schoolName = $('#cur_school').val();
-    console.log(params);
     if(params.name!="重点学院" && params.name!="非重点学院" && params.name!=schoolName) {
         let url = schoolName + '/' + params.name;
         //window.open(url);
