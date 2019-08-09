@@ -71,6 +71,14 @@
                                 {% if 'title' in teacher %}{{ teacher.title }}{% endif %}
                             </span>
                         </small>
+                        <br>
+                        <small>所在团队:&nbsp;&nbsp;&nbsp;
+                            <span class="text-primary">
+                                {% for i in teacher.team %}<a href="{{ url_for('.scholar_info', teacher_id=i[0]) }}">
+                                    {{ i[1] }}
+                                </a>&nbsp;&nbsp;&nbsp;{% endfor %}
+                            </span>
+                        </small>
                     </div>
                 </div>
             </div>

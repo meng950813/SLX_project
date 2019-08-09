@@ -5,7 +5,8 @@ by zhang
 import datetime
 from web.config import MongoDB_CONFIG
 from web.utils.mongo_operator import MongoOperator
-
+from web.utils.neo4j_operator import NeoOperator
+from web.config import NEO4J_CONFIG
 
 def get_info(teacher_id):
     """
@@ -111,10 +112,47 @@ def getFundsInfo(mongo_link, objectId_list):
     return list(info_list)
 
 
+def get_teacher_central_network(teacher_id, school=None):
+    """
+    获取某一教师社交网络
+    :param teacher_id: int
+    :param school: 学校名，限定关系网的范围
+    :return: [] or [
+                {
+                    "source": {id: teacher_id, name, shcool, institution, code},
+                    "r" : {paper:xxx, patent:xxx, project:xxx}
+                    "target":{id: xxx, name, school, institution, code}
+                }, ...
+            ]
+    """
+
+    try:
+        if school:
+            cql = "Match(source:Teacher{id:%d})-[r:学术合作]-(target:Teacher{school:%s}) " \
+                  "return target.id as id" % (teacher_id, school)
+        else:
+            cql = "Match(source:Teacher{id:%d})-[r:学术合作]-(target:Teacher) " \
+                  "return target.id as id" % teacher_id
+
+        neo = NeoOperator(**NEO4J_CONFIG).get_connection()
+        result = neo.run(cql).data()
+        team_list = []
+        for i in result:
+            team_list.append(i['id'])
+        return team_list
+    except Exception as e:
+        print(e)
+        return []
+
 if __name__ == '__main__':
-    id_list = [73927, 73928, 73929, 73930, 73931, 73932, 73933]
-    avg = 0
-    for i in range(len(id_list)):
-        avg += get_info(id_list[i])
-    # print(back)
-    print(avg / len(id_list))
+    # id_list = [73927, 73928, 73929, 73930, 73931, 73932, 73933]
+    # avg = 0
+    # for i in range(len(id_list)):
+    #     avg += get_info(id_list[i])
+    # # print(back)
+    # print(avg / len(id_list))
+    a = get_teacher_central_network(110778)
+    print(a)
+    # [135424, 135412, 136730, 135430, 135520, 135365,110778]
+    # a1 = get_info(135424)
+    # print(a1['name'])
