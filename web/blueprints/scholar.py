@@ -122,7 +122,13 @@ def search():
         teacher_name = request.args.get('teacher-name')
         # 获取老师列表
         teachers = get_teachers(teacher_name)
-
+        #获取团队教师id,姓名
+        for i in teachers:
+            team_id_list = basic_info_service.get_teacher_central_network(i['id'])
+            i['team'] = []
+            for j in team_id_list:
+                team_info = [j,basic_info_service.get_info(j)['name']]
+                i['team'].append(team_info)
     return render_template('scholar/search.html', teachers=teachers, teacher_name=teacher_name)
 
 
