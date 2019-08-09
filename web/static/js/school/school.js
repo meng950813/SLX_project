@@ -86,3 +86,5 @@ function showTree() {
 }
 
 showTree();
+//图跟随屏幕尺寸而改变
+window.onresize = myChart.resize;
