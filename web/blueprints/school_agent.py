@@ -107,16 +107,16 @@ def change_institution():
     
     # 个人中心需要获取关系数据
     if get_relation:
-        # json_data = agent_service.get_relations(school, institution, current_user.id)
-        json_data = agent_service.get_relations(school, institution)
+        # back_data = agent_service.get_relations(school, institution, current_user.id)
+        back_data = agent_service.get_relations(school, institution)
 
-        if json_data:
+        if back_data:
             # 放在此处执行 + 1 操作是为了让无关系文件的学院靠后
             # 多线程执行访问数 +1
             add_thead = threading.Thread(target=agent_service.add_institution_click_time, args=(school, institution))
             add_thead.start()
             
-            return json_data
+            return json.dumps(back_data)
         else:
             return json.dumps({"success": False, "message": "暂无当前学院的社交网络数据"})
 
@@ -266,7 +266,7 @@ def change_pwd_in_db(new_pwd):
 
 if __name__ == '__main__':
     # scholar_info(73927)
-    print(agent_service.get_relations("北京大学", "化学生物学与生物技术学院", ""))
+    print(agent_service.get_relations("北京大学", "化学生物学与生物技术学院"))
     # new_schedule()
     # index()
     # edit_schedule()

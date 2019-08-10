@@ -50,14 +50,14 @@ def show_institution(school, institution):
     if graph_json is False:
         rich_abort(404, '暂时没有该学院的社交网络，请确认名称或联系管理员')
     # 获取拜访次数
-    subjects = school_service.get_related_teachers(current_user.related_teacher, json.loads(graph_json))
+    subjects = school_service.get_related_teachers(current_user.related_teacher, graph_json)
     # 获取客观信息
     objects = school_service.get_institution_info(school, institution)
     if objects is None:
         rich_abort(404, '未找到关于该学校和学院的相关信息，请确认后重试')
 
     return render_template('school/institution.html', school=school, institution=institution,
-                           objects=objects, subjects=subjects, graph_json=graph_json)
+                           objects=objects, subjects=subjects, graph_json=json.dumps(graph_json))
 
 
 @school_bp.route('/<school>/<institution>/<int:team_index>')

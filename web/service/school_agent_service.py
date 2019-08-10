@@ -51,7 +51,7 @@ class SchoolAgentService(object):
         :param school: 学校名
         :param institution: 学院名
         :param agent_id: 商务自己建立的联系, [{id:xxx, name: xxx, weight: 123},{...},....]
-        :return: 可供echarts直接渲染的json文件 or False
+        :return: 可供echarts直接渲染的字典格式数据 or False
         """
         file_path = os.path.join(basedir, 'web', 'static', 'relation_data', '%s%s.txt' % (school, institution))
 
@@ -67,14 +67,13 @@ class SchoolAgentService(object):
             # agent_relation = self.get_institutions_relation_data(agent_id, school, institution)
 
             # relation_data = self.format_institution_relation_data(data, agent_relation)
-            relation_data = self.format_institution_relation_data(data)
-            return json.dumps(relation_data)
+            return self.format_institution_relation_data(data)
 
     def format_institution_relation_data(self, data):
         """
         将学院关系数据简化为可发送的数据
         :param data: 预处理过的社区网络数据
-        :return: 可供echarts直接渲染的json文件 or False
+        :return: 可供echarts直接渲染的字典格式数据 or False
         """
         try:
             """

@@ -21,12 +21,12 @@
                 </div>
                 <div class="col-sm-9 col-md-10">
                     <div class="scholar-name"> <strong> <a href="#" > {{ teacher["name"] }} </a>  </strong> </div>
-                    <div class="scholar-depart">{{ teacher["school"] }} - {{ teacher["institution"] }}</div>
+                    <div class="scholar-depart">{{ teacher["school"] }} - {{ teacher["institution"] }}-{{ teacher["department"] }}</div>
                     <div class="scholar-depart half">邮箱： {{ teacher["email"] }}</div>
                     <div class="scholar-depart half">手机： {{ teacher["phone_number"] }}</div>
                     <div class="scholar-depart half">办公室电话： {{ teacher["office_number"] }}</div>
                     <div class="scholar-tags">
-
+                        <strong>标签：</strong>
                         {% if 'age' in teacher %}
                             <span>{{ teacher['age'] }}岁</span>
                         {% endif %}
@@ -48,14 +48,14 @@
                             <span>{{ teacher["other_title"] }}</span>
                         {% endif %}
                     </div>
-                    {% if teacher["domain"] %}
-                        <div class="scholar-tags">
-                            <strong>研究领域：</strong>
-                            {% for item in teacher['domain'] %}
-                                <span>{{ item }}</span>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
+
+                    <div class="scholar-tags">
+                        <strong>研究领域：</strong>
+                        {% for item in teacher['domain'] %}
+                            <span>{{ item }}</span>
+                        {% endfor %}
+                    </div>
+
                 </div>
             </div>
         </fieldset>
@@ -63,14 +63,14 @@
         <fieldset id="edu-exp" class="row card-mine">
             <legend>教育经历</legend>
             {% if teacher["edu_exp"] %}
-                <p>{{ teacher["edu_exp"] }}</p>
+                <p>{{ teacher["edu_exp"] | safe }}</p>
             {% endif %}
         </fieldset>
 
         <fieldset id="work-exp" class="row card-mine">
             <legend>工作经历</legend>
             {% if teacher["work_exp"] %}
-                <p>{{ teacher["work_exp"] }}</p>
+                <p>{{ teacher["work_exp"] | safe }}</p>
             {% endif %}
         </fieldset>
 
