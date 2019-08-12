@@ -114,15 +114,24 @@ class NeoOperator(object):
             
             # 无关系 ==> 两者确实无关系 ==> 创建关系
             if rel is None:
+                # cover 属性只用于更新时, 在创建关系时无用, 需删除
+                if "cover" in data:
+                    del data['cover']
                 relation = Relationship(source, rel_type, target, **data)
                 self.neo.create(relation)
                 return {"success": True, "message": "关系创建成功"}
             
             # 已存在关系,修改其中属性值
             else:
-                for key, value in data.items():
-                    # 更新属性值
-                    rel[key] += int(value)
+                if "cover" in data:
+                    del data['cover']
+                    for key, value in data.items():
+                        # 更新属性值 => 覆盖原有属性值
+                        rel[key] = int(value)
+                else:
+                    for key, value in data.items():
+                        # 更新属性值
+                        rel[key] += int(value)
                 
                 # 更新数据库
                 self.neo.push(rel)
@@ -160,10 +169,7 @@ if __name__ == '__main__':
 
     obj = NeoOperator(**NEO4J_CONFIG)
     # obj.create_agent(100000, "杨秀宁", 0)
-    # # obj.upsert_agent_relation(100000, 99331)
-    # obj.upsert_agent_relation(100000, 86791)
-    # obj.upsert_agent_relation(100000, 86831)
-    # obj.upsert_agent_relation(100000, 90147)
+
 
     # obj.get_school_relation_with_agent(100000, "南京大学")
     # obj.get_institution_relation_with_agent(100000, "中国科学技术大学", "管理学院")
@@ -173,7 +179,7 @@ if __name__ == '__main__':
     # obj.modify_node("Agent", id=100001, allowed_keys={"name", "type"}, name="测试节点_修改", type=0)
     # obj.modify_teacher_node(id=73965, dept="农学系")
 
-    # obj.upsert_relation("Agent", 163544, "Agent", 100001, rel_type="合作", times=1, visited=0)
-    # obj.del_relation("Agent", 163544, "Agent", 100001, rel_type="合作")
+    obj.upsert_relation("Agent", 163544, "Agent", 100001, rel_type="knows", cooperation=1, cover=True)
+    # obj.del_relation("Agent", 163544, "Agent", 100001, rel_type="knows")
 
-    obj.get_teacher_central_network(153727)
+    # obj.get_teacher_central_network(153727)
