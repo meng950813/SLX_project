@@ -90,7 +90,7 @@ class NeoOperator(object):
         :param label_t: 目标节点所在表： Agent / Teacher / Company
         :param target_id: 目标节点 id
         :param rel_type: str 关系类型
-        :param data: dict 具体参数
+        :param data: dict 具体参数, 其中值只能为 0/1, 分别表示 不修改 和 属性值+1
         :return: dict {success: True/ False, message: xxx}
         """
         try:
@@ -103,17 +103,28 @@ class NeoOperator(object):
             target = self.neo.nodes.match(label_t, id=target_id).first()
             if target is None:
                 return {"success": False, "message": "target id 有误"}
-
+            
+            # 获取当前两者间的关系: 由于数据库中保存的关系具有方向, 因此需要判定两次两者关系
+            # 即 source -> target 与 target -> source 在数据库中不等价, 但在系统逻辑中等价
             rel = self.neo.match(nodes=(source, target), r_type=rel_type).first()
+
+            # 无关系 ==> 尝试获取另一方向的关系
             if rel is None:
                 rel = self.neo.match(nodes=(target, source), r_type=rel_type).first()
+            
+            # 无关系 ==> 两者确实无关系 ==> 创建关系
             if rel is None:
                 relation = Relationship(source, rel_type, target, **data)
                 self.neo.create(relation)
                 return {"success": True, "message": "关系创建成功"}
+            
+            # 已存在关系,修改其中属性值
             else:
                 for key, value in data.items():
+                    # 更新属性值
                     rel[key] += int(value)
+                
+                # 更新数据库
                 self.neo.push(rel)
                 return {"success": True, "message": "关系更新成功"}
         except Exception as e:

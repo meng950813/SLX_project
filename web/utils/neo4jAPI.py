@@ -140,7 +140,7 @@ def modify_agent_node(id=None, **data):
     :return: dict {success: True / False, message: xxx}
     """
     # 允许修改的属性
-    allowed_key = {"name", "charge"}
+    allowed_key = {"name", "charge", "type"}
     
     return NeoOperator(**NEO4J_CONFIG).modify_node("Teacher", id=id, allowed_keys=allowed_key, **data)
 
@@ -203,23 +203,16 @@ def modify_company_node(company_id=None, **data):
     return NeoOperator(**NEO4J_CONFIG).modify_node("Company", id=company_id, allowed_keys=allowed_key, **data)
 
 
-def upsert_relation_of_agent2agent(source_id, target_id, is_visit=True):
+def upsert_relation_of_agent2agent(source_id, target_id):
     """
-    TODO 商务间的关系类型
+    商务间的关系类型: 协作 -> cooperation
     创建/更新 商务与 其他商务 间的关系
     :param source_id: int 商务id
     :param target_id: int 商务id
-    :param is_visit: bool 关系类型，True ==> 拜访（默认）， False ==> 参与活动
     :return: dict {success: True / False, message: xxx}
     """
-    if is_visit:
-        visited = 1
-        activity = 0
-    else:
-        visited = 0
-        activity = 1
-    # TODO
-    # return upsert_relation("Agent", source_id, "Agent", target_id, "knows", visited=visited, activity=activity)
+    
+    return NeoOperator(**NEO4J_CONFIG).upsert_relation("Agent", source_id, "Agent", target_id, "knows", cooperation=1)
 
 
 def upsert_relation_of_agent2teacher(agent_id, teacher_id, is_visit=True):
@@ -230,14 +223,51 @@ def upsert_relation_of_agent2teacher(agent_id, teacher_id, is_visit=True):
     :param is_visit: bool 关系类型，True ==> 拜访（默认）， False ==> 参与活动
     :return: dict {success: True / False, message: xxx}
     """
-    if is_visit == 1:
+    visited, activity = 0, 0
+
+    if is_visit:
         visited = 1
-        activity = 0
     else:
-        visited = 0
         activity = 1
     return NeoOperator(**NEO4J_CONFIG).upsert_relation("Agent", agent_id, "Teacher", teacher_id, "knows", 
                     visited=visited, activity=activity)
+
+
+def upsert_relation_of_agent2company(agent_id, company_id, rel_type=1):
+    """
+    创建/更新 商务与企业间的关系
+    :param agent_id: int 商务id
+    :param teacher_id: int 企业id
+    :param rel_type: int 关系类型, 1 ==> 拜访(默认), 2 ==> 陪同教师拜访, 3==> 参与活动
+    :return: dict {success: True / False, message: xxx}
+    """
+    visited, accompany, activity = 0, 0, 0
+    # 拜访
+    if rel_type == 1:
+        visited = 1
+    # 陪同拜访
+    elif rel_type == 2:
+        accompany = 1
+    # 组织参与活动
+    else:
+        activity = 1
+
+    return NeoOperator(**NEO4J_CONFIG).upsert_relation("Agent", agent_id, "Company", company_id, "knows", 
+                    visited=visited, accompany=accompany, activity=activity)
+
+
+def upsert_relation_of_teacher2teacher(source_id, target_id, paper=0, patent=0, project=0, award=0):
+    """
+    创建/修改 老师与老师的关系，其关系名为: 学术合作
+        属性包括: paper(论文合作数据), patent(专利合作次数), project(项目合作次数), award(合作获奖次数)
+    :param source_id: int 教师id
+    :param target_id: int 企业id
+    :param paper, patent, project, award 属性值
+    :return: {"success": True / False}
+    """
+
+    return NeoOperator(**NEO4J_CONFIG).upsert_relation(label_s="Teacher", source_id=source_id, label_t="Teacher", 
+                        target_id=target_id, rel_type="学术合作", paper=paper, patent=patent, project=project, award=award)
 
 
 def upsert_relation_of_teacher2company(teacher_id, company_id, is_visit=True):

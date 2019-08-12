@@ -77,7 +77,7 @@ def get_institution_info(school, institution):
 
 def get_total_institutions(school_name, mongo=None):
     """
-    根据学校名获取学校中的重点学院和非重点学院，将有一流学科、重点学科和国家重点实验室
+    根据学校名获取学校中的重点学院和非重点学院，将有一流学科并且有重点学科或者拥有国家重点实验室的学院定位重点学院
     :param school_name:学校名
     :param mongo:为空则自己创建一个mongo
     :return:
@@ -85,7 +85,7 @@ def get_total_institutions(school_name, mongo=None):
     if mongo is None:
         mongo = MongoOperator(**MongoDB_CONFIG)
     collection = mongo.get_collection("institution")
-    institution = collection.find({"school": school_name}, {"_id": 0, "institution": 1, "dfc_num": 1, "nkd_num": 1,
+    institution = collection.find({"school": school_name,"relation_data":1}, {"_id": 0, "institution": 1, "dfc_num": 1, "nkd_num": 1,
                                                             "skl_num": 1})
     # 重点学院
     main_institution = []
@@ -114,11 +114,45 @@ def get_total_institutions(school_name, mongo=None):
     for i in dis_main_institution:
         dis_main_institution_children.append({"name": i})
     dis_main_institution_dict['children'] = dis_main_institution_children
-
     data['children'].append(main_institution_dict)
     data['children'].append(dis_main_institution_dict)
-
     return data
+
+
+def is_exist_data(school,institution):
+    """
+    判断学院文件是否存在
+    :return:有则返回1，无则返回0
+    """
+    file_path = os.path.join(basedir, 'web', 'static', 'relation_data', '%s%s.txt' % (school, institution))
+    if os.path.exists(file_path):
+        return True
+    else:
+        return False
+
+def get_institution(school,mongo=None):
+    """
+    获取mongo数据库中没有关系网络的学校学院
+    :return:
+    """
+    if mongo is None:
+        mongo = MongoOperator(**MongoDB_CONFIG)
+    collection = mongo.get_collection("institution")
+    institution = collection.find({"school":school,"relation_data":0},{"_id": 0,"school":1,"institution":1})
+    return institution
+
+def update_institution_relation_data(school,institution, mongo=None):
+    """
+    有此学校学院的关系数据网络则在此学院的字段添加字段relation_data为1，否则为0
+    :return:
+    """
+    if mongo is None:
+        mongo = MongoOperator(**MongoDB_CONFIG)
+    collection = mongo.get_collection("institution")
+    if(is_exist_data(school,institution)):
+        collection.update_one({"school":school,"institution":institution},{"$set":{"relation_data":1}})
+    else:
+        collection.update_one({"school":school,"institution":institution},{"$set":{"relation_data":0}})
 
 
 def get_team(school, institution, team_index):
