@@ -130,7 +130,7 @@ class NeoOperator(object):
                     del data['cover']
 
                 for key, value in data.items():
-                    if cover:
+                    if cover or key not in rel:
                         # 更新属性值 => 覆盖原有属性值
                         rel[key] = int(value)
                     else:
