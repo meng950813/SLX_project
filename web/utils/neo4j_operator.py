@@ -90,7 +90,8 @@ class NeoOperator(object):
         :param label_t: 目标节点所在表： Agent / Teacher / Company
         :param target_id: 目标节点 id
         :param rel_type: str 关系类型
-        :param data: dict 具体参数, 其中值只能为 0/1, 分别表示 不修改 和 属性值+1
+        :param data: dict 具体参数, 其中若有 cover 属性 且其值bool属性为 True，则表示以新数据覆盖原属性值
+                注意：cover 属性只在修改关系过程中有效，若为新建关系，则cover属性无效
         :return: dict {success: True/ False, message: xxx}
         """
         try:
@@ -123,13 +124,16 @@ class NeoOperator(object):
             
             # 已存在关系,修改其中属性值
             else:
+                cover = False
                 if "cover" in data:
+                    cover = data["cover"]
                     del data['cover']
-                    for key, value in data.items():
+
+                for key, value in data.items():
+                    if cover:
                         # 更新属性值 => 覆盖原有属性值
                         rel[key] = int(value)
-                else:
-                    for key, value in data.items():
+                    else:
                         # 更新属性值
                         rel[key] += int(value)
                 
