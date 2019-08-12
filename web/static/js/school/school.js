@@ -72,8 +72,7 @@ function showTree() {
             myChart.on('click', function (params) {
                 if(params.name!="重点学院" && params.name!="非重点学院" && params.name!=schoolName) {
                     let url = schoolName + '/' + params.name;
-                    //window.open(url);
-                    window.location.href = url;
+                    window.open(url,'_self');
                 }
             })
         },
