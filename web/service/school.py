@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 import os
 import json
 
@@ -85,7 +86,7 @@ def get_total_institutions(school_name, mongo=None):
     if mongo is None:
         mongo = MongoOperator(**MongoDB_CONFIG)
     collection = mongo.get_collection("institution")
-    institution = collection.find({"school": school_name,"relation_data":1}, {"_id": 0, "institution": 1, "dfc_num": 1, "nkd_num": 1,
+    institution = collection.find({"school": school_name,"relation_data":1,"select":1}, {"_id": 0, "institution": 1, "dfc_num": 1, "nkd_num": 1,
                                                             "skl_num": 1})
     # 重点学院
     main_institution = []
@@ -139,6 +140,21 @@ def get_institution(school,mongo=None):
         mongo = MongoOperator(**MongoDB_CONFIG)
     collection = mongo.get_collection("institution")
     institution = collection.find({"school":school,"relation_data":0},{"_id": 0,"school":1,"institution":1})
+    return institution
+
+
+def get_all_institution(school,mongo=None):
+    """
+    获取mongo数据库中此学校的所有学院
+    :return:
+    """
+    if mongo is None:
+        mongo = MongoOperator(**MongoDB_CONFIG)
+    collection = mongo.get_collection("institution")
+    institution_list = collection.find({"school":school},{"_id": 0,"institution":1})
+    institution = []
+    for i in institution_list:
+        institution.append(i['institution'])
     return institution
 
 def update_institution_relation_data(school,institution, mongo=None):
@@ -300,3 +316,49 @@ def get_related_teachers(related_teachers, graph_data):
         except ValueError:
             pass
     return subjects
+
+
+def get_edit_institution(school,mongo=None):
+    """
+    获取mongo数据库中所有的学校学院
+    :return:
+    """
+    if mongo is None:
+        mongo = MongoOperator(**MongoDB_CONFIG)
+    collection = mongo.get_collection("institution")
+    institution_list = collection.find({"school":school,"relation_data":1},{"_id": 0,"select":1,"institution":1,"dfc_num": 1, "nkd_num": 1,
+                                                            "skl_num": 1})
+    institution = {}
+    institution['main_institution'] = []
+    institution['dis_main_institution'] = []
+    institution['no_relation_data'] = []
+    for i in institution_list:
+        if (i['dfc_num'] > 0 and i['nkd_num'] > 0) or i['skl_num'] > 0:
+            institution['main_institution'].append([i['institution'],i['select']])
+        else:
+            institution['dis_main_institution'].append([i['institution'],i['select']])
+    return institution
+
+def update_institution_select(school,institution_select,mongo=None):
+    """
+    更新institution中select字段
+    :param school: 学校名
+    :param institution_select: 选择的学院信息
+    :param mongo: 数据库
+    :return:
+    """
+    if mongo is None:
+        mongo = MongoOperator(**MongoDB_CONFIG)
+    collection = mongo.get_collection("institution")
+    for i in institution_select:
+        collection.update_one({"school":school,"institution":i[0]},{"$set":{"select":i[1]}})
+
+if __name__ == "__main__":
+    # ins = get_all_institution("清华大学")
+    # print(ins)
+    # ins  = [['信息科学技术学院', 1], ['机械工程学院', 1], ['五道口金融学院', 0], ['交叉信息研究院', 0], ['人文学院', 0], ['体育部', 0], ['公共管理学院', 0], ['化学工程系', 0], ['医学院', 0], ['周培源应用数学研究中心', 0], ['土木水利学院', 0], ['工程物理系', 0], ['建筑学院', 0], ['教育研究院', 0], ['数学科学中心', 0], ['新闻与传播学院', 0], ['材料学院', 0], ['核能与新能源技术研究院', 0], ['法学院', 0], ['深圳研究院（信息与技术学部）', 0], ['深圳研究院（先进制造学部）', 0], ['深圳研究院（海洋科学与技术学部）', 0], ['深圳研究院（物流与交通学部）', 0], ['深圳研究院（生命与健康学部）', 0], ['深圳研究院（社会科学与管理学部）', 0], ['深圳研究院（能源与环境学部）', 0], ['燃烧能源中心', 0], ['环境学院', 0], ['理学院', 0], ['生命科学学院', 0], ['电机工程与应用电子技术系', 0], ['社会科学学院', 0], ['经济管理学院', 0], ['美术学院', 0], ['航天航空学院', 0], ['艺术教育中心', 0], ['药学院', 0], ['马克思主义学院', 0], ['高等研究院', 0]]
+
+    # update_institution_select("清华大学",ins)
+    ins = get_edit_institution("清华大学")
+    print(ins)
+    pass

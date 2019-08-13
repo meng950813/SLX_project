@@ -1,0 +1,96 @@
+{% extends 'school/base.html' %}
+
+{% block title %}
+    编辑学院
+{% endblock %}
+
+{% block styles %}
+   <style>
+    .checkbox{
+        display: inline-block;
+        padding-right: 50px;
+        padding-top: 10px;
+        font-size: 12px;
+        zoom:150%;
+    }
+    </style>
+{% endblock %}
+
+{% block breadcrum %}
+    <li class="breadcrumb-item"><a id="school" href="{{ url_for('school.index', school=school) }}">{{ school }}</a></li>
+{% endblock %}
+
+{% block detail%}
+    <br>
+    <div class="container">
+        <h4>选择需要关注的学院</h4>
+    <br>
+      <h5>重点学院</h5>
+      {% for i in institution.main_institution %}
+            <div id="chkDiv" class="form-check checkbox" >
+              <label class="form-check-label">
+                  {% if i[1] == 1 %}
+                    <input type="checkbox" checked name="institution" class="form-check-input" value="">{{ i[0] }}
+                  {% else %}
+                    <input type="checkbox" name="institution" class="form-check-input" value="">{{ i[0] }}
+                  {% endif %}
+              </label>
+            </div>
+      {% endfor %}
+      <br><br><br>
+      <h5>非重点学院</h5>
+      {% for i in institution.dis_main_institution %}
+            <div id="chkDiv" class="form-check checkbox">
+              <label class="form-check-label">
+                {% if i[1] == 1 %}
+                    <input type="checkbox" checked name="institution" class="form-check-input" value="">{{ i[0] }}
+                  {% else %}
+                    <input type="checkbox" name="institution" class="form-check-input" value="">{{ i[0] }}
+                  {% endif %}
+              </label>
+            </div>
+      {% endfor %}
+      <br><br>
+
+    <button class="btn btn-primary" onclick="select_instituion()">提交</button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+      /**
+     *提交编辑学校结果
+     */
+    function select_instituion(){
+        var id = document.getElementsByName('institution');
+        var value = new Array();
+        for(var i = 0; i < id.length; i++){
+         if(id[i].checked) {
+             value.push(id[i].nextSibling.data.replace(/\s+/g,""))
+         }
+        }
+        let schoolName = document.getElementById("school").innerText
+        $.ajax({
+            type: "get",
+            url: "update_institution_select",
+            dataType: "json",
+            data:{
+                school: schoolName,
+                institution: JSON.stringify(value)
+            },
+            success:function (response) {
+                if(response.success){
+                    toggle_alert(true, "", "提交成功！");
+                }
+                else{
+                    toggle_alert(false, "", "提交失败！请稍后重试");
+                }
+            },
+            error:function(error){
+                toggle_alert(false, "", "请求失败！");
+            }
+        })
+    }
+    </script>
+{% endblock %}

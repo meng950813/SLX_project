@@ -29,6 +29,8 @@ def check_user(username, password):
     # 以 id 登陆
     elif u_id.match(username):
         condition['id'] = int(username)
+    else:
+        return None
 
     # 连接服务器
     mongo = MongoOperator(**MongoDB_CONFIG)

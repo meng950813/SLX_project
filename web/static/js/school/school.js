@@ -24,7 +24,7 @@ let treeOption = {
                 position: 'left',
                 verticalAlign: 'middle',
                 align: 'right',
-                fontSize: 12
+                fontSize: 16
             }
         },
         leaves: {
@@ -81,8 +81,8 @@ function showTree() {
         }
 
     });
-
 }
+
 
 showTree();
 //图跟随屏幕尺寸而改变

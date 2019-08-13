@@ -84,3 +84,42 @@ def show_team(school, institution, team_index):
     return render_template('school/team.html', school=school, institution=institution,
                            graph_data=json.dumps(graph_data), core_node=core_node,
                            objects=objects, subjects=subjects)
+
+
+@school_bp.route('/edit_institution',methods=['GET'])
+@login_required
+def edit_institution():
+    """
+    跳转到选择关注的学院页面
+    :return:
+    """
+    school = request.args.get("cur_school")
+    institution = school_service.get_edit_institution(school)
+    return render_template("school/edit_institution.html",school=school,institution=institution)
+
+@school_bp.route('/update_institution_select',methods=['GET'])
+@login_required
+def update_institution_select():
+    """
+    更新数据库中学院表中用户学院slect字段
+    :return:
+    """
+    school = request.args.get("school")
+    select_institution = request.args.get("institution")
+    # 处理页面获取的所选学院的字符串为列表
+    selected_institution = []
+    for i in select_institution.strip("[").strip("]").split(","):
+        selected_institution.append(i.replace("\"", "").strip())
+    institution = []
+    all_institution = school_service.get_all_institution(school)
+    for i in selected_institution:
+        institution.append([i,1])
+        if i in all_institution:
+            all_institution.remove(i)
+    for j in all_institution:
+        institution.append([j,0])
+    try:
+        school_service.update_institution_select(school,institution)
+        return json.dumps({"success":True})
+    except:
+        return json.dumps({"success":False})
