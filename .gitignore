@@ -10,3 +10,5 @@ relation_data
 
 config.py
 uploads/
+
+db_operator/
