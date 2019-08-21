@@ -10,7 +10,12 @@
 {% endblock %}
 
 {% block detail %}
+
     <div class="float-right mt-5 mr-5">
+    <form method="get" action="edit_institution">
+        <input hidden id="cur_school" name="cur_school" value="{{ school }}">
+        <button class="btn btn-primary">编辑学院</button>
+    </form>
         <p>
             <a class="btn btn-link" data-toggle="collapse" href="#object" role="button" aria-expanded="false" onclick="$('#subject').collapse('hide')">客观信息</a>
             <a class="btn btn-link" data-toggle="collapse" href="#subject" aria-expanded="false" onclick="$('#object').collapse('hide')">拜访次数
