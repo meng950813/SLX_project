@@ -188,6 +188,82 @@
             </div>
         </fieldset>
 
+
+        <fieldset id="achieve-info" class="row card-mine">
+            <legend>团队科研成果</legend>
+            <ul class="nav nav-pills nav-fill">
+                <li class="nav-item">
+                    <a href="#project-list" class="nav-link active" data-toggle="tab">
+                        <i class="glyphicon glyphicon-tasks"></i> 科研项目
+                        ({% if 'funds' in teacher %}{{ teacher['funds'] | length }}{% else %}0{% endif %})
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#patent-list" class="nav-link" data-toggle="tab">
+                        <i class="glyphicon glyphicon-hdd"></i> 发明专利
+                        ({% if 'patents' in teacher %}{{ teacher['patents'] | length }}{% else %}0{% endif %})
+                    </a>
+                </li>
+                <li class="nav-item" >
+                    <a href="#paper-list" class="nav-link" data-toggle="tab">
+                        <i class="glyphicon glyphicon-book"></i> 论文成果
+                        ({% if 'papers' in teacher %}{{ teacher['papers'] | length }}{% else %}0{% endif %})
+                    </a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <ul class="tab-pane fade in active show" id="project-list">
+                    {% if "funds" in teacher %}
+                        {% for fund in teacher["funds"] %}
+                            <li>
+                                <div class="d-inline">
+                                    <i class="glyphicon glyphicon-tasks"></i> {{ fund["title"] }}</div>
+                                <div class="d-inline">
+                                    <span>{{ fund["belong"] }}</span>
+                                    <span>资金:{{ fund["money"] }}万元</span>
+                                    <span>起始年份:{{ fund["year"] }}年</span>
+                                    <span>项目周期:4年</span>
+                                    <span>负责人:{{ fund["name"] }}</span>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        {% endif %}
+                </ul>
+                <ul class="tab-pane fade in" id="patent-list">
+                    {% if "patents" in teacher %}
+                        {% for patent in teacher["patents"] %}
+                            <li>
+                                <div class="d-inline">
+                                    <i class="glyphicon glyphicon-hdd"></i> {{ patent["title"] }}&nbsp;
+                                </div>
+                                <div class="d-inline">
+                                    <span>申报单位: {{ patent["proposer"] }}</span>
+                                    <span>{{ patent["date"]}}</span>
+                                    <span>作者: {{ patent["author_list"] }}</span><br>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+                <ul class="tab-pane fade in" id="paper-list">
+                     {% if "papers" in teacher %}
+                        {% for paper in teacher["papers"] %}
+                            <li>
+                                <div class="d-inline">
+                                    <i class="glyphicon glyphicon-book"></i> 《{{ paper["name"] }}》
+                                </div>
+                                <div class="d-inline">
+                                    <span>{{ paper["year"] }} </span>
+                                    <span>发表自《{{ paper["org"] }}》</span>
+                                    <span>引用次数：{{ paper["cited_num"] }}</span>
+                                    <span>作者:  {{ paper["author"] }}</span>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+        </fieldset>
     </div>
 
     <!-- 模态框 -->

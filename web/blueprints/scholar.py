@@ -24,10 +24,11 @@ def scholar_info(teacher_id):
     """
     # 返回json 序列化后的数据
     teacher = basic_info_service.get_info(teacher_id)
+    team_id_list = basic_info_service.get_teacher_central_network(teacher_id)
+
     # 当老师id不存在时，直接报404
     if teacher is None:
         return abort(404)
-
     # 获取拜访记录
     visit_list = None
     try:
