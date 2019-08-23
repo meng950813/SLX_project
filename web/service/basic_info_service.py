@@ -28,8 +28,8 @@ def get_info(teacher_id):
             basic_info['honor_title'].sort(key=lambda k: (k.get('year', 0)), reverse=True)
 
         # 获取项目集合
-        if 'funds_id' in basic_info and len(basic_info["funds_id"]) > 0:
-            basic_info["funds"] = getFundsInfo(mongo, basic_info["funds_id"])
+        if 'project_id' in basic_info and len(basic_info["project_id"]) > 0:
+            basic_info["projects"] = getProjectsInfo(mongo, basic_info["project_id"])
 
         # 获取专利集合
         if 'patent_id' in basic_info and len(basic_info["patent_id"]) > 0:
@@ -81,13 +81,17 @@ def getPaperInfo(mongo_link, objectId_list):
     """
     collection = mongo_link.get_collection("paper")
     info_list = collection.find({"_id": {"$in": list(objectId_list)}},
-                                {"_id": 0, "id": 0, "abstract": 0, "source": 0, "keyword": 0}). \
-        sort([("cited_num", -1), ("year", -1)]).limit(25)
+                                {"_id": 0, "id": 0, "abstract": 0, "source": 0, "keyword": 0}).\
+                                sort([("cited_num", -1), ("year", -1)]).limit(25)
 
-    if "author" in info_list:
-        author = [item['name'] for item in info_list['author']]
-        info_list["author"] = ",".join(author)
-    return list(info_list)
+    info_list = list(info_list)
+
+    for item in info_list:
+        if "author" in item:
+            author = [i['name'] for i in item['author']]
+            item["author"] = ",".join(author)
+
+    return info_list
 
 
 def getAwardInfo(mongo_link, objectId_list):
@@ -102,12 +106,12 @@ def getAwardInfo(mongo_link, objectId_list):
     return list(info_list)
 
 
-def getFundsInfo(mongo_link, objectId_list):
+def getProjectsInfo(mongo_link, objectId_list):
     """
     """
-    collection = mongo_link.get_collection("funds")
+    collection = mongo_link.get_collection("project_info")
     info_list = collection.find({"_id": {"$in": list(objectId_list)}}, {"_id": 0}).\
-        sort([("money", -1), ("year", -1)]).limit(25)
+        sort([("money", -1), ("start_time", -1)]).limit(25)
 
     return list(info_list)
 
@@ -132,17 +136,16 @@ def get_teacher_central_network(teacher_id, school=None):
                   "return target.id as id" % (teacher_id, school)
         else:
             cql = "Match(source:Teacher{id:%d})-[r:学术合作]-(target:Teacher) " \
-                  "return target.id as id" % teacher_id
+                  "return target.id as id, target.name as name" % teacher_id
 
         neo = NeoOperator(**NEO4J_CONFIG).get_connection()
+        # dataType: [{"id":xxx, "name":xxx}, {...}, ...] or []
         result = neo.run(cql).data()
-        team_list = []
-        for i in result:
-            team_list.append(i['id'])
-        return team_list
+        return result
     except Exception as e:
         print(e)
         return []
+
 
 if __name__ == '__main__':
     # id_list = [73927, 73928, 73929, 73930, 73931, 73932, 73933]
@@ -151,7 +154,8 @@ if __name__ == '__main__':
     #     avg += get_info(id_list[i])
     # # print(back)
     # print(avg / len(id_list))
-    a = get_teacher_central_network(110778)
+    # a = get_teacher_central_network(86791)
+    a = get_teacher_central_network(82056)
     print(a)
     # [135424, 135412, 136730, 135430, 135520, 135365,110778]
     # a1 = get_info(135424)

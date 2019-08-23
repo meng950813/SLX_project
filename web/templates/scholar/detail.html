@@ -118,7 +118,7 @@
                 <li class="nav-item">
                     <a href="#project-list" class="nav-link active" data-toggle="tab">
                         <i class="glyphicon glyphicon-tasks"></i> 科研项目
-                        ({% if 'funds' in teacher %}{{ teacher['funds'] | length }}{% else %}0{% endif %})
+                        ({% if 'projects' in teacher %}{{ teacher['projects'] | length }}{% else %}0{% endif %})
                     </a>
                 </li>
                 <li class="nav-item">
@@ -136,17 +136,31 @@
             </ul>
             <div class="tab-content">
                 <ul class="tab-pane fade in active show" id="project-list">
-                    {% if "funds" in teacher %}
-                        {% for fund in teacher["funds"] %}
+                    {% if "projects" in teacher %}
+                        {% for project in teacher["projects"] %}
                             <li>
                                 <div class="d-inline">
-                                    <i class="glyphicon glyphicon-tasks"></i> {{ fund["title"] }}</div>
+                                    <i class="glyphicon glyphicon-tasks"></i> {{ project["project_name"] }}</div>
                                 <div class="d-inline">
-                                    <span>{{ fund["belong"] }}</span>
-                                    <span>资金:{{ fund["money"] }}万元</span>
-                                    <span>起始年份:{{ fund["year"] }}年</span>
-                                    <span>项目周期:4年</span>
-                                    <span>负责人:{{ fund["name"] }}</span>
+                                    <span>
+                                        {% if project["type"] == 1 %}
+                                            自然科学基金
+                                        {% elif project["type"] == 2 %}
+                                            国家重点研发计划
+                                        {% endif %}
+                                    </span>
+                                    <span>{{ project["belong"] }}</span>
+                                    <span>{{ project["content"] }}</span>
+                                    <span>{{ project["money"] }}万元</span>
+                                    <span>{{ project["start_time"] }}年</span>
+                                    <span>
+                                        {% if project["cycle"]%}
+                                            项目周期:{{ project["cycle"] }}年
+                                        {% elif project["end_time"] %}
+                                            - {{ project["end_time"] }}年
+                                        {% endif %}
+                                    </span>
+                                    <span>负责人:{{ project["name"] }}</span>
                                 </div>
                             </li>
                             {% endfor %}
@@ -176,7 +190,7 @@
                                     <i class="glyphicon glyphicon-book"></i> 《{{ paper["name"] }}》
                                 </div>
                                 <div class="d-inline">
-                                    <span>{{ paper["year"] }} </span>
+                                    <span>{{ paper["year"] }}年 </span>
                                     <span>发表自《{{ paper["org"] }}》</span>
                                     <span>引用次数：{{ paper["cited_num"] }}</span>
                                     <span>作者:  {{ paper["author"] }}</span>

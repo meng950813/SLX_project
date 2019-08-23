@@ -74,9 +74,11 @@
                         <br>
                         <small>团队成员:&nbsp;&nbsp;&nbsp;
                             <span class="text-primary">
-                                {% for i in teacher.team %}<a href="{{ url_for('.scholar_info', teacher_id=i[0]) }}">
-                                    {{ i[1] }}
-                                </a>&nbsp;&nbsp;&nbsp;{% endfor %}
+                                {% for item in teacher.team %}
+                                    <a href="{{ url_for('.scholar_info', teacher_id=item["id"]) }}">
+                                    {{ item['name'] }}
+                                    </a>&nbsp;&nbsp;&nbsp;
+                                {% endfor %}
                             </span>
                         </small>
                     </div>
