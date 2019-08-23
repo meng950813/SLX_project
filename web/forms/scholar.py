@@ -29,7 +29,7 @@ class ScholarForm(FlaskForm):
     title = SelectField('职称：', choices=[('', '未知'), ('教授', '教授'), ('副教授', '副教授'),
                                         ('讲师', '讲师'), ('助教', '助教')], default='', coerce=str)
     honor_title = SelectMultipleField('荣誉头衔：', choices=[
-        ('中国科学院院士', '中国科学院院士院士'), ('中国工程院院士', '中国工程院院士院士'), ('长江学者', '长江学者'),
+        ('中国科学院院士', '中国科学院院士'), ('中国工程院院士', '中国工程院院士'), ('长江学者', '长江学者'),
         ('杰出青年', '杰出青年'), ('优秀青年', '优秀青年')], default='', coerce=str)
     phone_number = StringField('手机号：')
     office_number = StringField('办公电话：')

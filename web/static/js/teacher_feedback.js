@@ -63,8 +63,8 @@ function submitData() {
     let $domains = $('.domain');
     let content = [];
     for (let i = 0; i < $domains.length; i++){
-        let text = $domains[i].innerHTML;
-        content .push(text);
+        let text = $domains[i].innerText.trim();
+        content.push(text);
     }
     $('#domain').val(content.join(';'));
     //格式化教育经历文本: 去除前后空格，换行符转为 <br>

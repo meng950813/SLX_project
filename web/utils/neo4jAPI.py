@@ -109,7 +109,7 @@ def get_school_relation_with_agent(agent_id, school):
         cql = "Match(agent:Agent{id:%d})-[r:knows]->(teacher:Teacher{school:'%s'}) " \
               "return r.visited as visited, r.activity as activity, teacher.id as t_id, " \
               "teacher.name as name, teacher.institution as institution" % (agent_id, school)
-        
+
         neo = NeoOperator(**NEO4J_CONFIG).get_connection()
         return neo.run(cql).data()
     except Exception as e:
@@ -128,7 +128,7 @@ def create_agent_node(agent_id, name, agent_type, charge=None):
     """
     if agent_id and name and agent_type and charge:
         return NeoOperator(**NEO4J_CONFIG).create_node("Agent", id=agent_id, name=name, type=agent_type, charge=charge)
-    
+
     return {"success": False, "message": "缺少必要参数"}
 
 
@@ -140,8 +140,8 @@ def modify_agent_node(id=None, **data):
     :return: dict {success: True / False, message: xxx}
     """
     # 允许修改的属性
-    allowed_key = {"name", "charge"}
-    
+    allowed_key = {"name", "charge", "type"}
+
     return NeoOperator(**NEO4J_CONFIG).modify_node("Teacher", id=id, allowed_keys=allowed_key, **data)
 
 
@@ -159,8 +159,8 @@ def create_teacher_node(teacher_id=None, name=None, school=None, institution=Non
 
     if not (teacher_id and name and school and institution):
         return {"success": False, "message": "必要数据不能为空"}
-    return NeoOperator(**NEO4J_CONFIG).create_node("Teacher", id=teacher_id, name=name, school=school, 
-                        institution=institution, dept=dept,code=code)
+    return NeoOperator(**NEO4J_CONFIG).create_node("Teacher", id=teacher_id, name=name, school=school,
+                                                   institution=institution, dept=dept, code=code)
 
 
 def modify_teacher_node(id=None, **data):
@@ -172,7 +172,7 @@ def modify_teacher_node(id=None, **data):
     """
     # 允许修改的属性
     allowed_key = {"school", "institution", "dept", "code", "name"}
-    
+
     return NeoOperator(**NEO4J_CONFIG).modify_node("Teacher", id=id, allowed_keys=allowed_key, **data)
 
 
@@ -186,7 +186,6 @@ def create_company_node(company_id=None, name=None, location=None):
     :return: {success: True/False, message: xxx}
     """
     if company_id and name and location:
-        
         return NeoOperator(**NEO4J_CONFIG).create_node("Company", id=company_id, name=name, location=location)
     return {"success": False, "message": "缺少必要参数"}
 
@@ -203,23 +202,16 @@ def modify_company_node(company_id=None, **data):
     return NeoOperator(**NEO4J_CONFIG).modify_node("Company", id=company_id, allowed_keys=allowed_key, **data)
 
 
-def upsert_relation_of_agent2agent(source_id, target_id, is_visit=True):
+def upsert_relation_of_agent2agent(source_id, target_id):
     """
-    TODO 商务间的关系类型
+    商务间的关系类型: 协作 -> cooperation
     创建/更新 商务与 其他商务 间的关系
     :param source_id: int 商务id
     :param target_id: int 商务id
-    :param is_visit: bool 关系类型，True ==> 拜访（默认）， False ==> 参与活动
     :return: dict {success: True / False, message: xxx}
     """
-    if is_visit:
-        visited = 1
-        activity = 0
-    else:
-        visited = 0
-        activity = 1
-    # TODO
-    # return upsert_relation("Agent", source_id, "Agent", target_id, "knows", visited=visited, activity=activity)
+
+    return NeoOperator(**NEO4J_CONFIG).upsert_relation("Agent", source_id, "Agent", target_id, "knows", cooperation=1)
 
 
 def upsert_relation_of_agent2teacher(agent_id, teacher_id, is_visit=True):
@@ -230,14 +222,72 @@ def upsert_relation_of_agent2teacher(agent_id, teacher_id, is_visit=True):
     :param is_visit: bool 关系类型，True ==> 拜访（默认）， False ==> 参与活动
     :return: dict {success: True / False, message: xxx}
     """
-    if is_visit == 1:
+    visited, activity = 0, 0
+
+    if is_visit:
         visited = 1
-        activity = 0
     else:
-        visited = 0
         activity = 1
-    return NeoOperator(**NEO4J_CONFIG).upsert_relation("Agent", agent_id, "Teacher", teacher_id, "knows", 
-                    visited=visited, activity=activity)
+    return NeoOperator(**NEO4J_CONFIG).upsert_relation("Agent", agent_id, "Teacher", teacher_id, "knows",
+                                                       visited=visited, activity=activity)
+
+
+def upsert_relation_of_agent2company(agent_id, company_id, rel_type=1):
+    """
+    创建/更新 商务与企业间的关系
+    :param agent_id: int 商务id
+    :param teacher_id: int 企业id
+    :param rel_type: int 关系类型, 1 ==> 拜访(默认), 2 ==> 陪同教师拜访, 3==> 参与活动
+    :return: dict {success: True / False, message: xxx}
+    """
+    visited, accompany, activity = 0, 0, 0
+    # 拜访
+    if rel_type == 1:
+        visited = 1
+    # 陪同拜访
+    elif rel_type == 2:
+        accompany = 1
+    # 组织参与活动
+    else:
+        activity = 1
+
+    return NeoOperator(**NEO4J_CONFIG).upsert_relation("Agent", agent_id, "Company", company_id, "knows",
+                                                       visited=visited, accompany=accompany, activity=activity)
+
+
+def upsert_relation_of_teacher2teacher(source_id, target_id, paper=0, patent=0, project=0, award=0):
+    """
+    创建/修改 老师与老师的关系，其关系名为: 学术合作
+    :param source_id: int 教师id
+    :param target_id: int 另一个教师id
+    :param paper: int 论文合作次数
+    :param patent: int 专利合作次数
+    :param project: int 项目合作次数
+    :param award: int 合作获奖次数
+    :return: {"success": True / False}
+    """
+
+    return NeoOperator(**NEO4J_CONFIG).upsert_relation(label_s="Teacher", source_id=source_id, label_t="Teacher",
+                                                       target_id=target_id, rel_type="学术合作", paper=paper, patent=patent,
+                                                       project=project, award=award)
+
+
+def cover_relation_of_teacher2teacher(source_id, target_id, **data):
+    """
+    ！！慎用！！
+    覆盖 老师与老师的关系属性，其关系名为: 学术合作
+    :param source_id: int 教师id
+    :param target_id: int 另一个教师id
+    :param data: dict 需要覆盖的属性及其值
+    :return: {"success": True / False}
+    """
+    allowed_key = ("paper", "patent", "project", "award")
+    for key in data.keys():
+        if key not in allowed_key:
+            return {"success": True, "message": "无效的key :%s" % key}
+
+    return NeoOperator(**NEO4J_CONFIG).upsert_relation(label_s="Teacher", source_id=source_id, label_t="Teacher",
+                                                       target_id=target_id, rel_type="学术合作", cover=True, **data)
 
 
 def upsert_relation_of_teacher2company(teacher_id, company_id, is_visit=True):
@@ -256,8 +306,9 @@ def upsert_relation_of_teacher2company(teacher_id, company_id, is_visit=True):
         cooperation = 1
         visited = 0
 
-    return NeoOperator(**NEO4J_CONFIG).upsert_relation(label_s="Teacher", source_id=teacher_id, label_t="Company", 
-                        target_id=company_id, rel_type="knows", cooperation=cooperation, visited=visited)
+    return NeoOperator(**NEO4J_CONFIG).upsert_relation(label_s="Teacher", source_id=teacher_id, label_t="Company",
+                                                       target_id=company_id, rel_type="knows", cooperation=cooperation,
+                                                       visited=visited)
 
 
 if __name__ == '__main__':

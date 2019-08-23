@@ -9,13 +9,13 @@
     <li class="breadcrumb-item active" aria-current="page">{{ school }}</li>
 {% endblock %}
 
+
+{% block editInstitution %}
+    <a href="/school/edit_institution?cur_school={{ school }}" target="_blank" class="edit-institution float-right btn btn-primary">编辑学院</a>
+{% endblock %}
 {% block detail %}
 
     <div class="float-right mt-5 mr-5">
-    <form method="get" action="edit_institution">
-        <input hidden id="cur_school" name="cur_school" value="{{ school }}">
-        <button class="btn btn-primary">编辑学院</button>
-    </form>
         <p>
             <a class="btn btn-link" data-toggle="collapse" href="#object" role="button" aria-expanded="false" onclick="$('#subject').collapse('hide')">客观信息</a>
             <a class="btn btn-link" data-toggle="collapse" href="#subject" aria-expanded="false" onclick="$('#object').collapse('hide')">拜访次数
@@ -45,7 +45,7 @@
 {% block scripts %}
     {{ super() }}
     <script src="https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts.min.js"></script>
-    <script src="{{ url_for("static",filename="js/school/school.js") }}"></script>
+    <script src="{{ url_for('static',filename='js/school/school.js') }}"></script>
     <script type="text/javascript">
         $('#object').collapse('toggle');
     </script>

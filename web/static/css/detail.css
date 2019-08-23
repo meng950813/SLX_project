@@ -57,18 +57,17 @@ ul{
     display: inline-block;
     padding: 0 10px;
     margin: 5px 0;
-    border-left: 1px solid gray;
+    border-right: 1px solid gray;
 	cursor: pointer;
 }
-.scholar-tags span:first-child{
-    border-left: none;
-    padding-left: 0;
+.scholar-tags>span:last-child{
+    border-right: none;
+    padding-right: 0;
 }
 
 
 #edu-exp p{
 	line-height: 27px;
-	text-indent: 2em;
 }
 
 #achieve-info a{

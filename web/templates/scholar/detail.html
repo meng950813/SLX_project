@@ -21,12 +21,12 @@
                 </div>
                 <div class="col-sm-9 col-md-10">
                     <div class="scholar-name"> <strong> <a href="#" > {{ teacher["name"] }} </a>  </strong> </div>
-                    <div class="scholar-depart">{{ teacher["school"] }} - {{ teacher["institution"] }}</div>
+                    <div class="scholar-depart">{{ teacher["school"] }} - {{ teacher["institution"] }}-{{ teacher["department"] }}</div>
                     <div class="scholar-depart half">邮箱： {{ teacher["email"] }}</div>
                     <div class="scholar-depart half">手机： {{ teacher["phone_number"] }}</div>
                     <div class="scholar-depart half">办公室电话： {{ teacher["office_number"] }}</div>
                     <div class="scholar-tags">
-
+                        <strong>标签：</strong>
                         {% if 'age' in teacher %}
                             <span>{{ teacher['age'] }}岁</span>
                         {% endif %}
@@ -48,14 +48,14 @@
                             <span>{{ teacher["other_title"] }}</span>
                         {% endif %}
                     </div>
-                    {% if teacher["domain"] %}
-                        <div class="scholar-tags">
-                            <strong>研究领域：</strong>
-                            {% for item in teacher['domain'] %}
-                                <span>{{ item }}</span>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
+
+                    <div class="scholar-tags">
+                        <strong>研究领域：</strong>
+                        {% for item in teacher['domain'] %}
+                            <span>{{ item }}</span>
+                        {% endfor %}
+                    </div>
+
                 </div>
             </div>
         </fieldset>
@@ -63,14 +63,14 @@
         <fieldset id="edu-exp" class="row card-mine">
             <legend>教育经历</legend>
             {% if teacher["edu_exp"] %}
-                <p>{{ teacher["edu_exp"] }}</p>
+                <p>{{ teacher["edu_exp"] | safe }}</p>
             {% endif %}
         </fieldset>
 
         <fieldset id="work-exp" class="row card-mine">
             <legend>工作经历</legend>
             {% if teacher["work_exp"] %}
-                <p>{{ teacher["work_exp"] }}</p>
+                <p>{{ teacher["work_exp"] | safe }}</p>
             {% endif %}
         </fieldset>
 
@@ -118,7 +118,7 @@
                 <li class="nav-item">
                     <a href="#project-list" class="nav-link active" data-toggle="tab">
                         <i class="glyphicon glyphicon-tasks"></i> 科研项目
-                        ({% if 'funds' in teacher %}{{ teacher['funds'] | length }}{% else %}0{% endif %})
+                        ({% if 'projects' in teacher %}{{ teacher['projects'] | length }}{% else %}0{% endif %})
                     </a>
                 </li>
                 <li class="nav-item">
@@ -136,17 +136,31 @@
             </ul>
             <div class="tab-content">
                 <ul class="tab-pane fade in active show" id="project-list">
-                    {% if "funds" in teacher %}
-                        {% for fund in teacher["funds"] %}
+                    {% if "projects" in teacher %}
+                        {% for project in teacher["projects"] %}
                             <li>
                                 <div class="d-inline">
-                                    <i class="glyphicon glyphicon-tasks"></i> {{ fund["title"] }}</div>
+                                    <i class="glyphicon glyphicon-tasks"></i> {{ project["project_name"] }}</div>
                                 <div class="d-inline">
-                                    <span>{{ fund["belong"] }}</span>
-                                    <span>资金:{{ fund["money"] }}万元</span>
-                                    <span>起始年份:{{ fund["year"] }}年</span>
-                                    <span>项目周期:4年</span>
-                                    <span>负责人:{{ fund["name"] }}</span>
+                                    <span>
+                                        {% if project["type"] == 1 %}
+                                            自然科学基金
+                                        {% elif project["type"] == 2 %}
+                                            国家重点研发计划
+                                        {% endif %}
+                                    </span>
+                                    <span>{{ project["belong"] }}</span>
+                                    <span>{{ project["content"] }}</span>
+                                    <span>{{ project["money"] }}万元</span>
+                                    <span>{{ project["start_time"] }}年</span>
+                                    <span>
+                                        {% if project["cycle"]%}
+                                            项目周期:{{ project["cycle"] }}年
+                                        {% elif project["end_time"] %}
+                                            - {{ project["end_time"] }}年
+                                        {% endif %}
+                                    </span>
+                                    <span>负责人:{{ project["name"] }}</span>
                                 </div>
                             </li>
                             {% endfor %}
@@ -176,7 +190,7 @@
                                     <i class="glyphicon glyphicon-book"></i> 《{{ paper["name"] }}》
                                 </div>
                                 <div class="d-inline">
-                                    <span>{{ paper["year"] }} </span>
+                                    <span>{{ paper["year"] }}年 </span>
                                     <span>发表自《{{ paper["org"] }}》</span>
                                     <span>引用次数：{{ paper["cited_num"] }}</span>
                                     <span>作者:  {{ paper["author"] }}</span>

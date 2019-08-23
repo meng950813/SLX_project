@@ -10,17 +10,28 @@
         left: 0;
         z-index: -1;
     }
+    .breadcrumb-nav{
+        position: relative;
+    }
+    
+    .edit-institution{
+        position: absolute;
+        top: 5px;
+        right: 0.5rem;
+    }
 </style>
 {% endblock %}
 
 
 {% block main %}
 <div id="container"></div>
-<nav aria-label="breadcrumb">
+<nav aria-label="breadcrumb" class="breadcrumb-nav">
     <ol class="breadcrumb">
         {% block breadcrum %}
         {% endblock %}
     </ol>
+    {% block editInstitution %}
+    {% endblock %}
 </nav>
     {% block detail %}
     {% endblock %}
