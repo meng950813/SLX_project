@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request
+import datetime
 import json
 from flask_login import current_user
 
@@ -28,8 +29,23 @@ def schedule():
     # 找到对应的user ,根据提醒日期对日程进行降序排序
     schedule_list = schedule_col.find({"user_id": user_id, "status": 1}).sort([("remind_date", 1)])
 
-    # print(schedule_list)
+    schedule_list = list(schedule_list)
+    now = datetime.datetime.now()
 
+    for item in schedule_list:
+        remind_date = datetime.datetime.strptime(item["remind_date"], "%Y-%m-%d")
+
+        # 计算该日程距离今天还有几天，计算结果向下取整
+        # 由于 now 有 时分秒存在,计算结果会比正常理解小1， 例如提醒日期就是今天，结果为 -1
+        diff = remind_date - now
+
+        # 距离设定的提醒日期多余1天
+        if diff.days < -1:
+            item["bg"] = "bg-danger"
+        elif diff.days == -1:
+            item['bg'] = "bg-warning"
+        else:
+            item['bg'] = ""
     return render_template("schedule.html", schedule_list=schedule_list)
 
 
@@ -71,7 +87,7 @@ def operate_schedule():
     schedule_id = request.form.get('id')
     status = request.form.get('type', type=int)
 
-    back = set_whether_completed_or_canceled(schedule_id, status)
+    back = set_completed_or_canceled(schedule_id, status)
 
     if back:
         return json.dumps({"success": True, "message": "操作成功"})
@@ -105,7 +121,7 @@ def insert_or_edit_schedule(s_data, schedule_id):
         return 0
 
 
-def set_whether_completed_or_canceled(schedule_id, status):
+def set_completed_or_canceled(schedule_id, status):
     """
     设置该用户下的该计划是否完成或取消
     :param schedule_id:
@@ -129,9 +145,9 @@ def set_whether_completed_or_canceled(schedule_id, status):
 
 
 if __name__ == "__main__":
-    # print(set_whether_completed_or_canceled(100006, 0, 1))
-    # print(set_whether_completed_or_canceled(100001, 1, 1))
-    # print(set_whether_completed_or_canceled(100006, 1, -1))
+    # print(set_completed_or_canceled(100006, 0, 1))
+    # print(set_completed_or_canceled(100001, 1, 1))
+    # print(set_completed_or_canceled(100006, 1, -1))
     data = {
         "create_date": "2019-06-08",
         "content": "测试插入函数的数据",
