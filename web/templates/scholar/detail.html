@@ -21,10 +21,24 @@
                 </div>
                 <div class="col-sm-9 col-md-10">
                     <div class="scholar-name"> <strong> <a href="#" > {{ teacher["name"] }} </a>  </strong> </div>
-                    <div class="scholar-depart">{{ teacher["school"] }} - {{ teacher["institution"] }}-{{ teacher["department"] }}</div>
-                    <div class="scholar-depart half">邮箱： {{ teacher["email"] }}</div>
-                    <div class="scholar-depart half">手机： {{ teacher["phone_number"] }}</div>
-                    <div class="scholar-depart half">办公室电话： {{ teacher["office_number"] }}</div>
+                    <div class="scholar-depart">
+                        {{ teacher["school"] }} - {{ teacher["institution"] }}
+                        {% if teacher["department"] %}
+                            -{{ teacher["department"] }}
+                        {% endif %}
+                    </div>
+                    {% if teacher["email"] %}
+                        <div class="scholar-depart half">邮箱： {{ teacher["email"] }}</div>
+                    {% endif %}
+                    
+                    {% if teacher["phone_number"] %}
+                        <div class="scholar-depart half">手机： {{ teacher["phone_number"] }}</div>
+                    {% endif %}
+
+                    {% if teacher["office_number"] %}
+                        <div class="scholar-depart half">办公室电话： {{ teacher["office_number"] }}</div>
+                    {% endif %}
+
                     <div class="scholar-tags">
                         <strong>标签：</strong>
                         {% if 'age' in teacher %}
@@ -45,34 +59,36 @@
                         {% endif %}
 
                         {% if teacher["other_title"] | length > 1 %}
-                            <span>{{ teacher["other_title"] }}</span>
+                        <span>{{ teacher["other_title"] }}</span>
                         {% endif %}
                     </div>
-
-                    <div class="scholar-tags">
-                        <strong>研究领域：</strong>
-                        {% for item in teacher['domain'] %}
-                            <span>{{ item }}</span>
-                        {% endfor %}
-                    </div>
+                    
+                    {% if teacher["domain"] | length > 1 %}
+                        <div class="scholar-tags">
+                            <strong>研究领域：</strong>
+                            {% for item in teacher['domain'] %}
+                                <span>{{ item }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
 
                 </div>
             </div>
         </fieldset>
 
-        <fieldset id="edu-exp" class="row card-mine">
-            <legend>教育经历</legend>
-            {% if teacher["edu_exp"] %}
+        {% if teacher["edu_exp"] %}
+            <fieldset id="edu-exp" class="row card-mine">
+                <legend>教育经历</legend>
                 <p>{{ teacher["edu_exp"] | safe }}</p>
-            {% endif %}
-        </fieldset>
+            </fieldset>
+        {% endif %}
 
-        <fieldset id="work-exp" class="row card-mine">
-            <legend>工作经历</legend>
-            {% if teacher["work_exp"] %}
+        {% if teacher["work_exp"] %}
+            <fieldset id="work-exp" class="row card-mine">
+                <legend>工作经历</legend>
                 <p>{{ teacher["work_exp"] | safe }}</p>
-            {% endif %}
-        </fieldset>
+            </fieldset>
+        {% endif %}
 
         {% if teacher["awards"] %}
             <fieldset id="award-info" class="row card-mine">
@@ -115,8 +131,14 @@
         <fieldset id="achieve-info" class="row card-mine">
             <legend>学术成果</legend>
             <ul class="nav nav-pills nav-fill">
+                <li class="nav-item" >
+                    <a href="#paper-list" class="nav-link active" data-toggle="tab">
+                        <i class="glyphicon glyphicon-book"></i> 论文成果
+                        ({% if 'papers' in teacher %}{{ teacher['papers'] | length }}{% else %}0{% endif %})
+                    </a>
+                </li>
                 <li class="nav-item">
-                    <a href="#project-list" class="nav-link active" data-toggle="tab">
+                    <a href="#project-list" class="nav-link" data-toggle="tab">
                         <i class="glyphicon glyphicon-tasks"></i> 科研项目
                         ({% if 'projects' in teacher %}{{ teacher['projects'] | length }}{% else %}0{% endif %})
                     </a>
@@ -127,15 +149,26 @@
                         ({% if 'patents' in teacher %}{{ teacher['patents'] | length }}{% else %}0{% endif %})
                     </a>
                 </li>
-                <li class="nav-item" >
-                    <a href="#paper-list" class="nav-link" data-toggle="tab">
-                        <i class="glyphicon glyphicon-book"></i> 论文成果
-                        ({% if 'papers' in teacher %}{{ teacher['papers'] | length }}{% else %}0{% endif %})
-                    </a>
-                </li>
             </ul>
             <div class="tab-content">
-                <ul class="tab-pane fade in active show" id="project-list">
+                <ul class="tab-pane fade in active show" id="paper-list">
+                     {% if "papers" in teacher %}
+                        {% for paper in teacher["papers"] %}
+                            <li>
+                                <div class="d-inline">
+                                    <i class="glyphicon glyphicon-book"></i> 《{{ paper["name"] }}》
+                                </div>
+                                <div class="d-inline">
+                                    <span>{{ paper["year"] }}年 </span>
+                                    <span>发表自《{{ paper["org"] }}》</span>
+                                    <span>引用次数：{{ paper["cited_num"] }}</span>
+                                    <span>作者:  {{ paper["author"] }}</span>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+                <ul class="tab-pane fade in" id="project-list">
                     {% if "projects" in teacher %}
                         {% for project in teacher["projects"] %}
                             <li>
@@ -182,23 +215,7 @@
                         {% endfor %}
                     {% endif %}
                 </ul>
-                <ul class="tab-pane fade in" id="paper-list">
-                     {% if "papers" in teacher %}
-                        {% for paper in teacher["papers"] %}
-                            <li>
-                                <div class="d-inline">
-                                    <i class="glyphicon glyphicon-book"></i> 《{{ paper["name"] }}》
-                                </div>
-                                <div class="d-inline">
-                                    <span>{{ paper["year"] }}年 </span>
-                                    <span>发表自《{{ paper["org"] }}》</span>
-                                    <span>引用次数：{{ paper["cited_num"] }}</span>
-                                    <span>作者:  {{ paper["author"] }}</span>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    {% endif %}
-                </ul>
+
             </div>
         </fieldset>
 
