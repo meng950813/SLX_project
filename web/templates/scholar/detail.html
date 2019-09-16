@@ -209,7 +209,7 @@
                                 <div class="d-inline">
                                     <span>申报单位: {{ patent["proposer"] }}</span>
                                     <span>{{ patent["date"]}}</span>
-                                    <span>作者: {{ patent["author_list"] }}</span><br>
+                                    <span>发明人: {{ patent["author_list"] }}</span><br>
                                 </div>
                             </li>
                         {% endfor %}
@@ -219,6 +219,88 @@
             </div>
         </fieldset>
 
+
+        <fieldset id="achieve-info" class="row card-mine">
+            <legend>团队科研成果</legend>
+            <ul class="nav nav-pills nav-fill">
+                <li class="nav-item">
+                    <a href="#team_project-list" class="nav-link active" data-toggle="tab">
+                        <i class="glyphicon glyphicon-tasks"></i> 科研项目
+                        ({% if 'projects' in team_info %}{{ team_info['projects'] | length }}{% else %}0{% endif %})
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#team_patent-list" class="nav-link" data-toggle="tab">
+                        <i class="glyphicon glyphicon-hdd"></i> 发明专利
+                        ({% if 'patents' in team_info %}{{ team_info['patents'] | length }}{% else %}0{% endif %})
+                    </a>
+                </li>
+                <li class="nav-item" >
+                    <a href="#team_paper-list" class="nav-link" data-toggle="tab">
+                        <i class="glyphicon glyphicon-book"></i> 论文成果
+                        ({% if 'papers' in team_info %}{{ team_info['papers'] | length }}{% else %}0{% endif %})
+                    </a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <ul class="tab-pane fade in active show" id="team_project-list">
+                    {% if "projects" in team_info %}
+                        {% for project in team_info["projects"] %}
+                            <li>
+                                <div class="d-inline">
+                                    <i class="glyphicon glyphicon-tasks"></i> {{ project["project_name"] }}</div>
+                                <div class="d-inline">
+                                    <span>
+                                        {% if project["type"] == 1 %}
+                                            自然科学基金
+                                        {% elif project["type"] == 2 %}
+                                            国家重点研发计划
+                                        {% endif %}
+                                    </span>
+                                    <span>{{ project["belong"] }}</span>
+                                    <span>资金:{{ project["money"] }}万元</span>
+                                    <span>起始年份:{{ project["start_time"] }}年</span>
+                                    <span>负责人:{{ project["name"] }}</span>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        {% endif %}
+                </ul>
+                <ul class="tab-pane fade in" id="team_patent-list">
+                    {% if "patents" in team_info %}
+                        {% for patent in team_info["patents"] %}
+                            <li>
+                                <div class="d-inline">
+                                    <i class="glyphicon glyphicon-hdd"></i> {{ patent["title"] }}&nbsp;
+                                </div>
+                                <div class="d-inline">
+                                    <span>申报单位: {{ patent["proposer"] }}</span>
+                                    <span>{{ patent["date"]}}</span>
+                                    <span>发明人: {{ patent["author_list"] }}</span><br>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+                <ul class="tab-pane fade in" id="team_paper-list">
+                     {% if "papers" in team_info %}
+                        {% for paper in team_info["papers"] %}
+                            <li>
+                                <div class="d-inline">
+                                    <i class="glyphicon glyphicon-book"></i> 《{{ paper["name"] }}》
+                                </div>
+                                <div class="d-inline">
+                                    <span>{{ paper["year"] }}年 </span>
+                                    <span>发表自{{ paper["org"] }}</span>
+                                    <span>引用次数：{{ paper["cited_num"] }}</span>
+                                    <span>作者:  {{ paper["author"] }}</span>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+        </fieldset>
     </div>
 
     <!-- 模态框 -->

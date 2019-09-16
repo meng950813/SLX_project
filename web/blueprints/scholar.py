@@ -24,10 +24,14 @@ def scholar_info(teacher_id):
     """
     # 返回json 序列化后的数据
     teacher = basic_info_service.get_info(teacher_id)
+    team_list = basic_info_service.get_teacher_central_network(teacher_id)
+    team_id_list = []
+    for i in team_list:
+        team_id_list.append(i['id'])
+    team_info = basic_info_service.get_team_info(team_id_list)
     # 当老师id不存在时，直接报404
     if teacher is None:
         return abort(404)
-
     # 获取拜访记录
     visit_list = None
     try:
@@ -41,8 +45,7 @@ def scholar_info(teacher_id):
         visit_list = list(visit_info)
     except Exception as e:
         print('get_visit_info error:%s' % e)
-
-    return render_template('scholar/detail.html', teacher=teacher, visit_list=visit_list)
+    return render_template('scholar/detail.html', teacher=teacher, visit_list=visit_list,team_info=team_info)
 
 
 @scholar_bp.route('/feedback', methods=['GET'], defaults={'teacher_id': None})

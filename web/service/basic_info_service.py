@@ -3,6 +3,9 @@
 by zhang
 """
 import datetime
+import operator
+from functools import reduce
+
 from web.config import MongoDB_CONFIG
 from web.utils.mongo_operator import MongoOperator
 from web.utils.neo4j_operator import NeoOperator
@@ -23,7 +26,7 @@ def get_info(teacher_id):
         if basic_info is None:
             return basic_info
 
-        # 荣誉头衔排序，按时间，倒叙
+        # 荣誉头衔排序，按时间，倒序
         if 'honor_title' in basic_info and len(basic_info['honor_title']) > 0:
             basic_info['honor_title'].sort(key=lambda k: (k.get('year', 0)), reverse=True)
 
@@ -57,12 +60,52 @@ def get_info(teacher_id):
 
     return basic_info
 
+def get_team_info(teacher_id_list):
+    """
+    根据教师团队的id收集
+    :param teacher_id_list:教师团队中所有老师的ID
+    :return:team_info:教师团队的项目、专利和论文数据
+    """
+    team_info = {}
+    team_info["patents"] = []
+    team_info["projects"] = []
+    team_info["papers"] = []
+    for i in teacher_id_list:
+        try:
+            mongo = MongoOperator(**MongoDB_CONFIG)
+            # 获取老师基本信息
+            basic_info = mongo.get_collection('basic_info').find_one({'id': i}, {'_id': 0})
+
+            # 获取项目集合
+            if 'project_id' in basic_info and len(basic_info["project_id"]) > 0:
+                team_info["projects"].extend(getProjectsInfo(mongo, basic_info["project_id"]))
+
+            # 获取专利集合
+            if 'patent_id' in basic_info and len(basic_info["patent_id"]) > 0:
+                team_info["patents"].extend(getPatentInfo(mongo, basic_info["patent_id"]))
+
+            # 获取论文数据集合
+            if 'paper_id' in basic_info and len(basic_info["paper_id"]) > 0:
+                team_info["papers"].extend(getPaperInfo(mongo, basic_info["paper_id"]))
+        except:
+            pass
+    #排除重复项
+    run_function = lambda x, y: x if y in x else x + [y]
+    team_info['papers'] = reduce(run_function, [[], ] + team_info['papers'])
+    team_info['patents'] = reduce(run_function, [[], ] + team_info['patents'])
+    team_info['projects'] = reduce(run_function, [[], ] + team_info['projects'])
+    # #按时间排序
+    team_info['papers'] = sorted(team_info['papers'], key=lambda x: x['year'], reverse=True)[0:30]  # True 是倒叙  默认是False
+    team_info['patents'] = sorted(team_info['patents'], key=lambda x: x['date'], reverse=True)[0:30]
+    team_info['projects'] = sorted(team_info['projects'], key=lambda x: x['start_time'], reverse=True)[0:30]
+
+    return team_info
 
 def getPatentInfo(mongo_link, objectId_list):
     """
     利用专利 objectId list获取 专利数据
     :param mongo_link: mongoDB 的连接
-    :param objectId_list: list, not null
+    :param objectId_list: 教师专利id列表
     :return: list
     """
     collection = mongo_link.get_collection("patent")
@@ -76,7 +119,7 @@ def getPaperInfo(mongo_link, objectId_list):
     """
     利用专利 objectId list获取 论文数据
     :param mongo_link: mongoDB 的连接
-    :param objectId_list: list, not null
+    :param objectId_list: 教师论文id列表
     :return: list
     """
     collection = mongo_link.get_collection("paper")
@@ -98,7 +141,7 @@ def getAwardInfo(mongo_link, objectId_list):
     """
     利用专利 objectId list获取 获奖数据
     :param mongo_link: mongoDB 的连接
-    :param objectId_list: list, not null
+    :param objectId_list: 教师获奖id列表
     :return: list
     """
     collection = mongo_link.get_collection("awards")
@@ -146,17 +189,8 @@ def get_teacher_central_network(teacher_id, school=None):
         print(e)
         return []
 
-
 if __name__ == '__main__':
-    # id_list = [73927, 73928, 73929, 73930, 73931, 73932, 73933]
-    # avg = 0
-    # for i in range(len(id_list)):
-    #     avg += get_info(id_list[i])
-    # # print(back)
-    # print(avg / len(id_list))
-    # a = get_teacher_central_network(86791)
-    a = get_teacher_central_network(82056)
-    print(a)
-    # [135424, 135412, 136730, 135430, 135520, 135365,110778]
-    # a1 = get_info(135424)
-    # print(a1['name'])
+    id_list = [74587]
+    tf = get_team_info(id_list)
+    for i in tf['projects']:
+        print(i)
