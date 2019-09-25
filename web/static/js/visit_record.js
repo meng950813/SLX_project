@@ -110,6 +110,9 @@ if ($('#school').val()){
  */
 $('#select-college').on("change", loadInstitution)
 
+/**
+ * 点击学院后，后台给该学院点击量 +1
+ */
 $('#select-institution').on("change", function () {
     cur_school = $('#select-college').children("option:selected").text();
     cur_institution = $(this).children("option:selected").text();
@@ -121,6 +124,8 @@ $('#select-institution').on("change", function () {
         success: function (response) {}
     });
 })
+
+
 /**
  * 加载当前学校的所有学院数据
  */
