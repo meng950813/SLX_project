@@ -2,7 +2,7 @@ import json
 import os
 import threading
 
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect, url_for
 
 from flask_login import current_user
 from web.blueprints.auth import login_required
@@ -22,6 +22,12 @@ def index():
     学校商务的个人主页
     :return:
     """
+    charge_schools = current_user.charge_school
+    school = charge_schools[0] if len(charge_schools) > 0 else '东南大学'
+    return redirect(url_for('school.index', school=school))
+
+
+def deprecated_index():
     # 获取当前商务负责的学校 / 学院及其建立的关系
     mongo_operator = MongoOperator(**MongoDB_CONFIG)
     # 获取用户的uid
