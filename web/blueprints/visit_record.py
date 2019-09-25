@@ -22,7 +22,7 @@ def manage_visit_record():
     uid = current_user.id
     # 查询询该用户的日程安排
     generator = mongo_operator.find({'user_id': uid, 'status': 1}, 'visit_record').sort("date", -1)
-    return render_template('visit_record/manager.html', visited_records=list(generator))
+    return render_template('visit_record/index.html', visited_records=list(generator))
 
 
 @visit_record_bp.route('/visit_record/new', methods=['POST'])

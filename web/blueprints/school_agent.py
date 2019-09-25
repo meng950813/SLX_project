@@ -153,11 +153,9 @@ def get_user_info():
     :return:json格式的用户字典
     """
 
-    type = current_user.type
-    user_type = ""
-    if type == "0":
+    if current_user.type == "0":
         user_type = "学校商务"
-    elif type == "1":
+    elif current_user.type == "1":
         user_type = "企业商务"
     else:
         user_type = "其他用户"
